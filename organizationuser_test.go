@@ -24,9 +24,6 @@ func TestOrganizationUserGetWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.Users.Get(
 		context.TODO(),
@@ -35,7 +32,6 @@ func TestOrganizationUserGetWithOptionalParams(t *testing.T) {
 			OrganizationID:   "x",
 			Expand:           []string{"permissions"},
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
@@ -58,19 +54,15 @@ func TestOrganizationUserUpdateWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.Users.Update(
 		context.TODO(),
 		"ab3def8hij2klm9opq5rst7uvw",
 		keycardapi.OrganizationUserUpdateParams{
 			OrganizationID:   "x",
-			Role:             keycardapi.OrganizationRoleOrgAdmin,
-			Status:           keycardapi.OrganizationStatusActive,
+			Role:             keycardapi.OrganizationUserUpdateParamsRoleOrgAdmin,
+			Status:           keycardapi.OrganizationUserUpdateParamsStatusActive,
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
@@ -93,9 +85,6 @@ func TestOrganizationUserListWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.Users.List(
 		context.TODO(),
@@ -105,9 +94,8 @@ func TestOrganizationUserListWithOptionalParams(t *testing.T) {
 			Before:           keycardapi.String("x"),
 			Expand:           []string{"permissions"},
 			Limit:            keycardapi.Int(1),
-			Role:             keycardapi.OrganizationRoleOrgAdmin,
+			Role:             keycardapi.OrganizationUserListParamsRoleOrgAdmin,
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
@@ -130,9 +118,6 @@ func TestOrganizationUserDeleteWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	err := client.Organizations.Users.Delete(
 		context.TODO(),
@@ -140,7 +125,6 @@ func TestOrganizationUserDeleteWithOptionalParams(t *testing.T) {
 		keycardapi.OrganizationUserDeleteParams{
 			OrganizationID:   "x",
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {

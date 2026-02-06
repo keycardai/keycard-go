@@ -18,6 +18,7 @@ import (
 	"github.com/stainless-sdks/keycard-api-go/option"
 	"github.com/stainless-sdks/keycard-api-go/packages/param"
 	"github.com/stainless-sdks/keycard-api-go/packages/respjson"
+	"github.com/stainless-sdks/keycard-api-go/shared/constant"
 )
 
 // ZoneSecretService contains methods and other services that help with interacting
@@ -39,15 +40,11 @@ func NewZoneSecretService(opts ...option.RequestOption) (r ZoneSecretService) {
 	return
 }
 
-func (r *ZoneSecretService) New(ctx context.Context, zoneID string, params ZoneSecretNewParams, opts ...option.RequestOption) (res *Secret, err error) {
+func (r *ZoneSecretService) New(ctx context.Context, zoneID string, params ZoneSecretNewParams, opts ...option.RequestOption) (res *ZoneSecretNewResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	if !param.IsOmitted(params.XRequestID) {
-		opts = append(opts, option.WithHeader("X-Request-ID", fmt.Sprintf("%s", params.XRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithVaultBearerAuthSecurity()}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zone_id parameter")
 		return
@@ -61,11 +58,7 @@ func (r *ZoneSecretService) Get(ctx context.Context, id string, params ZoneSecre
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	if !param.IsOmitted(params.XRequestID) {
-		opts = append(opts, option.WithHeader("X-Request-ID", fmt.Sprintf("%s", params.XRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithVaultBearerAuthSecurity()}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zone_id parameter")
 		return
@@ -79,15 +72,11 @@ func (r *ZoneSecretService) Get(ctx context.Context, id string, params ZoneSecre
 	return
 }
 
-func (r *ZoneSecretService) Update(ctx context.Context, id string, params ZoneSecretUpdateParams, opts ...option.RequestOption) (res *Secret, err error) {
+func (r *ZoneSecretService) Update(ctx context.Context, id string, params ZoneSecretUpdateParams, opts ...option.RequestOption) (res *ZoneSecretUpdateResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	if !param.IsOmitted(params.XRequestID) {
-		opts = append(opts, option.WithHeader("X-Request-ID", fmt.Sprintf("%s", params.XRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithVaultBearerAuthSecurity()}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zone_id parameter")
 		return
@@ -101,15 +90,11 @@ func (r *ZoneSecretService) Update(ctx context.Context, id string, params ZoneSe
 	return
 }
 
-func (r *ZoneSecretService) List(ctx context.Context, zoneID string, params ZoneSecretListParams, opts ...option.RequestOption) (res *[]Secret, err error) {
+func (r *ZoneSecretService) List(ctx context.Context, zoneID string, params ZoneSecretListParams, opts ...option.RequestOption) (res *[]ZoneSecretListResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	if !param.IsOmitted(params.XRequestID) {
-		opts = append(opts, option.WithHeader("X-Request-ID", fmt.Sprintf("%s", params.XRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithVaultBearerAuthSecurity()}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zone_id parameter")
 		return
@@ -123,11 +108,7 @@ func (r *ZoneSecretService) Delete(ctx context.Context, id string, params ZoneSe
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	if !param.IsOmitted(params.XRequestID) {
-		opts = append(opts, option.WithHeader("X-Request-ID", fmt.Sprintf("%s", params.XRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithVaultBearerAuthSecurity()}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zone_id parameter")
@@ -142,7 +123,7 @@ func (r *ZoneSecretService) Delete(ctx context.Context, id string, params ZoneSe
 	return
 }
 
-type Secret struct {
+type ZoneSecretNewResponse struct {
 	// A globally unique opaque identifier
 	ID        string    `json:"id,required"`
 	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
@@ -151,9 +132,9 @@ type Secret struct {
 	// A name for the entity to be displayed in UI
 	Name string `json:"name,required"`
 	// Any of "token", "password".
-	Type      SecretType `json:"type,required"`
-	UpdatedAt time.Time  `json:"updated_at,required" format:"date-time"`
-	Version   int64      `json:"version,required"`
+	Type      ZoneSecretNewResponseType `json:"type,required"`
+	UpdatedAt time.Time                 `json:"updated_at,required" format:"date-time"`
+	Version   int64                     `json:"version,required"`
 	// A globally unique opaque identifier
 	ZoneID string `json:"zone_id,required"`
 	// A description of the entity
@@ -178,120 +159,17 @@ type Secret struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r Secret) RawJSON() string { return r.JSON.raw }
-func (r *Secret) UnmarshalJSON(data []byte) error {
+func (r ZoneSecretNewResponse) RawJSON() string { return r.JSON.raw }
+func (r *ZoneSecretNewResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type SecretType string
+type ZoneSecretNewResponseType string
 
 const (
-	SecretTypeToken    SecretType = "token"
-	SecretTypePassword SecretType = "password"
+	ZoneSecretNewResponseTypeToken    ZoneSecretNewResponseType = "token"
+	ZoneSecretNewResponseTypePassword ZoneSecretNewResponseType = "password"
 )
-
-type SecretPasswordFields struct {
-	Password string `json:"password,required"`
-	// Any of "password".
-	Type     SecretPasswordFieldsType `json:"type,required"`
-	Username string                   `json:"username,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Password    respjson.Field
-		Type        respjson.Field
-		Username    respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r SecretPasswordFields) RawJSON() string { return r.JSON.raw }
-func (r *SecretPasswordFields) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// ToParam converts this SecretPasswordFields to a SecretPasswordFieldsParam.
-//
-// Warning: the fields of the param type will not be present. ToParam should only
-// be used at the last possible moment before sending a request. Test for this with
-// SecretPasswordFieldsParam.Overrides()
-func (r SecretPasswordFields) ToParam() SecretPasswordFieldsParam {
-	return param.Override[SecretPasswordFieldsParam](json.RawMessage(r.RawJSON()))
-}
-
-type SecretPasswordFieldsType string
-
-const (
-	SecretPasswordFieldsTypePassword SecretPasswordFieldsType = "password"
-)
-
-// The properties Password, Type, Username are required.
-type SecretPasswordFieldsParam struct {
-	Password string `json:"password,required"`
-	// Any of "password".
-	Type     SecretPasswordFieldsType `json:"type,omitzero,required"`
-	Username string                   `json:"username,required"`
-	paramObj
-}
-
-func (r SecretPasswordFieldsParam) MarshalJSON() (data []byte, err error) {
-	type shadow SecretPasswordFieldsParam
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *SecretPasswordFieldsParam) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type SecretTokenFields struct {
-	Token string `json:"token,required"`
-	// Any of "token".
-	Type SecretTokenFieldsType `json:"type,required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Token       respjson.Field
-		Type        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r SecretTokenFields) RawJSON() string { return r.JSON.raw }
-func (r *SecretTokenFields) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// ToParam converts this SecretTokenFields to a SecretTokenFieldsParam.
-//
-// Warning: the fields of the param type will not be present. ToParam should only
-// be used at the last possible moment before sending a request. Test for this with
-// SecretTokenFieldsParam.Overrides()
-func (r SecretTokenFields) ToParam() SecretTokenFieldsParam {
-	return param.Override[SecretTokenFieldsParam](json.RawMessage(r.RawJSON()))
-}
-
-type SecretTokenFieldsType string
-
-const (
-	SecretTokenFieldsTypeToken SecretTokenFieldsType = "token"
-)
-
-// The properties Token, Type are required.
-type SecretTokenFieldsParam struct {
-	Token string `json:"token,required"`
-	// Any of "token".
-	Type SecretTokenFieldsType `json:"type,omitzero,required"`
-	paramObj
-}
-
-func (r SecretTokenFieldsParam) MarshalJSON() (data []byte, err error) {
-	type shadow SecretTokenFieldsParam
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *SecretTokenFieldsParam) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
 
 type ZoneSecretGetResponse struct {
 	// A globally unique opaque identifier
@@ -334,19 +212,19 @@ func (r *ZoneSecretGetResponse) UnmarshalJSON(data []byte) error {
 }
 
 // ZoneSecretGetResponseDataUnion contains all possible properties and values from
-// [SecretTokenFields], [SecretPasswordFields].
+// [ZoneSecretGetResponseDataToken], [ZoneSecretGetResponseDataPassword].
 //
 // Use the [ZoneSecretGetResponseDataUnion.AsAny] method to switch on the variant.
 //
 // Use the methods beginning with 'As' to cast the union to one of its variants.
 type ZoneSecretGetResponseDataUnion struct {
-	// This field is from variant [SecretTokenFields].
+	// This field is from variant [ZoneSecretGetResponseDataToken].
 	Token string `json:"token"`
 	// Any of "token", "password".
 	Type string `json:"type"`
-	// This field is from variant [SecretPasswordFields].
+	// This field is from variant [ZoneSecretGetResponseDataPassword].
 	Password string `json:"password"`
-	// This field is from variant [SecretPasswordFields].
+	// This field is from variant [ZoneSecretGetResponseDataPassword].
 	Username string `json:"username"`
 	JSON     struct {
 		Token    respjson.Field
@@ -364,14 +242,14 @@ type anyZoneSecretGetResponseData interface {
 	implZoneSecretGetResponseDataUnion()
 }
 
-func (SecretTokenFields) implZoneSecretGetResponseDataUnion()    {}
-func (SecretPasswordFields) implZoneSecretGetResponseDataUnion() {}
+func (ZoneSecretGetResponseDataToken) implZoneSecretGetResponseDataUnion()    {}
+func (ZoneSecretGetResponseDataPassword) implZoneSecretGetResponseDataUnion() {}
 
 // Use the following switch statement to find the correct variant
 //
 //	switch variant := ZoneSecretGetResponseDataUnion.AsAny().(type) {
-//	case keycardapi.SecretTokenFields:
-//	case keycardapi.SecretPasswordFields:
+//	case keycardapi.ZoneSecretGetResponseDataToken:
+//	case keycardapi.ZoneSecretGetResponseDataPassword:
 //	default:
 //	  fmt.Errorf("no variant present")
 //	}
@@ -385,12 +263,12 @@ func (u ZoneSecretGetResponseDataUnion) AsAny() anyZoneSecretGetResponseData {
 	return nil
 }
 
-func (u ZoneSecretGetResponseDataUnion) AsToken() (v SecretTokenFields) {
+func (u ZoneSecretGetResponseDataUnion) AsToken() (v ZoneSecretGetResponseDataToken) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
 
-func (u ZoneSecretGetResponseDataUnion) AsPassword() (v SecretPasswordFields) {
+func (u ZoneSecretGetResponseDataUnion) AsPassword() (v ZoneSecretGetResponseDataPassword) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
@@ -402,6 +280,140 @@ func (r *ZoneSecretGetResponseDataUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type ZoneSecretGetResponseDataToken struct {
+	Token string         `json:"token,required"`
+	Type  constant.Token `json:"type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Token       respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneSecretGetResponseDataToken) RawJSON() string { return r.JSON.raw }
+func (r *ZoneSecretGetResponseDataToken) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ZoneSecretGetResponseDataPassword struct {
+	Password string            `json:"password,required"`
+	Type     constant.Password `json:"type,required"`
+	Username string            `json:"username,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Password    respjson.Field
+		Type        respjson.Field
+		Username    respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneSecretGetResponseDataPassword) RawJSON() string { return r.JSON.raw }
+func (r *ZoneSecretGetResponseDataPassword) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ZoneSecretUpdateResponse struct {
+	// A globally unique opaque identifier
+	ID        string    `json:"id,required"`
+	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	// A globally unique opaque identifier
+	EntityID string `json:"entity_id,required"`
+	// A name for the entity to be displayed in UI
+	Name string `json:"name,required"`
+	// Any of "token", "password".
+	Type      ZoneSecretUpdateResponseType `json:"type,required"`
+	UpdatedAt time.Time                    `json:"updated_at,required" format:"date-time"`
+	Version   int64                        `json:"version,required"`
+	// A globally unique opaque identifier
+	ZoneID string `json:"zone_id,required"`
+	// A description of the entity
+	Description string `json:"description"`
+	// A JSON object containing arbitrary metadata. Metadata will not be encrypted.
+	Metadata any `json:"metadata"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		CreatedAt   respjson.Field
+		EntityID    respjson.Field
+		Name        respjson.Field
+		Type        respjson.Field
+		UpdatedAt   respjson.Field
+		Version     respjson.Field
+		ZoneID      respjson.Field
+		Description respjson.Field
+		Metadata    respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneSecretUpdateResponse) RawJSON() string { return r.JSON.raw }
+func (r *ZoneSecretUpdateResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ZoneSecretUpdateResponseType string
+
+const (
+	ZoneSecretUpdateResponseTypeToken    ZoneSecretUpdateResponseType = "token"
+	ZoneSecretUpdateResponseTypePassword ZoneSecretUpdateResponseType = "password"
+)
+
+type ZoneSecretListResponse struct {
+	// A globally unique opaque identifier
+	ID        string    `json:"id,required"`
+	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	// A globally unique opaque identifier
+	EntityID string `json:"entity_id,required"`
+	// A name for the entity to be displayed in UI
+	Name string `json:"name,required"`
+	// Any of "token", "password".
+	Type      ZoneSecretListResponseType `json:"type,required"`
+	UpdatedAt time.Time                  `json:"updated_at,required" format:"date-time"`
+	Version   int64                      `json:"version,required"`
+	// A globally unique opaque identifier
+	ZoneID string `json:"zone_id,required"`
+	// A description of the entity
+	Description string `json:"description"`
+	// A JSON object containing arbitrary metadata. Metadata will not be encrypted.
+	Metadata any `json:"metadata"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		CreatedAt   respjson.Field
+		EntityID    respjson.Field
+		Name        respjson.Field
+		Type        respjson.Field
+		UpdatedAt   respjson.Field
+		Version     respjson.Field
+		ZoneID      respjson.Field
+		Description respjson.Field
+		Metadata    respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneSecretListResponse) RawJSON() string { return r.JSON.raw }
+func (r *ZoneSecretListResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ZoneSecretListResponseType string
+
+const (
+	ZoneSecretListResponseTypeToken    ZoneSecretListResponseType = "token"
+	ZoneSecretListResponseTypePassword ZoneSecretListResponseType = "password"
+)
+
 type ZoneSecretNewParams struct {
 	Data ZoneSecretNewParamsDataUnion `json:"data,omitzero,required"`
 	// A globally unique opaque identifier
@@ -411,7 +423,6 @@ type ZoneSecretNewParams struct {
 	// A description of the entity
 	Description      param.Opt[string] `json:"description,omitzero"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	XRequestID       param.Opt[string] `header:"X-Request-ID,omitzero" format:"uuid" json:"-"`
 	// A JSON object containing arbitrary metadata. Metadata will not be encrypted.
 	Metadata any `json:"metadata,omitzero"`
 	paramObj
@@ -429,8 +440,8 @@ func (r *ZoneSecretNewParams) UnmarshalJSON(data []byte) error {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type ZoneSecretNewParamsDataUnion struct {
-	OfToken    *SecretTokenFieldsParam    `json:",omitzero,inline"`
-	OfPassword *SecretPasswordFieldsParam `json:",omitzero,inline"`
+	OfToken    *ZoneSecretNewParamsDataToken    `json:",omitzero,inline"`
+	OfPassword *ZoneSecretNewParamsDataPassword `json:",omitzero,inline"`
 	paramUnion
 }
 
@@ -487,16 +498,48 @@ func (u ZoneSecretNewParamsDataUnion) GetType() *string {
 func init() {
 	apijson.RegisterUnion[ZoneSecretNewParamsDataUnion](
 		"type",
-		apijson.Discriminator[SecretTokenFieldsParam]("token"),
-		apijson.Discriminator[SecretPasswordFieldsParam]("password"),
+		apijson.Discriminator[ZoneSecretNewParamsDataToken]("token"),
+		apijson.Discriminator[ZoneSecretNewParamsDataPassword]("password"),
 	)
+}
+
+// The properties Token, Type are required.
+type ZoneSecretNewParamsDataToken struct {
+	Token string `json:"token,required"`
+	// This field can be elided, and will marshal its zero value as "token".
+	Type constant.Token `json:"type,required"`
+	paramObj
+}
+
+func (r ZoneSecretNewParamsDataToken) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneSecretNewParamsDataToken
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZoneSecretNewParamsDataToken) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The properties Password, Type, Username are required.
+type ZoneSecretNewParamsDataPassword struct {
+	Password string `json:"password,required"`
+	Username string `json:"username,required"`
+	// This field can be elided, and will marshal its zero value as "password".
+	Type constant.Password `json:"type,required"`
+	paramObj
+}
+
+func (r ZoneSecretNewParamsDataPassword) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneSecretNewParamsDataPassword
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZoneSecretNewParamsDataPassword) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ZoneSecretGetParams struct {
 	// A globally unique opaque identifier
 	ZoneID           string            `path:"zone_id,required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	XRequestID       param.Opt[string] `header:"X-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 
@@ -508,7 +551,6 @@ type ZoneSecretUpdateParams struct {
 	// A name for the entity to be displayed in UI
 	Name             param.Opt[string]               `json:"name,omitzero"`
 	XClientRequestID param.Opt[string]               `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	XRequestID       param.Opt[string]               `header:"X-Request-ID,omitzero" format:"uuid" json:"-"`
 	Data             ZoneSecretUpdateParamsDataUnion `json:"data,omitzero"`
 	// A JSON object containing arbitrary metadata. Metadata will not be encrypted.
 	Metadata any `json:"metadata,omitzero"`
@@ -527,8 +569,8 @@ func (r *ZoneSecretUpdateParams) UnmarshalJSON(data []byte) error {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type ZoneSecretUpdateParamsDataUnion struct {
-	OfToken    *SecretTokenFieldsParam    `json:",omitzero,inline"`
-	OfPassword *SecretPasswordFieldsParam `json:",omitzero,inline"`
+	OfToken    *ZoneSecretUpdateParamsDataToken    `json:",omitzero,inline"`
+	OfPassword *ZoneSecretUpdateParamsDataPassword `json:",omitzero,inline"`
 	paramUnion
 }
 
@@ -585,16 +627,48 @@ func (u ZoneSecretUpdateParamsDataUnion) GetType() *string {
 func init() {
 	apijson.RegisterUnion[ZoneSecretUpdateParamsDataUnion](
 		"type",
-		apijson.Discriminator[SecretTokenFieldsParam]("token"),
-		apijson.Discriminator[SecretPasswordFieldsParam]("password"),
+		apijson.Discriminator[ZoneSecretUpdateParamsDataToken]("token"),
+		apijson.Discriminator[ZoneSecretUpdateParamsDataPassword]("password"),
 	)
+}
+
+// The properties Token, Type are required.
+type ZoneSecretUpdateParamsDataToken struct {
+	Token string `json:"token,required"`
+	// This field can be elided, and will marshal its zero value as "token".
+	Type constant.Token `json:"type,required"`
+	paramObj
+}
+
+func (r ZoneSecretUpdateParamsDataToken) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneSecretUpdateParamsDataToken
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZoneSecretUpdateParamsDataToken) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The properties Password, Type, Username are required.
+type ZoneSecretUpdateParamsDataPassword struct {
+	Password string `json:"password,required"`
+	Username string `json:"username,required"`
+	// This field can be elided, and will marshal its zero value as "password".
+	Type constant.Password `json:"type,required"`
+	paramObj
+}
+
+func (r ZoneSecretUpdateParamsDataPassword) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneSecretUpdateParamsDataPassword
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZoneSecretUpdateParamsDataPassword) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ZoneSecretListParams struct {
 	// The entity to list all secrets for
 	EntityID         param.Opt[string] `query:"entity_id,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	XRequestID       param.Opt[string] `header:"X-Request-ID,omitzero" format:"uuid" json:"-"`
 	// The type of secrets to list
 	//
 	// Any of "token", "password".
@@ -622,6 +696,5 @@ type ZoneSecretDeleteParams struct {
 	// A globally unique opaque identifier
 	ZoneID           string            `path:"zone_id,required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	XRequestID       param.Opt[string] `header:"X-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }

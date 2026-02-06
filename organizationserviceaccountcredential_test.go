@@ -24,9 +24,6 @@ func TestOrganizationServiceAccountCredentialNewWithOptionalParams(t *testing.T)
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.ServiceAccounts.Credentials.New(
 		context.TODO(),
@@ -36,7 +33,6 @@ func TestOrganizationServiceAccountCredentialNewWithOptionalParams(t *testing.T)
 			Name:             "name",
 			Description:      keycardapi.String("description"),
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
@@ -59,9 +55,6 @@ func TestOrganizationServiceAccountCredentialGetWithOptionalParams(t *testing.T)
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.ServiceAccounts.Credentials.Get(
 		context.TODO(),
@@ -71,7 +64,6 @@ func TestOrganizationServiceAccountCredentialGetWithOptionalParams(t *testing.T)
 			ServiceAccountID: "ab3def8hij2klm9opq5rst7uvw",
 			Expand:           []string{"permissions"},
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
@@ -94,9 +86,6 @@ func TestOrganizationServiceAccountCredentialUpdateWithOptionalParams(t *testing
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.ServiceAccounts.Credentials.Update(
 		context.TODO(),
@@ -107,7 +96,6 @@ func TestOrganizationServiceAccountCredentialUpdateWithOptionalParams(t *testing
 			Description:      keycardapi.String("description"),
 			Name:             keycardapi.String("name"),
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
@@ -130,9 +118,6 @@ func TestOrganizationServiceAccountCredentialListWithOptionalParams(t *testing.T
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.ServiceAccounts.Credentials.List(
 		context.TODO(),
@@ -144,7 +129,6 @@ func TestOrganizationServiceAccountCredentialListWithOptionalParams(t *testing.T
 			Expand:           []string{"permissions"},
 			Limit:            keycardapi.Int(1),
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
@@ -167,9 +151,6 @@ func TestOrganizationServiceAccountCredentialDeleteWithOptionalParams(t *testing
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	err := client.Organizations.ServiceAccounts.Credentials.Delete(
 		context.TODO(),
@@ -178,7 +159,6 @@ func TestOrganizationServiceAccountCredentialDeleteWithOptionalParams(t *testing
 			OrganizationID:   "x",
 			ServiceAccountID: "ab3def8hij2klm9opq5rst7uvw",
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {

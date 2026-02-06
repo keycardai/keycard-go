@@ -24,9 +24,6 @@ func TestZoneProviderNewWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.Providers.New(
 		context.TODO(),
@@ -37,20 +34,17 @@ func TestZoneProviderNewWithOptionalParams(t *testing.T) {
 			ClientID:     keycardapi.String("client_id"),
 			ClientSecret: keycardapi.String("client_secret"),
 			Description:  keycardapi.String("description"),
-			Domains:      []string{"string"},
-			Metadata: keycardapi.ZoneProviderNewParamsMetadata{
-				InternalClaims: map[string]any{
-					"foo": "bar",
-				},
-			},
+			Metadata:     map[string]any{},
 			Protocols: keycardapi.ZoneProviderNewParamsProtocols{
 				Oauth2: keycardapi.ZoneProviderNewParamsProtocolsOauth2{
-					AuthorizationEndpoint:         keycardapi.String("https://example.com"),
-					CodeChallengeMethodsSupported: []string{"string"},
-					JwksUri:                       keycardapi.String("https://example.com"),
-					RegistrationEndpoint:          keycardapi.String("https://example.com"),
-					ScopesSupported:               []string{"string"},
-					TokenEndpoint:                 keycardapi.String("https://example.com"),
+					AuthorizationEndpoint:          keycardapi.String("https://example.com"),
+					AuthorizationResourceEnabled:   keycardapi.Bool(true),
+					AuthorizationResourceParameter: keycardapi.String("authorization_resource_parameter"),
+					CodeChallengeMethodsSupported:  []string{"string"},
+					JwksUri:                        keycardapi.String("https://example.com"),
+					RegistrationEndpoint:           keycardapi.String("https://example.com"),
+					ScopesSupported:                []string{"string"},
+					TokenEndpoint:                  keycardapi.String("https://example.com"),
 				},
 				Openid: keycardapi.ZoneProviderNewParamsProtocolsOpenid{
 					UserinfoEndpoint: keycardapi.String("https://example.com"),
@@ -78,9 +72,6 @@ func TestZoneProviderGet(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.Providers.Get(
 		context.TODO(),
@@ -109,9 +100,6 @@ func TestZoneProviderUpdateWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.Providers.Update(
 		context.TODO(),
@@ -121,22 +109,19 @@ func TestZoneProviderUpdateWithOptionalParams(t *testing.T) {
 			ClientID:     keycardapi.String("client_id"),
 			ClientSecret: keycardapi.String("client_secret"),
 			Description:  keycardapi.String("description"),
-			Domains:      []string{"string"},
 			Identifier:   keycardapi.String("x"),
-			Metadata: keycardapi.ZoneProviderUpdateParamsMetadata{
-				InternalClaims: map[string]any{
-					"foo": "bar",
-				},
-			},
-			Name: keycardapi.String("x"),
+			Metadata:     map[string]any{},
+			Name:         keycardapi.String("x"),
 			Protocols: keycardapi.ZoneProviderUpdateParamsProtocols{
 				Oauth2: keycardapi.ZoneProviderUpdateParamsProtocolsOauth2{
-					AuthorizationEndpoint:         keycardapi.String("https://example.com"),
-					CodeChallengeMethodsSupported: []string{"string"},
-					JwksUri:                       keycardapi.String("https://example.com"),
-					RegistrationEndpoint:          keycardapi.String("https://example.com"),
-					ScopesSupported:               []string{"string"},
-					TokenEndpoint:                 keycardapi.String("https://example.com"),
+					AuthorizationEndpoint:          keycardapi.String("https://example.com"),
+					AuthorizationResourceEnabled:   keycardapi.Bool(true),
+					AuthorizationResourceParameter: keycardapi.String("authorization_resource_parameter"),
+					CodeChallengeMethodsSupported:  []string{"string"},
+					JwksUri:                        keycardapi.String("https://example.com"),
+					RegistrationEndpoint:           keycardapi.String("https://example.com"),
+					ScopesSupported:                []string{"string"},
+					TokenEndpoint:                  keycardapi.String("https://example.com"),
 				},
 				Openid: keycardapi.ZoneProviderUpdateParamsProtocolsOpenid{
 					UserinfoEndpoint: keycardapi.String("https://example.com"),
@@ -164,9 +149,6 @@ func TestZoneProviderListWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.Providers.List(
 		context.TODO(),
@@ -199,9 +181,6 @@ func TestZoneProviderDelete(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	err := client.Zones.Providers.Delete(
 		context.TODO(),

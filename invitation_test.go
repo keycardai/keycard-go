@@ -24,16 +24,12 @@ func TestInvitationGetWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Invitations.Get(
 		context.TODO(),
 		"token",
 		keycardapi.InvitationGetParams{
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
@@ -56,16 +52,12 @@ func TestInvitationAcceptWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Invitations.Accept(
 		context.TODO(),
 		"token",
 		keycardapi.InvitationAcceptParams{
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {

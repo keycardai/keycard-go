@@ -24,16 +24,12 @@ func TestServiceAccountTokenNewWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.ServiceAccountToken.New(context.TODO(), keycardapi.ServiceAccountTokenNewParams{
 		ClientID:         "client_id",
 		ClientSecret:     "client_secret",
 		GrantType:        keycardapi.ServiceAccountTokenNewParamsGrantTypeClientCredentials,
 		XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
 		var apierr *keycardapi.Error

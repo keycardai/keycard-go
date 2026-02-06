@@ -64,8 +64,7 @@ func NewZoneService(opts ...option.RequestOption) (r ZoneService) {
 // Creates a new zone for the authenticated organization. A zone is an isolated
 // environment for IAM resources.
 func (r *ZoneService) New(ctx context.Context, body ZoneNewParams, opts ...option.RequestOption) (res *Zone, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	path := "zones"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
@@ -73,8 +72,7 @@ func (r *ZoneService) New(ctx context.Context, body ZoneNewParams, opts ...optio
 
 // Returns details of a specific zone by ID
 func (r *ZoneService) Get(ctx context.Context, zoneID string, query ZoneGetParams, opts ...option.RequestOption) (res *Zone, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -86,8 +84,7 @@ func (r *ZoneService) Get(ctx context.Context, zoneID string, query ZoneGetParam
 
 // Updates a zone's configuration (partial update)
 func (r *ZoneService) Update(ctx context.Context, zoneID string, body ZoneUpdateParams, opts ...option.RequestOption) (res *Zone, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -99,8 +96,7 @@ func (r *ZoneService) Update(ctx context.Context, zoneID string, body ZoneUpdate
 
 // Returns a list of zones for the authenticated organization
 func (r *ZoneService) List(ctx context.Context, query ZoneListParams, opts ...option.RequestOption) (res *ZoneListResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	path := "zones"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
@@ -108,8 +104,7 @@ func (r *ZoneService) List(ctx context.Context, query ZoneListParams, opts ...op
 
 // Permanently deletes a zone and all its associated resources
 func (r *ZoneService) Delete(ctx context.Context, zoneID string, opts ...option.RequestOption) (err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -123,8 +118,7 @@ func (r *ZoneService) Delete(ctx context.Context, zoneID string, opts ...option.
 // Removes downstream resource, dependency, and optionally upstream
 // resource/provider
 func (r *ZoneService) DeleteMcpServer(ctx context.Context, downstreamID string, body ZoneDeleteMcpServerParams, opts ...option.RequestOption) (err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -144,8 +138,7 @@ func (r *ZoneService) DeleteMcpServer(ctx context.Context, downstreamID string, 
 // by user_id, returns sessions with an initiator (application or user agent). Use
 // has_initiator=true to explicitly filter to sessions with an initiator.
 func (r *ZoneService) ListSessionResourceAccess(ctx context.Context, zoneID string, query ZoneListSessionResourceAccessParams, opts ...option.RequestOption) (res *ZoneListSessionResourceAccessResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -256,8 +249,6 @@ type Zone struct {
 	Slug string `json:"slug,required"`
 	// Entity update timestamp
 	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
-	// Custom domain name (CNAME) for the zone
-	Cname string `json:"cname" format:"hostname"`
 	// Application ID configured as the default MCP Gateway for the zone
 	DefaultMcpGatewayApplicationID string `json:"default_mcp_gateway_application_id"`
 	// Human-readable description
@@ -288,7 +279,6 @@ type Zone struct {
 		Protocols                      respjson.Field
 		Slug                           respjson.Field
 		UpdatedAt                      respjson.Field
-		Cname                          respjson.Field
 		DefaultMcpGatewayApplicationID respjson.Field
 		Description                    respjson.Field
 		DirectoryOpenSignupsEnabled    respjson.Field
@@ -475,8 +465,6 @@ type ZoneNewParams struct {
 	Name string `json:"name,required"`
 	// Human-readable description
 	Description param.Opt[string] `json:"description,omitzero"`
-	// Custom domain name (CNAME) for the zone
-	Cname param.Opt[string] `json:"cname,omitzero" format:"hostname"`
 	// Assign a default MCP Gateway application to the zone
 	DefaultMcpGatewayApplication param.Opt[bool] `json:"default_mcp_gateway_application,omitzero"`
 	// Whether directory open signups are enabled for the zone, only applies when
@@ -584,8 +572,6 @@ const (
 )
 
 type ZoneUpdateParams struct {
-	// Custom domain name (CNAME) for the zone (set to null to remove)
-	Cname param.Opt[string] `json:"cname,omitzero" format:"hostname"`
 	// Application ID configured as the default MCP Gateway for the zone (set to null
 	// to unset)
 	DefaultMcpGatewayApplicationID param.Opt[string] `json:"default_mcp_gateway_application_id,omitzero"`

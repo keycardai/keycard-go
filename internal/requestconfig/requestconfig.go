@@ -5,7 +5,6 @@ package requestconfig
 import (
 	"bytes"
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -172,17 +171,10 @@ func NewRequestConfig(ctx context.Context, method string, u string, body any, ds
 		Body:       reader,
 	}
 	cfg.ResponseBodyInto = dst
-	cfg.Security = Security{
-		SvcOrgManagementBasicAuth: true,
-		VaultBearerAuth:           true,
-	}
 	err = cfg.Apply(opts...)
 	if err != nil {
 		return nil, err
 	}
-
-	// This must run after `cfg.Apply(...)` above so we know which specific security scheme to add
-	ApplySecurity(cfg)
 
 	// This must run after `cfg.Apply(...)` above in case the request timeout gets modified. We also only
 	// apply our own logic for it if it's still "0" from above. If it's not, then it was deleted or modified
@@ -223,8 +215,6 @@ type RequestConfig struct {
 	APIKey         string
 	Username       string
 	Password       string
-	// Configure which security scheme(s) should be enabled for this request
-	Security Security
 	// If ResponseBodyInto not nil, then we will attempt to deserialize into
 	// ResponseBodyInto. If Destination is a []byte, then it will return the body as
 	// is.
@@ -645,50 +635,4 @@ func WithDefaultBaseURL(baseURL string) RequestOption {
 		r.DefaultBaseURL = u
 		return nil
 	})
-}
-
-type Security struct {
-	SvcOrgManagementBasicAuth bool
-	VaultBearerAuth           bool
-}
-
-func WithSecurity(security Security) RequestOption {
-	return RequestOptionFunc(func(r *RequestConfig) error {
-		r.Security = security
-		return nil
-	})
-}
-
-// WithSvcOrgManagementBasicAuthSecurity() should only be used within a method, not
-// provided to at the client-level.
-func WithSvcOrgManagementBasicAuthSecurity() RequestOption {
-	return RequestOptionFunc(func(r *RequestConfig) error {
-		r.Security = Security{
-			SvcOrgManagementBasicAuth: true,
-			VaultBearerAuth:           false,
-		}
-		return nil
-	})
-}
-
-// WithVaultBearerAuthSecurity() should only be used within a method, not provided
-// to at the client-level.
-func WithVaultBearerAuthSecurity() RequestOption {
-	return RequestOptionFunc(func(r *RequestConfig) error {
-		r.Security = Security{
-			SvcOrgManagementBasicAuth: false,
-			VaultBearerAuth:           true,
-		}
-		return nil
-	})
-}
-
-func ApplySecurity(r RequestConfig) {
-	if r.Security.SvcOrgManagementBasicAuth && r.Username != "" && r.Password != "" && r.Request.Header.Get("Authorization") == "" {
-		r.Request.Header.Set("authorization", fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(r.Username+":"+r.Password))))
-	}
-
-	if r.Security.VaultBearerAuth && r.APIKey != "" && r.Request.Header.Get("Authorization") == "" {
-		r.Request.Header.Set("authorization", fmt.Sprintf("Bearer %s", r.APIKey))
-	}
 }

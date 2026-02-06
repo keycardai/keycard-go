@@ -41,11 +41,7 @@ func (r *InvitationService) Get(ctx context.Context, token string, query Invitat
 	if !param.IsOmitted(query.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", query.XClientRequestID.Value)))
 	}
-	if !param.IsOmitted(query.XRequestID) {
-		opts = append(opts, option.WithHeader("X-Request-ID", fmt.Sprintf("%s", query.XRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if token == "" {
 		err = errors.New("missing required token parameter")
 		return
@@ -60,11 +56,7 @@ func (r *InvitationService) Accept(ctx context.Context, token string, body Invit
 	if !param.IsOmitted(body.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", body.XClientRequestID.Value)))
 	}
-	if !param.IsOmitted(body.XRequestID) {
-		opts = append(opts, option.WithHeader("X-Request-ID", fmt.Sprintf("%s", body.XRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if token == "" {
 		err = errors.New("missing required token parameter")
 		return
@@ -87,11 +79,11 @@ type InvitationGetResponse struct {
 	// Role that will be assigned when invitation is accepted
 	//
 	// Any of "org_admin", "org_member", "org_viewer".
-	Role OrganizationRole `json:"role,required"`
+	Role InvitationGetResponseRole `json:"role,required"`
 	// Status of an invitation
 	//
 	// Any of "pending", "accepted", "expired", "revoked".
-	Status InvitationStatus `json:"status,required"`
+	Status InvitationGetResponseStatus `json:"status,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		CreatedByName    respjson.Field
@@ -110,6 +102,25 @@ func (r InvitationGetResponse) RawJSON() string { return r.JSON.raw }
 func (r *InvitationGetResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Role that will be assigned when invitation is accepted
+type InvitationGetResponseRole string
+
+const (
+	InvitationGetResponseRoleOrgAdmin  InvitationGetResponseRole = "org_admin"
+	InvitationGetResponseRoleOrgMember InvitationGetResponseRole = "org_member"
+	InvitationGetResponseRoleOrgViewer InvitationGetResponseRole = "org_viewer"
+)
+
+// Status of an invitation
+type InvitationGetResponseStatus string
+
+const (
+	InvitationGetResponseStatusPending  InvitationGetResponseStatus = "pending"
+	InvitationGetResponseStatusAccepted InvitationGetResponseStatus = "accepted"
+	InvitationGetResponseStatusExpired  InvitationGetResponseStatus = "expired"
+	InvitationGetResponseStatusRevoked  InvitationGetResponseStatus = "revoked"
+)
 
 // Result of accepting an invitation
 type InvitationAcceptResponse struct {
@@ -140,12 +151,10 @@ func (r *InvitationAcceptResponse) UnmarshalJSON(data []byte) error {
 
 type InvitationGetParams struct {
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	XRequestID       param.Opt[string] `header:"X-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 
 type InvitationAcceptParams struct {
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	XRequestID       param.Opt[string] `header:"X-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }

@@ -37,8 +37,7 @@ func NewZoneMcpGatewayService(opts ...option.RequestOption) (r ZoneMcpGatewaySer
 
 // Creates all resources required to access an MCP server through an MCP gateway
 func (r *ZoneMcpGatewayService) NewServer(ctx context.Context, applicationID string, params ZoneMcpGatewayNewServerParams, opts ...option.RequestOption) (res *ZoneMcpGatewayNewServerResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
