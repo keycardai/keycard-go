@@ -24,9 +24,6 @@ func TestZoneApplicationDependencyGet(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.Applications.Dependencies.Get(
 		context.TODO(),
@@ -56,9 +53,6 @@ func TestZoneApplicationDependencyListWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.Applications.Dependencies.List(
 		context.TODO(),
@@ -90,9 +84,6 @@ func TestZoneApplicationDependencyAddWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	err := client.Zones.Applications.Dependencies.Add(
 		context.TODO(),
@@ -123,9 +114,6 @@ func TestZoneApplicationDependencyRemove(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	err := client.Zones.Applications.Dependencies.Remove(
 		context.TODO(),

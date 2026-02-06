@@ -12,6 +12,7 @@ import (
 	"github.com/stainless-sdks/keycard-api-go/internal/requestconfig"
 	"github.com/stainless-sdks/keycard-api-go/option"
 	"github.com/stainless-sdks/keycard-api-go/packages/param"
+	"github.com/stainless-sdks/keycard-api-go/packages/respjson"
 )
 
 // ServiceAccountTokenService contains methods and other services that help with
@@ -34,18 +35,38 @@ func NewServiceAccountTokenService(opts ...option.RequestOption) (r ServiceAccou
 }
 
 // Exchange service account credentials for organization-scoped M2M token
-func (r *ServiceAccountTokenService) New(ctx context.Context, params ServiceAccountTokenNewParams, opts ...option.RequestOption) (res *TokenResponse, err error) {
+func (r *ServiceAccountTokenService) New(ctx context.Context, params ServiceAccountTokenNewParams, opts ...option.RequestOption) (res *ServiceAccountTokenNewResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	if !param.IsOmitted(params.XRequestID) {
-		opts = append(opts, option.WithHeader("X-Request-ID", fmt.Sprintf("%s", params.XRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	path := "service-account-token"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
 	return
+}
+
+// OAuth2-style token response for M2M tokens
+type ServiceAccountTokenNewResponse struct {
+	// The M2M access token
+	AccessToken string `json:"access_token,required"`
+	// Token type (always "Bearer")
+	TokenType string `json:"token_type,required"`
+	// Token expiration time in seconds
+	ExpiresIn int64 `json:"expires_in"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AccessToken respjson.Field
+		TokenType   respjson.Field
+		ExpiresIn   respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ServiceAccountTokenNewResponse) RawJSON() string { return r.JSON.raw }
+func (r *ServiceAccountTokenNewResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ServiceAccountTokenNewParams struct {
@@ -58,7 +79,6 @@ type ServiceAccountTokenNewParams struct {
 	// Any of "client_credentials".
 	GrantType        ServiceAccountTokenNewParamsGrantType `json:"grant_type,omitzero,required"`
 	XClientRequestID param.Opt[string]                     `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	XRequestID       param.Opt[string]                     `header:"X-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 

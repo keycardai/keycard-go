@@ -24,18 +24,14 @@ func TestOrganizationInvitationNewWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.Invitations.New(
 		context.TODO(),
 		"x",
 		keycardapi.OrganizationInvitationNewParams{
 			Email:            "dev@stainless.com",
-			Role:             keycardapi.OrganizationRoleOrgAdmin,
+			Role:             keycardapi.OrganizationInvitationNewParamsRoleOrgAdmin,
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
@@ -58,9 +54,6 @@ func TestOrganizationInvitationListWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.Invitations.List(
 		context.TODO(),
@@ -71,7 +64,6 @@ func TestOrganizationInvitationListWithOptionalParams(t *testing.T) {
 			Expand:           []string{"permissions"},
 			Limit:            keycardapi.Int(1),
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
@@ -94,9 +86,6 @@ func TestOrganizationInvitationDeleteWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	err := client.Organizations.Invitations.Delete(
 		context.TODO(),
@@ -104,7 +93,6 @@ func TestOrganizationInvitationDeleteWithOptionalParams(t *testing.T) {
 		keycardapi.OrganizationInvitationDeleteParams{
 			OrganizationID:   "x",
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {

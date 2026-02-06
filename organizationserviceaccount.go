@@ -41,15 +41,11 @@ func NewOrganizationServiceAccountService(opts ...option.RequestOption) (r Organ
 }
 
 // Create a new service account for an organization
-func (r *OrganizationServiceAccountService) New(ctx context.Context, organizationID string, params OrganizationServiceAccountNewParams, opts ...option.RequestOption) (res *ServiceAccount, err error) {
+func (r *OrganizationServiceAccountService) New(ctx context.Context, organizationID string, params OrganizationServiceAccountNewParams, opts ...option.RequestOption) (res *OrganizationServiceAccountNewResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	if !param.IsOmitted(params.XRequestID) {
-		opts = append(opts, option.WithHeader("X-Request-ID", fmt.Sprintf("%s", params.XRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return
@@ -60,15 +56,11 @@ func (r *OrganizationServiceAccountService) New(ctx context.Context, organizatio
 }
 
 // Get a specific service account
-func (r *OrganizationServiceAccountService) Get(ctx context.Context, serviceAccountID string, params OrganizationServiceAccountGetParams, opts ...option.RequestOption) (res *ServiceAccount, err error) {
+func (r *OrganizationServiceAccountService) Get(ctx context.Context, serviceAccountID string, params OrganizationServiceAccountGetParams, opts ...option.RequestOption) (res *OrganizationServiceAccountGetResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	if !param.IsOmitted(params.XRequestID) {
-		opts = append(opts, option.WithHeader("X-Request-ID", fmt.Sprintf("%s", params.XRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return
@@ -83,15 +75,11 @@ func (r *OrganizationServiceAccountService) Get(ctx context.Context, serviceAcco
 }
 
 // Update a service account
-func (r *OrganizationServiceAccountService) Update(ctx context.Context, serviceAccountID string, params OrganizationServiceAccountUpdateParams, opts ...option.RequestOption) (res *ServiceAccount, err error) {
+func (r *OrganizationServiceAccountService) Update(ctx context.Context, serviceAccountID string, params OrganizationServiceAccountUpdateParams, opts ...option.RequestOption) (res *OrganizationServiceAccountUpdateResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	if !param.IsOmitted(params.XRequestID) {
-		opts = append(opts, option.WithHeader("X-Request-ID", fmt.Sprintf("%s", params.XRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return
@@ -110,11 +98,7 @@ func (r *OrganizationServiceAccountService) List(ctx context.Context, organizati
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	if !param.IsOmitted(params.XRequestID) {
-		opts = append(opts, option.WithHeader("X-Request-ID", fmt.Sprintf("%s", params.XRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return
@@ -129,11 +113,7 @@ func (r *OrganizationServiceAccountService) Delete(ctx context.Context, serviceA
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	if !param.IsOmitted(params.XRequestID) {
-		opts = append(opts, option.WithHeader("X-Request-ID", fmt.Sprintf("%s", params.XRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
@@ -148,7 +128,7 @@ func (r *OrganizationServiceAccountService) Delete(ctx context.Context, serviceA
 	return
 }
 
-type ServiceAccount struct {
+type OrganizationServiceAccountNewResponse struct {
 	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
 	ID string `json:"id,required"`
 	// The time the entity was created in utc
@@ -178,15 +158,85 @@ type ServiceAccount struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ServiceAccount) RawJSON() string { return r.JSON.raw }
-func (r *ServiceAccount) UnmarshalJSON(data []byte) error {
+func (r OrganizationServiceAccountNewResponse) RawJSON() string { return r.JSON.raw }
+func (r *OrganizationServiceAccountNewResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type OrganizationServiceAccountGetResponse struct {
+	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
+	ID string `json:"id,required"`
+	// The time the entity was created in utc
+	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	// A name for the entity to be displayed in UI
+	Name string `json:"name,required"`
+	// The time the entity was mostly recently updated in utc
+	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	// Optional description of the service account
+	Description string `json:"description"`
+	// Permissions granted to the authenticated principal for this resource. Only
+	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
+	// resource types (e.g., "organizations"), values are objects mapping permission
+	// names to boolean values indicating if the permission is granted.
+	Permissions map[string]map[string]bool `json:"permissions"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		CreatedAt   respjson.Field
+		Name        respjson.Field
+		UpdatedAt   respjson.Field
+		Description respjson.Field
+		Permissions respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrganizationServiceAccountGetResponse) RawJSON() string { return r.JSON.raw }
+func (r *OrganizationServiceAccountGetResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type OrganizationServiceAccountUpdateResponse struct {
+	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
+	ID string `json:"id,required"`
+	// The time the entity was created in utc
+	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	// A name for the entity to be displayed in UI
+	Name string `json:"name,required"`
+	// The time the entity was mostly recently updated in utc
+	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	// Optional description of the service account
+	Description string `json:"description"`
+	// Permissions granted to the authenticated principal for this resource. Only
+	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
+	// resource types (e.g., "organizations"), values are objects mapping permission
+	// names to boolean values indicating if the permission is granted.
+	Permissions map[string]map[string]bool `json:"permissions"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		CreatedAt   respjson.Field
+		Name        respjson.Field
+		UpdatedAt   respjson.Field
+		Description respjson.Field
+		Permissions respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrganizationServiceAccountUpdateResponse) RawJSON() string { return r.JSON.raw }
+func (r *OrganizationServiceAccountUpdateResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 type OrganizationServiceAccountListResponse struct {
-	Items []ServiceAccount `json:"items,required"`
+	Items []OrganizationServiceAccountListResponseItem `json:"items,required"`
 	// Pagination information using cursor-based pagination
-	PageInfo PageInfoCursor `json:"page_info,required"`
+	PageInfo OrganizationServiceAccountListResponsePageInfo `json:"page_info,required"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -208,13 +258,74 @@ func (r *OrganizationServiceAccountListResponse) UnmarshalJSON(data []byte) erro
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type OrganizationServiceAccountListResponseItem struct {
+	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
+	ID string `json:"id,required"`
+	// The time the entity was created in utc
+	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	// A name for the entity to be displayed in UI
+	Name string `json:"name,required"`
+	// The time the entity was mostly recently updated in utc
+	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	// Optional description of the service account
+	Description string `json:"description"`
+	// Permissions granted to the authenticated principal for this resource. Only
+	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
+	// resource types (e.g., "organizations"), values are objects mapping permission
+	// names to boolean values indicating if the permission is granted.
+	Permissions map[string]map[string]bool `json:"permissions"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		CreatedAt   respjson.Field
+		Name        respjson.Field
+		UpdatedAt   respjson.Field
+		Description respjson.Field
+		Permissions respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrganizationServiceAccountListResponseItem) RawJSON() string { return r.JSON.raw }
+func (r *OrganizationServiceAccountListResponseItem) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Pagination information using cursor-based pagination
+type OrganizationServiceAccountListResponsePageInfo struct {
+	// Whether there are more items after the current page
+	HasNextPage bool `json:"has_next_page,required"`
+	// Whether there are more items before the current page
+	HasPrevPage bool `json:"has_prev_page,required"`
+	// Cursor pointing to the last item in the current page
+	EndCursor string `json:"end_cursor"`
+	// Cursor pointing to the first item in the current page
+	StartCursor string `json:"start_cursor"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		HasNextPage respjson.Field
+		HasPrevPage respjson.Field
+		EndCursor   respjson.Field
+		StartCursor respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrganizationServiceAccountListResponsePageInfo) RawJSON() string { return r.JSON.raw }
+func (r *OrganizationServiceAccountListResponsePageInfo) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type OrganizationServiceAccountNewParams struct {
 	// Service account name
 	Name string `json:"name,required"`
 	// Optional description of the service account
 	Description      param.Opt[string] `json:"description,omitzero"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	XRequestID       param.Opt[string] `header:"X-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 
@@ -230,7 +341,6 @@ type OrganizationServiceAccountGetParams struct {
 	// Organization ID or label identifier
 	OrganizationID   string            `path:"organization_id,required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	XRequestID       param.Opt[string] `header:"X-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Fields to expand in the response. Currently supports "permissions" to include
 	// the permissions field with the caller's permissions for the resource.
 	//
@@ -256,7 +366,6 @@ type OrganizationServiceAccountUpdateParams struct {
 	// Service account name
 	Name             param.Opt[string] `json:"name,omitzero"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	XRequestID       param.Opt[string] `header:"X-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 
@@ -276,7 +385,6 @@ type OrganizationServiceAccountListParams struct {
 	// Maximum number of service accounts to return
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	XRequestID       param.Opt[string] `header:"X-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Fields to expand in the response. Currently supports "permissions" to include
 	// the permissions field with the caller's permissions for the resource.
 	//
@@ -298,6 +406,5 @@ type OrganizationServiceAccountDeleteParams struct {
 	// Organization ID or label identifier
 	OrganizationID   string            `path:"organization_id,required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	XRequestID       param.Opt[string] `header:"X-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }

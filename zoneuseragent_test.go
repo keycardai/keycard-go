@@ -24,9 +24,6 @@ func TestZoneUserAgentGet(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.UserAgents.Get(
 		context.TODO(),
@@ -55,9 +52,6 @@ func TestZoneUserAgentList(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.UserAgents.List(context.TODO(), "zoneId")
 	if err != nil {

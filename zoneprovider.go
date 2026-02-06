@@ -41,8 +41,7 @@ func NewZoneProviderService(opts ...option.RequestOption) (r ZoneProviderService
 // Creates a new Provider - a system that supplies access to Resources and allows
 // actors to authenticate
 func (r *ZoneProviderService) New(ctx context.Context, zoneID string, body ZoneProviderNewParams, opts ...option.RequestOption) (res *Provider, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -54,8 +53,7 @@ func (r *ZoneProviderService) New(ctx context.Context, zoneID string, body ZoneP
 
 // Returns details of a specific Provider by ID
 func (r *ZoneProviderService) Get(ctx context.Context, id string, query ZoneProviderGetParams, opts ...option.RequestOption) (res *Provider, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -71,8 +69,7 @@ func (r *ZoneProviderService) Get(ctx context.Context, id string, query ZoneProv
 
 // Updates a Provider's configuration and metadata
 func (r *ZoneProviderService) Update(ctx context.Context, id string, params ZoneProviderUpdateParams, opts ...option.RequestOption) (res *Provider, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -88,8 +85,7 @@ func (r *ZoneProviderService) Update(ctx context.Context, id string, params Zone
 
 // Returns a list of providers in the specified zone
 func (r *ZoneProviderService) List(ctx context.Context, zoneID string, query ZoneProviderListParams, opts ...option.RequestOption) (res *ZoneProviderListResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -101,8 +97,7 @@ func (r *ZoneProviderService) List(ctx context.Context, zoneID string, query Zon
 
 // Permanently deletes a provider
 func (r *ZoneProviderService) Delete(ctx context.Context, id string, body ZoneProviderDeleteParams, opts ...option.RequestOption) (err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -142,11 +137,8 @@ type Provider struct {
 	ClientSecretSet bool `json:"client_secret_set"`
 	// Human-readable description
 	Description string `json:"description,nullable"`
-	// Domains for identifier-first login flow. Must be globally unique across all
-	// providers.
-	Domains []string `json:"domains,nullable" format:"hostname"`
 	// Provider metadata
-	Metadata ProviderMetadata `json:"metadata,nullable"`
+	Metadata any `json:"metadata,nullable"`
 	// Protocol-specific configuration
 	Protocols ProviderProtocols `json:"protocols,nullable"`
 	// Any of "external", "keycard-vault", "keycard-sts".
@@ -164,7 +156,6 @@ type Provider struct {
 		ClientID        respjson.Field
 		ClientSecretSet respjson.Field
 		Description     respjson.Field
-		Domains         respjson.Field
 		Metadata        respjson.Field
 		Protocols       respjson.Field
 		Type            respjson.Field
@@ -176,24 +167,6 @@ type Provider struct {
 // Returns the unmodified JSON received from the API
 func (r Provider) RawJSON() string { return r.JSON.raw }
 func (r *Provider) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Provider metadata
-type ProviderMetadata struct {
-	// Additional claims to inject when provider is used for zone login
-	InternalClaims map[string]any `json:"internal_claims"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		InternalClaims respjson.Field
-		ExtraFields    map[string]respjson.Field
-		raw            string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r ProviderMetadata) RawJSON() string { return r.JSON.raw }
-func (r *ProviderMetadata) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -220,22 +193,29 @@ func (r *ProviderProtocols) UnmarshalJSON(data []byte) error {
 
 // OAuth 2.0 protocol configuration
 type ProviderProtocolsOauth2 struct {
-	AuthorizationEndpoint         string   `json:"authorization_endpoint,nullable" format:"uri"`
-	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported,nullable"`
-	JwksUri                       string   `json:"jwks_uri,nullable" format:"uri"`
-	RegistrationEndpoint          string   `json:"registration_endpoint,nullable" format:"uri"`
-	ScopesSupported               []string `json:"scopes_supported,nullable"`
-	TokenEndpoint                 string   `json:"token_endpoint,nullable" format:"uri"`
+	AuthorizationEndpoint string `json:"authorization_endpoint,nullable" format:"uri"`
+	// Whether to include the resource parameter in authorization requests.
+	AuthorizationResourceEnabled bool `json:"authorization_resource_enabled,nullable"`
+	// The resource parameter value to include in authorization requests. Defaults to
+	// "resource" when authorization_resource_enabled is true.
+	AuthorizationResourceParameter string   `json:"authorization_resource_parameter,nullable"`
+	CodeChallengeMethodsSupported  []string `json:"code_challenge_methods_supported,nullable"`
+	JwksUri                        string   `json:"jwks_uri,nullable" format:"uri"`
+	RegistrationEndpoint           string   `json:"registration_endpoint,nullable" format:"uri"`
+	ScopesSupported                []string `json:"scopes_supported,nullable"`
+	TokenEndpoint                  string   `json:"token_endpoint,nullable" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		AuthorizationEndpoint         respjson.Field
-		CodeChallengeMethodsSupported respjson.Field
-		JwksUri                       respjson.Field
-		RegistrationEndpoint          respjson.Field
-		ScopesSupported               respjson.Field
-		TokenEndpoint                 respjson.Field
-		ExtraFields                   map[string]respjson.Field
-		raw                           string
+		AuthorizationEndpoint          respjson.Field
+		AuthorizationResourceEnabled   respjson.Field
+		AuthorizationResourceParameter respjson.Field
+		CodeChallengeMethodsSupported  respjson.Field
+		JwksUri                        respjson.Field
+		RegistrationEndpoint           respjson.Field
+		ScopesSupported                respjson.Field
+		TokenEndpoint                  respjson.Field
+		ExtraFields                    map[string]respjson.Field
+		raw                            string
 	} `json:"-"`
 }
 
@@ -300,11 +280,8 @@ type ZoneProviderNewParams struct {
 	ClientID param.Opt[string] `json:"client_id,omitzero"`
 	// OAuth 2.0 client secret (will be encrypted and stored securely)
 	ClientSecret param.Opt[string] `json:"client_secret,omitzero"`
-	// Domains for identifier-first login flow. Must be globally unique across all
-	// providers.
-	Domains []string `json:"domains,omitzero" format:"hostname"`
 	// Provider metadata
-	Metadata ZoneProviderNewParamsMetadata `json:"metadata,omitzero"`
+	Metadata any `json:"metadata,omitzero"`
 	// Protocol-specific configuration for provider creation
 	Protocols ZoneProviderNewParamsProtocols `json:"protocols,omitzero"`
 	paramObj
@@ -315,21 +292,6 @@ func (r ZoneProviderNewParams) MarshalJSON() (data []byte, err error) {
 	return param.MarshalObject(r, (*shadow)(&r))
 }
 func (r *ZoneProviderNewParams) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Provider metadata
-type ZoneProviderNewParamsMetadata struct {
-	// Additional claims to inject when provider is used for zone login
-	InternalClaims map[string]any `json:"internal_claims,omitzero"`
-	paramObj
-}
-
-func (r ZoneProviderNewParamsMetadata) MarshalJSON() (data []byte, err error) {
-	type shadow ZoneProviderNewParamsMetadata
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *ZoneProviderNewParamsMetadata) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -352,12 +314,17 @@ func (r *ZoneProviderNewParamsProtocols) UnmarshalJSON(data []byte) error {
 
 // OAuth 2.0 protocol configuration for provider creation
 type ZoneProviderNewParamsProtocolsOauth2 struct {
-	AuthorizationEndpoint         param.Opt[string] `json:"authorization_endpoint,omitzero" format:"uri"`
-	JwksUri                       param.Opt[string] `json:"jwks_uri,omitzero" format:"uri"`
-	RegistrationEndpoint          param.Opt[string] `json:"registration_endpoint,omitzero" format:"uri"`
-	TokenEndpoint                 param.Opt[string] `json:"token_endpoint,omitzero" format:"uri"`
-	CodeChallengeMethodsSupported []string          `json:"code_challenge_methods_supported,omitzero"`
-	ScopesSupported               []string          `json:"scopes_supported,omitzero"`
+	AuthorizationEndpoint param.Opt[string] `json:"authorization_endpoint,omitzero" format:"uri"`
+	// Whether to include the resource parameter in authorization requests.
+	AuthorizationResourceEnabled param.Opt[bool] `json:"authorization_resource_enabled,omitzero"`
+	// The resource parameter value to include in authorization requests. Defaults to
+	// "resource" when authorization_resource_enabled is true.
+	AuthorizationResourceParameter param.Opt[string] `json:"authorization_resource_parameter,omitzero"`
+	JwksUri                        param.Opt[string] `json:"jwks_uri,omitzero" format:"uri"`
+	RegistrationEndpoint           param.Opt[string] `json:"registration_endpoint,omitzero" format:"uri"`
+	TokenEndpoint                  param.Opt[string] `json:"token_endpoint,omitzero" format:"uri"`
+	CodeChallengeMethodsSupported  []string          `json:"code_challenge_methods_supported,omitzero"`
+	ScopesSupported                []string          `json:"scopes_supported,omitzero"`
 	paramObj
 }
 
@@ -401,11 +368,8 @@ type ZoneProviderUpdateParams struct {
 	Identifier param.Opt[string] `json:"identifier,omitzero"`
 	// Human-readable name
 	Name param.Opt[string] `json:"name,omitzero"`
-	// Domains for identifier-first login flow. Must be globally unique across all
-	// providers. Set to null to remove all domains.
-	Domains []string `json:"domains,omitzero" format:"hostname"`
 	// Provider metadata. Set to null to remove all metadata.
-	Metadata ZoneProviderUpdateParamsMetadata `json:"metadata,omitzero"`
+	Metadata any `json:"metadata,omitzero"`
 	// Protocol-specific configuration. Set to null to remove all protocols.
 	Protocols ZoneProviderUpdateParamsProtocols `json:"protocols,omitzero"`
 	paramObj
@@ -416,22 +380,6 @@ func (r ZoneProviderUpdateParams) MarshalJSON() (data []byte, err error) {
 	return param.MarshalObject(r, (*shadow)(&r))
 }
 func (r *ZoneProviderUpdateParams) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Provider metadata. Set to null to remove all metadata.
-type ZoneProviderUpdateParamsMetadata struct {
-	// Additional claims to inject when provider is used for zone login. Set to null to
-	// remove.
-	InternalClaims map[string]any `json:"internal_claims,omitzero"`
-	paramObj
-}
-
-func (r ZoneProviderUpdateParamsMetadata) MarshalJSON() (data []byte, err error) {
-	type shadow ZoneProviderUpdateParamsMetadata
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *ZoneProviderUpdateParamsMetadata) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -454,12 +402,18 @@ func (r *ZoneProviderUpdateParamsProtocols) UnmarshalJSON(data []byte) error {
 
 // OAuth 2.0 protocol configuration. Set to null to remove all OAuth2 config.
 type ZoneProviderUpdateParamsProtocolsOauth2 struct {
-	AuthorizationEndpoint         param.Opt[string] `json:"authorization_endpoint,omitzero" format:"uri"`
-	JwksUri                       param.Opt[string] `json:"jwks_uri,omitzero" format:"uri"`
-	RegistrationEndpoint          param.Opt[string] `json:"registration_endpoint,omitzero" format:"uri"`
-	TokenEndpoint                 param.Opt[string] `json:"token_endpoint,omitzero" format:"uri"`
-	CodeChallengeMethodsSupported []string          `json:"code_challenge_methods_supported,omitzero"`
-	ScopesSupported               []string          `json:"scopes_supported,omitzero"`
+	AuthorizationEndpoint param.Opt[string] `json:"authorization_endpoint,omitzero" format:"uri"`
+	// Whether to include the resource parameter in authorization requests. Set to null
+	// to unset.
+	AuthorizationResourceEnabled param.Opt[bool] `json:"authorization_resource_enabled,omitzero"`
+	// The resource parameter value to include in authorization requests. Defaults to
+	// "resource" when authorization_resource_enabled is true. Set to null to unset.
+	AuthorizationResourceParameter param.Opt[string] `json:"authorization_resource_parameter,omitzero"`
+	JwksUri                        param.Opt[string] `json:"jwks_uri,omitzero" format:"uri"`
+	RegistrationEndpoint           param.Opt[string] `json:"registration_endpoint,omitzero" format:"uri"`
+	TokenEndpoint                  param.Opt[string] `json:"token_endpoint,omitzero" format:"uri"`
+	CodeChallengeMethodsSupported  []string          `json:"code_challenge_methods_supported,omitzero"`
+	ScopesSupported                []string          `json:"scopes_supported,omitzero"`
 	paramObj
 }
 

@@ -18,6 +18,15 @@ func ValueOf[T Constant[T]]() T {
 	return t.Default()
 }
 
+type Password string // Always "password"
+type Token string    // Always "token"
+
+func (c Password) Default() Password { return "password" }
+func (c Token) Default() Token       { return "token" }
+
+func (c Password) MarshalJSON() ([]byte, error) { return marshalString(c) }
+func (c Token) MarshalJSON() ([]byte, error)    { return marshalString(c) }
+
 type constant[T any] interface {
 	Constant[T]
 	*T

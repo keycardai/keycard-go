@@ -24,9 +24,6 @@ func TestOrganizationSSOConnectionGetWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.SSOConnection.Get(
 		context.TODO(),
@@ -34,7 +31,6 @@ func TestOrganizationSSOConnectionGetWithOptionalParams(t *testing.T) {
 		keycardapi.OrganizationSSOConnectionGetParams{
 			Expand:           []string{"permissions"},
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
@@ -57,9 +53,6 @@ func TestOrganizationSSOConnectionUpdateWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.SSOConnection.Update(
 		context.TODO(),
@@ -68,8 +61,8 @@ func TestOrganizationSSOConnectionUpdateWithOptionalParams(t *testing.T) {
 			ClientID:     keycardapi.String("client_id"),
 			ClientSecret: keycardapi.String("client_secret"),
 			Identifier:   keycardapi.String("x"),
-			Protocols: keycardapi.SSOConnectionProtocolParam{
-				Oauth2: keycardapi.SSOConnectionProtocolOauth2Param{
+			Protocols: keycardapi.OrganizationSSOConnectionUpdateParamsProtocols{
+				Oauth2: keycardapi.OrganizationSSOConnectionUpdateParamsProtocolsOauth2{
 					AuthorizationEndpoint:         keycardapi.String("https://example.com"),
 					CodeChallengeMethodsSupported: []string{"string"},
 					JwksUri:                       keycardapi.String("https://example.com"),
@@ -77,12 +70,11 @@ func TestOrganizationSSOConnectionUpdateWithOptionalParams(t *testing.T) {
 					ScopesSupported:               []string{"string"},
 					TokenEndpoint:                 keycardapi.String("https://example.com"),
 				},
-				Openid: keycardapi.SSOConnectionProtocolOpenidParam{
+				Openid: keycardapi.OrganizationSSOConnectionUpdateParamsProtocolsOpenid{
 					UserinfoEndpoint: keycardapi.String("https://example.com"),
 				},
 			},
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
@@ -105,16 +97,12 @@ func TestOrganizationSSOConnectionDisableWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	err := client.Organizations.SSOConnection.Disable(
 		context.TODO(),
 		"x",
 		keycardapi.OrganizationSSOConnectionDisableParams{
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
@@ -137,9 +125,6 @@ func TestOrganizationSSOConnectionEnableWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.SSOConnection.Enable(
 		context.TODO(),
@@ -148,8 +133,8 @@ func TestOrganizationSSOConnectionEnableWithOptionalParams(t *testing.T) {
 			ClientID:     "client_id",
 			Identifier:   "x",
 			ClientSecret: keycardapi.String("client_secret"),
-			Protocols: keycardapi.SSOConnectionProtocolParam{
-				Oauth2: keycardapi.SSOConnectionProtocolOauth2Param{
+			Protocols: keycardapi.OrganizationSSOConnectionEnableParamsProtocols{
+				Oauth2: keycardapi.OrganizationSSOConnectionEnableParamsProtocolsOauth2{
 					AuthorizationEndpoint:         keycardapi.String("https://example.com"),
 					CodeChallengeMethodsSupported: []string{"string"},
 					JwksUri:                       keycardapi.String("https://example.com"),
@@ -157,12 +142,11 @@ func TestOrganizationSSOConnectionEnableWithOptionalParams(t *testing.T) {
 					ScopesSupported:               []string{"string"},
 					TokenEndpoint:                 keycardapi.String("https://example.com"),
 				},
-				Openid: keycardapi.SSOConnectionProtocolOpenidParam{
+				Openid: keycardapi.OrganizationSSOConnectionEnableParamsProtocolsOpenid{
 					UserinfoEndpoint: keycardapi.String("https://example.com"),
 				},
 			},
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			XRequestID:       keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
