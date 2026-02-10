@@ -114,6 +114,9 @@ type Grant struct {
 	OrganizationID string `json:"organization_id,required"`
 	// ID of the provider that issued this grant
 	ProviderID string `json:"provider_id,required"`
+	// Indicates whether a refresh token is stored for this grant. Grants with refresh
+	// tokens can be refreshed even after access token expiration.
+	RefreshTokenSet bool `json:"refresh_token_set,required"`
 	// ID of resource receiving grant
 	ResourceID string `json:"resource_id,required"`
 	// Granted OAuth scopes
@@ -135,6 +138,9 @@ type Grant struct {
 	//
 	// Deprecated: deprecated
 	Provider Provider `json:"provider"`
+	// Timestamp when this grant's tokens were last refreshed. Omitted if grant was
+	// never refreshed.
+	RefreshedAt time.Time `json:"refreshed_at" format:"date-time"`
 	// A Resource is a system that exposes protected information or functionality. It
 	// requires authentication of the requesting actor, which may be a user or
 	// application, before allowing access.
@@ -147,23 +153,25 @@ type Grant struct {
 	User User `json:"user"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID             respjson.Field
-		CreatedAt      respjson.Field
-		ExpiresAt      respjson.Field
-		OrganizationID respjson.Field
-		ProviderID     respjson.Field
-		ResourceID     respjson.Field
-		Scopes         respjson.Field
-		Status         respjson.Field
-		UpdatedAt      respjson.Field
-		UserID         respjson.Field
-		ZoneID         respjson.Field
-		Active         respjson.Field
-		Provider       respjson.Field
-		Resource       respjson.Field
-		User           respjson.Field
-		ExtraFields    map[string]respjson.Field
-		raw            string
+		ID              respjson.Field
+		CreatedAt       respjson.Field
+		ExpiresAt       respjson.Field
+		OrganizationID  respjson.Field
+		ProviderID      respjson.Field
+		RefreshTokenSet respjson.Field
+		ResourceID      respjson.Field
+		Scopes          respjson.Field
+		Status          respjson.Field
+		UpdatedAt       respjson.Field
+		UserID          respjson.Field
+		ZoneID          respjson.Field
+		Active          respjson.Field
+		Provider        respjson.Field
+		RefreshedAt     respjson.Field
+		Resource        respjson.Field
+		User            respjson.Field
+		ExtraFields     map[string]respjson.Field
+		raw             string
 	} `json:"-"`
 }
 

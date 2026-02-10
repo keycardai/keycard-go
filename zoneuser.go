@@ -71,6 +71,8 @@ type User struct {
 	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
 	// Email address of the user
 	Email string `json:"email,required" format:"email"`
+	// Whether the email address has been verified
+	EmailVerified bool `json:"email_verified,required"`
 	// Issuer identifier of the identity provider
 	Issuer string `json:"issuer,required"`
 	// Organization that owns this user
@@ -91,6 +93,7 @@ type User struct {
 		ID              respjson.Field
 		CreatedAt       respjson.Field
 		Email           respjson.Field
+		EmailVerified   respjson.Field
 		Issuer          respjson.Field
 		OrganizationID  respjson.Field
 		Subject         respjson.Field
