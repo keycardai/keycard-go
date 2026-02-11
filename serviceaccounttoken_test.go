@@ -24,6 +24,9 @@ func TestServiceAccountTokenNewWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithUsername("My Username"),
+		option.WithPassword("My Password"),
 	)
 	_, err := client.ServiceAccountToken.New(context.TODO(), keycardapi.ServiceAccountTokenNewParams{
 		ClientID:         "client_id",

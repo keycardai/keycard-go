@@ -22,6 +22,9 @@ func TestUsage(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithUsername("My Username"),
+		option.WithPassword("My Password"),
 	)
 	t.Skip("Prism tests are disabled")
 	zones, err := client.Zones.List(context.TODO(), keycardapi.ZoneListParams{})

@@ -13,7 +13,7 @@ import (
 	"github.com/stainless-sdks/keycard-api-go/option"
 )
 
-func TestZoneMcpGatewayNewServerWithOptionalParams(t *testing.T) {
+func TestZoneMcpGatewayNewMcpServerWithOptionalParams(t *testing.T) {
 	t.Skip("Prism tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -24,20 +24,23 @@ func TestZoneMcpGatewayNewServerWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithUsername("My Username"),
+		option.WithPassword("My Password"),
 	)
-	_, err := client.Zones.McpGateways.NewServer(
+	_, err := client.Zones.McpGateways.NewMcpServer(
 		context.TODO(),
 		"applicationId",
-		keycardapi.ZoneMcpGatewayNewServerParams{
+		keycardapi.ZoneMcpGatewayNewMcpServerParams{
 			ZoneID: "zoneId",
-			Downstream: keycardapi.ZoneMcpGatewayNewServerParamsDownstream{
+			Downstream: keycardapi.ZoneMcpGatewayNewMcpServerParamsDownstream{
 				Slug: keycardapi.String("slug"),
 			},
-			Upstream: keycardapi.ZoneMcpGatewayNewServerParamsUpstream{
+			Upstream: keycardapi.ZoneMcpGatewayNewMcpServerParamsUpstream{
 				Identifier: "x",
 				Name:       "x",
 			},
-			UpstreamProvider: keycardapi.ZoneMcpGatewayNewServerParamsUpstreamProvider{
+			UpstreamProvider: keycardapi.ZoneMcpGatewayNewMcpServerParamsUpstreamProvider{
 				Identifier: "x",
 				Name:       "x",
 			},

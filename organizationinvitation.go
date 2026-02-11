@@ -39,16 +39,17 @@ func NewOrganizationInvitationService(opts ...option.RequestOption) (r Organizat
 }
 
 // Create an invitation to join an organization
-func (r *OrganizationInvitationService) New(ctx context.Context, organizationID string, params OrganizationInvitationNewParams, opts ...option.RequestOption) (res *OrganizationInvitationNewResponse, err error) {
+func (r *OrganizationInvitationService) New(ctx context.Context, organizationID string, params OrganizationInvitationNewParams, opts ...option.RequestOption) (res *Invitation, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return
 	}
-	path := fmt.Sprintf("organizations/%s/invitations", organizationID)
+	path := fmt.Sprintf("organizations/%s/invitations", url.PathEscape(organizationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
 	return
 }
@@ -58,12 +59,13 @@ func (r *OrganizationInvitationService) List(ctx context.Context, organizationID
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return
 	}
-	path := fmt.Sprintf("organizations/%s/invitations", organizationID)
+	path := fmt.Sprintf("organizations/%s/invitations", url.PathEscape(organizationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
 	return
 }
@@ -73,7 +75,8 @@ func (r *OrganizationInvitationService) Delete(ctx context.Context, invitationID
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
@@ -83,12 +86,12 @@ func (r *OrganizationInvitationService) Delete(ctx context.Context, invitationID
 		err = errors.New("missing required invitation_id parameter")
 		return
 	}
-	path := fmt.Sprintf("organizations/%s/invitations/%s", params.OrganizationID, invitationID)
+	path := fmt.Sprintf("organizations/%s/invitations/%s", url.PathEscape(params.OrganizationID), url.PathEscape(invitationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
 	return
 }
 
-type OrganizationInvitationNewResponse struct {
+type Invitation struct {
 	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
 	ID string `json:"id,required"`
 	// The time the entity was created in utc
@@ -104,11 +107,11 @@ type OrganizationInvitationNewResponse struct {
 	// Role that will be assigned when invitation is accepted
 	//
 	// Any of "org_admin", "org_member", "org_viewer".
-	Role OrganizationInvitationNewResponseRole `json:"role,required"`
+	Role OrganizationRole `json:"role,required"`
 	// Status of an invitation
 	//
 	// Any of "pending", "accepted", "expired", "revoked".
-	Status OrganizationInvitationNewResponseStatus `json:"status,required"`
+	Status InvitationStatus `json:"status,required"`
 	// The time the entity was mostly recently updated in utc
 	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
 	// Permissions granted to the authenticated principal for this resource. Only
@@ -134,34 +137,25 @@ type OrganizationInvitationNewResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r OrganizationInvitationNewResponse) RawJSON() string { return r.JSON.raw }
-func (r *OrganizationInvitationNewResponse) UnmarshalJSON(data []byte) error {
+func (r Invitation) RawJSON() string { return r.JSON.raw }
+func (r *Invitation) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Role that will be assigned when invitation is accepted
-type OrganizationInvitationNewResponseRole string
-
-const (
-	OrganizationInvitationNewResponseRoleOrgAdmin  OrganizationInvitationNewResponseRole = "org_admin"
-	OrganizationInvitationNewResponseRoleOrgMember OrganizationInvitationNewResponseRole = "org_member"
-	OrganizationInvitationNewResponseRoleOrgViewer OrganizationInvitationNewResponseRole = "org_viewer"
-)
-
 // Status of an invitation
-type OrganizationInvitationNewResponseStatus string
+type InvitationStatus string
 
 const (
-	OrganizationInvitationNewResponseStatusPending  OrganizationInvitationNewResponseStatus = "pending"
-	OrganizationInvitationNewResponseStatusAccepted OrganizationInvitationNewResponseStatus = "accepted"
-	OrganizationInvitationNewResponseStatusExpired  OrganizationInvitationNewResponseStatus = "expired"
-	OrganizationInvitationNewResponseStatusRevoked  OrganizationInvitationNewResponseStatus = "revoked"
+	InvitationStatusPending  InvitationStatus = "pending"
+	InvitationStatusAccepted InvitationStatus = "accepted"
+	InvitationStatusExpired  InvitationStatus = "expired"
+	InvitationStatusRevoked  InvitationStatus = "revoked"
 )
 
 type OrganizationInvitationListResponse struct {
-	Items []OrganizationInvitationListResponseItem `json:"items,required"`
+	Items []Invitation `json:"items,required"`
 	// Pagination information using cursor-based pagination
-	PageInfo OrganizationInvitationListResponsePageInfo `json:"page_info,required"`
+	PageInfo PageInfoCursor `json:"page_info,required"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -183,84 +177,6 @@ func (r *OrganizationInvitationListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type OrganizationInvitationListResponseItem struct {
-	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
-	ID string `json:"id,required"`
-	// The time the entity was created in utc
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
-	// ID of the user who created the invitation
-	CreatedBy string `json:"created_by,required"`
-	// Email address for the invitation
-	Email string `json:"email,required" format:"email"`
-	// When the invitation expires
-	ExpiresAt time.Time `json:"expires_at,required" format:"date-time"`
-	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
-	OrganizationID string `json:"organization_id,required"`
-	// Role that will be assigned when invitation is accepted
-	//
-	// Any of "org_admin", "org_member", "org_viewer".
-	Role string `json:"role,required"`
-	// Status of an invitation
-	//
-	// Any of "pending", "accepted", "expired", "revoked".
-	Status string `json:"status,required"`
-	// The time the entity was mostly recently updated in utc
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
-	// Permissions granted to the authenticated principal for this resource. Only
-	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
-	// resource types (e.g., "organizations"), values are objects mapping permission
-	// names to boolean values indicating if the permission is granted.
-	Permissions map[string]map[string]bool `json:"permissions"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID             respjson.Field
-		CreatedAt      respjson.Field
-		CreatedBy      respjson.Field
-		Email          respjson.Field
-		ExpiresAt      respjson.Field
-		OrganizationID respjson.Field
-		Role           respjson.Field
-		Status         respjson.Field
-		UpdatedAt      respjson.Field
-		Permissions    respjson.Field
-		ExtraFields    map[string]respjson.Field
-		raw            string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrganizationInvitationListResponseItem) RawJSON() string { return r.JSON.raw }
-func (r *OrganizationInvitationListResponseItem) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Pagination information using cursor-based pagination
-type OrganizationInvitationListResponsePageInfo struct {
-	// Whether there are more items after the current page
-	HasNextPage bool `json:"has_next_page,required"`
-	// Whether there are more items before the current page
-	HasPrevPage bool `json:"has_prev_page,required"`
-	// Cursor pointing to the last item in the current page
-	EndCursor string `json:"end_cursor"`
-	// Cursor pointing to the first item in the current page
-	StartCursor string `json:"start_cursor"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		HasNextPage respjson.Field
-		HasPrevPage respjson.Field
-		EndCursor   respjson.Field
-		StartCursor respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrganizationInvitationListResponsePageInfo) RawJSON() string { return r.JSON.raw }
-func (r *OrganizationInvitationListResponsePageInfo) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
 type OrganizationInvitationNewParams struct {
 	// Email address to invite
 	Email            string            `json:"email,required" format:"email"`
@@ -269,7 +185,7 @@ type OrganizationInvitationNewParams struct {
 	// provided)
 	//
 	// Any of "org_admin", "org_member", "org_viewer".
-	Role OrganizationInvitationNewParamsRole `json:"role,omitzero"`
+	Role OrganizationRole `json:"role,omitzero"`
 	paramObj
 }
 
@@ -280,16 +196,6 @@ func (r OrganizationInvitationNewParams) MarshalJSON() (data []byte, err error) 
 func (r *OrganizationInvitationNewParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-// Role to assign when invitation is accepted (defaults to org_admin if not
-// provided)
-type OrganizationInvitationNewParamsRole string
-
-const (
-	OrganizationInvitationNewParamsRoleOrgAdmin  OrganizationInvitationNewParamsRole = "org_admin"
-	OrganizationInvitationNewParamsRoleOrgMember OrganizationInvitationNewParamsRole = "org_member"
-	OrganizationInvitationNewParamsRoleOrgViewer OrganizationInvitationNewParamsRole = "org_viewer"
-)
 
 type OrganizationInvitationListParams struct {
 	// Cursor for forward pagination

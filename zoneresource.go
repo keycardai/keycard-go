@@ -40,19 +40,21 @@ func NewZoneResourceService(opts ...option.RequestOption) (r ZoneResourceService
 // Creates a new Resource - a system that exposes protected information or
 // functionality requiring authentication
 func (r *ZoneResourceService) New(ctx context.Context, zoneID string, body ZoneResourceNewParams, opts ...option.RequestOption) (res *Resource, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/resources", zoneID)
+	path := fmt.Sprintf("zones/%s/resources", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
 }
 
 // Returns details of a specific Resource by ID
 func (r *ZoneResourceService) Get(ctx context.Context, id string, query ZoneResourceGetParams, opts ...option.RequestOption) (res *Resource, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -61,14 +63,15 @@ func (r *ZoneResourceService) Get(ctx context.Context, id string, query ZoneReso
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/resources/%s", query.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/resources/%s", url.PathEscape(query.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
 
 // Updates a Resource's configuration and metadata
 func (r *ZoneResourceService) Update(ctx context.Context, id string, params ZoneResourceUpdateParams, opts ...option.RequestOption) (res *Resource, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -77,26 +80,28 @@ func (r *ZoneResourceService) Update(ctx context.Context, id string, params Zone
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/resources/%s", params.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/resources/%s", url.PathEscape(params.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
 	return
 }
 
 // Returns a list of resources in the specified zone
 func (r *ZoneResourceService) List(ctx context.Context, zoneID string, query ZoneResourceListParams, opts ...option.RequestOption) (res *ZoneResourceListResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/resources", zoneID)
+	path := fmt.Sprintf("zones/%s/resources", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
 }
 
 // Permanently deletes a Resource
 func (r *ZoneResourceService) Delete(ctx context.Context, id string, body ZoneResourceDeleteParams, opts ...option.RequestOption) (err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -106,7 +111,7 @@ func (r *ZoneResourceService) Delete(ctx context.Context, id string, body ZoneRe
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/resources/%s", body.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/resources/%s", url.PathEscape(body.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
 	return
 }

@@ -44,19 +44,21 @@ func NewZoneApplicationService(opts ...option.RequestOption) (r ZoneApplicationS
 // Creates a new Application - a software system with an identity that can access
 // Resources
 func (r *ZoneApplicationService) New(ctx context.Context, zoneID string, body ZoneApplicationNewParams, opts ...option.RequestOption) (res *Application, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/applications", zoneID)
+	path := fmt.Sprintf("zones/%s/applications", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
 }
 
 // Returns details of a specific Application by ID
 func (r *ZoneApplicationService) Get(ctx context.Context, id string, query ZoneApplicationGetParams, opts ...option.RequestOption) (res *Application, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -65,14 +67,15 @@ func (r *ZoneApplicationService) Get(ctx context.Context, id string, query ZoneA
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/applications/%s", query.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/applications/%s", url.PathEscape(query.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
 
 // Updates an Application's configuration and metadata
 func (r *ZoneApplicationService) Update(ctx context.Context, id string, params ZoneApplicationUpdateParams, opts ...option.RequestOption) (res *Application, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -81,26 +84,28 @@ func (r *ZoneApplicationService) Update(ctx context.Context, id string, params Z
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/applications/%s", params.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/applications/%s", url.PathEscape(params.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
 	return
 }
 
 // Returns a list of applications in the specified zone
 func (r *ZoneApplicationService) List(ctx context.Context, zoneID string, query ZoneApplicationListParams, opts ...option.RequestOption) (res *ZoneApplicationListResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/applications", zoneID)
+	path := fmt.Sprintf("zones/%s/applications", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
 }
 
 // Permanently deletes an application
 func (r *ZoneApplicationService) Delete(ctx context.Context, id string, body ZoneApplicationDeleteParams, opts ...option.RequestOption) (err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -110,14 +115,15 @@ func (r *ZoneApplicationService) Delete(ctx context.Context, id string, body Zon
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/applications/%s", body.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/applications/%s", url.PathEscape(body.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
 	return
 }
 
 // Returns a list of application credentials for a specific application
 func (r *ZoneApplicationService) ListCredentials(ctx context.Context, id string, params ZoneApplicationListCredentialsParams, opts ...option.RequestOption) (res *ZoneApplicationListCredentialsResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -126,14 +132,15 @@ func (r *ZoneApplicationService) ListCredentials(ctx context.Context, id string,
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/applications/%s/application-credentials", params.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/applications/%s/application-credentials", url.PathEscape(params.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
 	return
 }
 
 // Returns a list of resources provided by an application
 func (r *ZoneApplicationService) ListResources(ctx context.Context, id string, params ZoneApplicationListResourcesParams, opts ...option.RequestOption) (res *ZoneApplicationListResourcesResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -142,7 +149,7 @@ func (r *ZoneApplicationService) ListResources(ctx context.Context, id string, p
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/applications/%s/resources", params.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/applications/%s/resources", url.PathEscape(params.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
 	return
 }

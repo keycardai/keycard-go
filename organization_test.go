@@ -24,6 +24,9 @@ func TestOrganizationNewWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithUsername("My Username"),
+		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.New(context.TODO(), keycardapi.OrganizationNewParams{
 		Name:             keycardapi.String("name"),
@@ -49,6 +52,9 @@ func TestOrganizationGetWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithUsername("My Username"),
+		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.Get(
 		context.TODO(),
@@ -78,6 +84,9 @@ func TestOrganizationUpdateWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithUsername("My Username"),
+		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.Update(
 		context.TODO(),
@@ -107,6 +116,9 @@ func TestOrganizationListWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithUsername("My Username"),
+		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.List(context.TODO(), keycardapi.OrganizationListParams{
 		After:            keycardapi.String("x"),
@@ -135,6 +147,9 @@ func TestOrganizationExchangeTokenWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithUsername("My Username"),
+		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.ExchangeToken(
 		context.TODO(),
@@ -163,6 +178,9 @@ func TestOrganizationListIdentitiesWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithUsername("My Username"),
+		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.ListIdentities(
 		context.TODO(),
@@ -172,7 +190,7 @@ func TestOrganizationListIdentitiesWithOptionalParams(t *testing.T) {
 			Before:           keycardapi.String("x"),
 			Expand:           []string{"permissions"},
 			Limit:            keycardapi.Int(1),
-			Role:             keycardapi.OrganizationListIdentitiesParamsRoleOrgAdmin,
+			Role:             keycardapi.OrganizationRoleOrgAdmin,
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
@@ -196,13 +214,16 @@ func TestOrganizationListRolesWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithUsername("My Username"),
+		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.ListRoles(
 		context.TODO(),
 		"x",
 		keycardapi.OrganizationListRolesParams{
 			Expand:           []string{"permissions"},
-			Scope:            keycardapi.OrganizationListRolesParamsScopeOrganization,
+			Scope:            keycardapi.RoleScopeOrganization,
 			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)

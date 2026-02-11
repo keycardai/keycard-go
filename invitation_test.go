@@ -24,6 +24,9 @@ func TestInvitationGetWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithUsername("My Username"),
+		option.WithPassword("My Password"),
 	)
 	_, err := client.Invitations.Get(
 		context.TODO(),
@@ -52,6 +55,9 @@ func TestInvitationAcceptWithOptionalParams(t *testing.T) {
 	}
 	client := keycardapi.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithUsername("My Username"),
+		option.WithPassword("My Password"),
 	)
 	_, err := client.Invitations.Accept(
 		context.TODO(),

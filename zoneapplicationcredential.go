@@ -41,19 +41,21 @@ func NewZoneApplicationCredentialService(opts ...option.RequestOption) (r ZoneAp
 
 // Creates a new application credential
 func (r *ZoneApplicationCredentialService) New(ctx context.Context, zoneID string, body ZoneApplicationCredentialNewParams, opts ...option.RequestOption) (res *ZoneApplicationCredentialNewResponseUnion, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/application-credentials", zoneID)
+	path := fmt.Sprintf("zones/%s/application-credentials", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
 }
 
 // Returns details of a specific application credential by ID
 func (r *ZoneApplicationCredentialService) Get(ctx context.Context, id string, query ZoneApplicationCredentialGetParams, opts ...option.RequestOption) (res *CredentialUnion, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -62,14 +64,15 @@ func (r *ZoneApplicationCredentialService) Get(ctx context.Context, id string, q
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/application-credentials/%s", query.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/application-credentials/%s", url.PathEscape(query.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
 
 // Updates an application credential's configuration
 func (r *ZoneApplicationCredentialService) Update(ctx context.Context, id string, params ZoneApplicationCredentialUpdateParams, opts ...option.RequestOption) (res *CredentialUnion, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -78,26 +81,28 @@ func (r *ZoneApplicationCredentialService) Update(ctx context.Context, id string
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/application-credentials/%s", params.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/application-credentials/%s", url.PathEscape(params.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
 	return
 }
 
 // Returns a list of application credentials in the specified zone
 func (r *ZoneApplicationCredentialService) List(ctx context.Context, zoneID string, query ZoneApplicationCredentialListParams, opts ...option.RequestOption) (res *ZoneApplicationCredentialListResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/application-credentials", zoneID)
+	path := fmt.Sprintf("zones/%s/application-credentials", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
 }
 
 // Permanently deletes an application credential
 func (r *ZoneApplicationCredentialService) Delete(ctx context.Context, id string, body ZoneApplicationCredentialDeleteParams, opts ...option.RequestOption) (err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -107,7 +112,7 @@ func (r *ZoneApplicationCredentialService) Delete(ctx context.Context, id string
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/application-credentials/%s", body.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/application-credentials/%s", url.PathEscape(body.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
 	return
 }
