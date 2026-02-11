@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"slices"
 	"time"
 
@@ -37,7 +38,8 @@ func NewZoneUserService(opts ...option.RequestOption) (r ZoneUserService) {
 
 // Returns details of a specific user by user ID
 func (r *ZoneUserService) Get(ctx context.Context, id string, query ZoneUserGetParams, opts ...option.RequestOption) (res *User, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -46,19 +48,20 @@ func (r *ZoneUserService) Get(ctx context.Context, id string, query ZoneUserGetP
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/users/%s", query.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/users/%s", url.PathEscape(query.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
 
 // Returns a list of users in the specified zone. Can be filtered by email address.
 func (r *ZoneUserService) List(ctx context.Context, zoneID string, opts ...option.RequestOption) (res *ZoneUserListResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/users", zoneID)
+	path := fmt.Sprintf("zones/%s/users", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }

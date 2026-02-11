@@ -44,7 +44,8 @@ func (r *OrganizationServiceAccountCredentialService) New(ctx context.Context, s
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return
@@ -53,17 +54,18 @@ func (r *OrganizationServiceAccountCredentialService) New(ctx context.Context, s
 		err = errors.New("missing required service_account_id parameter")
 		return
 	}
-	path := fmt.Sprintf("organizations/%s/service-accounts/%s/credentials", params.OrganizationID, serviceAccountID)
+	path := fmt.Sprintf("organizations/%s/service-accounts/%s/credentials", url.PathEscape(params.OrganizationID), url.PathEscape(serviceAccountID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
 	return
 }
 
 // Get a specific service account credential
-func (r *OrganizationServiceAccountCredentialService) Get(ctx context.Context, credentialID string, params OrganizationServiceAccountCredentialGetParams, opts ...option.RequestOption) (res *OrganizationServiceAccountCredentialGetResponse, err error) {
+func (r *OrganizationServiceAccountCredentialService) Get(ctx context.Context, credentialID string, params OrganizationServiceAccountCredentialGetParams, opts ...option.RequestOption) (res *ServiceAccountCredential, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return
@@ -76,17 +78,18 @@ func (r *OrganizationServiceAccountCredentialService) Get(ctx context.Context, c
 		err = errors.New("missing required credential_id parameter")
 		return
 	}
-	path := fmt.Sprintf("organizations/%s/service-accounts/%s/credentials/%s", params.OrganizationID, params.ServiceAccountID, credentialID)
+	path := fmt.Sprintf("organizations/%s/service-accounts/%s/credentials/%s", url.PathEscape(params.OrganizationID), url.PathEscape(params.ServiceAccountID), url.PathEscape(credentialID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
 	return
 }
 
 // Update a service account credential
-func (r *OrganizationServiceAccountCredentialService) Update(ctx context.Context, credentialID string, params OrganizationServiceAccountCredentialUpdateParams, opts ...option.RequestOption) (res *OrganizationServiceAccountCredentialUpdateResponse, err error) {
+func (r *OrganizationServiceAccountCredentialService) Update(ctx context.Context, credentialID string, params OrganizationServiceAccountCredentialUpdateParams, opts ...option.RequestOption) (res *ServiceAccountCredential, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return
@@ -99,7 +102,7 @@ func (r *OrganizationServiceAccountCredentialService) Update(ctx context.Context
 		err = errors.New("missing required credential_id parameter")
 		return
 	}
-	path := fmt.Sprintf("organizations/%s/service-accounts/%s/credentials/%s", params.OrganizationID, params.ServiceAccountID, credentialID)
+	path := fmt.Sprintf("organizations/%s/service-accounts/%s/credentials/%s", url.PathEscape(params.OrganizationID), url.PathEscape(params.ServiceAccountID), url.PathEscape(credentialID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
 	return
 }
@@ -109,7 +112,8 @@ func (r *OrganizationServiceAccountCredentialService) List(ctx context.Context, 
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return
@@ -118,7 +122,7 @@ func (r *OrganizationServiceAccountCredentialService) List(ctx context.Context, 
 		err = errors.New("missing required service_account_id parameter")
 		return
 	}
-	path := fmt.Sprintf("organizations/%s/service-accounts/%s/credentials", params.OrganizationID, serviceAccountID)
+	path := fmt.Sprintf("organizations/%s/service-accounts/%s/credentials", url.PathEscape(params.OrganizationID), url.PathEscape(serviceAccountID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
 	return
 }
@@ -128,7 +132,8 @@ func (r *OrganizationServiceAccountCredentialService) Delete(ctx context.Context
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
@@ -142,9 +147,48 @@ func (r *OrganizationServiceAccountCredentialService) Delete(ctx context.Context
 		err = errors.New("missing required credential_id parameter")
 		return
 	}
-	path := fmt.Sprintf("organizations/%s/service-accounts/%s/credentials/%s", params.OrganizationID, params.ServiceAccountID, credentialID)
+	path := fmt.Sprintf("organizations/%s/service-accounts/%s/credentials/%s", url.PathEscape(params.OrganizationID), url.PathEscape(params.ServiceAccountID), url.PathEscape(credentialID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
 	return
+}
+
+// Service account credential (without secret)
+type ServiceAccountCredential struct {
+	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
+	ID string `json:"id,required"`
+	// The client ID for authentication
+	ClientID string `json:"client_id,required"`
+	// The time the entity was created in utc
+	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	// A name for the entity to be displayed in UI
+	Name string `json:"name,required"`
+	// Optional description of the credential
+	Description string `json:"description"`
+	// When the credential was last used
+	LastUsedAt time.Time `json:"last_used_at" format:"date-time"`
+	// Permissions granted to the authenticated principal for this resource. Only
+	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
+	// resource types (e.g., "organizations"), values are objects mapping permission
+	// names to boolean values indicating if the permission is granted.
+	Permissions map[string]map[string]bool `json:"permissions"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		ClientID    respjson.Field
+		CreatedAt   respjson.Field
+		Name        respjson.Field
+		Description respjson.Field
+		LastUsedAt  respjson.Field
+		Permissions respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ServiceAccountCredential) RawJSON() string { return r.JSON.raw }
+func (r *ServiceAccountCredential) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Service account credential with plaintext secret (only returned on creation)
@@ -180,88 +224,10 @@ func (r *OrganizationServiceAccountCredentialNewResponse) UnmarshalJSON(data []b
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Service account credential (without secret)
-type OrganizationServiceAccountCredentialGetResponse struct {
-	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
-	ID string `json:"id,required"`
-	// The client ID for authentication
-	ClientID string `json:"client_id,required"`
-	// The time the entity was created in utc
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
-	// A name for the entity to be displayed in UI
-	Name string `json:"name,required"`
-	// Optional description of the credential
-	Description string `json:"description"`
-	// When the credential was last used
-	LastUsedAt time.Time `json:"last_used_at" format:"date-time"`
-	// Permissions granted to the authenticated principal for this resource. Only
-	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
-	// resource types (e.g., "organizations"), values are objects mapping permission
-	// names to boolean values indicating if the permission is granted.
-	Permissions map[string]map[string]bool `json:"permissions"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID          respjson.Field
-		ClientID    respjson.Field
-		CreatedAt   respjson.Field
-		Name        respjson.Field
-		Description respjson.Field
-		LastUsedAt  respjson.Field
-		Permissions respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrganizationServiceAccountCredentialGetResponse) RawJSON() string { return r.JSON.raw }
-func (r *OrganizationServiceAccountCredentialGetResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Service account credential (without secret)
-type OrganizationServiceAccountCredentialUpdateResponse struct {
-	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
-	ID string `json:"id,required"`
-	// The client ID for authentication
-	ClientID string `json:"client_id,required"`
-	// The time the entity was created in utc
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
-	// A name for the entity to be displayed in UI
-	Name string `json:"name,required"`
-	// Optional description of the credential
-	Description string `json:"description"`
-	// When the credential was last used
-	LastUsedAt time.Time `json:"last_used_at" format:"date-time"`
-	// Permissions granted to the authenticated principal for this resource. Only
-	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
-	// resource types (e.g., "organizations"), values are objects mapping permission
-	// names to boolean values indicating if the permission is granted.
-	Permissions map[string]map[string]bool `json:"permissions"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID          respjson.Field
-		ClientID    respjson.Field
-		CreatedAt   respjson.Field
-		Name        respjson.Field
-		Description respjson.Field
-		LastUsedAt  respjson.Field
-		Permissions respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrganizationServiceAccountCredentialUpdateResponse) RawJSON() string { return r.JSON.raw }
-func (r *OrganizationServiceAccountCredentialUpdateResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
 type OrganizationServiceAccountCredentialListResponse struct {
-	Items []OrganizationServiceAccountCredentialListResponseItem `json:"items,required"`
+	Items []ServiceAccountCredential `json:"items,required"`
 	// Pagination information using cursor-based pagination
-	PageInfo OrganizationServiceAccountCredentialListResponsePageInfo `json:"page_info,required"`
+	PageInfo PageInfoCursor `json:"page_info,required"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -280,72 +246,6 @@ type OrganizationServiceAccountCredentialListResponse struct {
 // Returns the unmodified JSON received from the API
 func (r OrganizationServiceAccountCredentialListResponse) RawJSON() string { return r.JSON.raw }
 func (r *OrganizationServiceAccountCredentialListResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Service account credential (without secret)
-type OrganizationServiceAccountCredentialListResponseItem struct {
-	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
-	ID string `json:"id,required"`
-	// The client ID for authentication
-	ClientID string `json:"client_id,required"`
-	// The time the entity was created in utc
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
-	// A name for the entity to be displayed in UI
-	Name string `json:"name,required"`
-	// Optional description of the credential
-	Description string `json:"description"`
-	// When the credential was last used
-	LastUsedAt time.Time `json:"last_used_at" format:"date-time"`
-	// Permissions granted to the authenticated principal for this resource. Only
-	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
-	// resource types (e.g., "organizations"), values are objects mapping permission
-	// names to boolean values indicating if the permission is granted.
-	Permissions map[string]map[string]bool `json:"permissions"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID          respjson.Field
-		ClientID    respjson.Field
-		CreatedAt   respjson.Field
-		Name        respjson.Field
-		Description respjson.Field
-		LastUsedAt  respjson.Field
-		Permissions respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrganizationServiceAccountCredentialListResponseItem) RawJSON() string { return r.JSON.raw }
-func (r *OrganizationServiceAccountCredentialListResponseItem) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Pagination information using cursor-based pagination
-type OrganizationServiceAccountCredentialListResponsePageInfo struct {
-	// Whether there are more items after the current page
-	HasNextPage bool `json:"has_next_page,required"`
-	// Whether there are more items before the current page
-	HasPrevPage bool `json:"has_prev_page,required"`
-	// Cursor pointing to the last item in the current page
-	EndCursor string `json:"end_cursor"`
-	// Cursor pointing to the first item in the current page
-	StartCursor string `json:"start_cursor"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		HasNextPage respjson.Field
-		HasPrevPage respjson.Field
-		EndCursor   respjson.Field
-		StartCursor respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrganizationServiceAccountCredentialListResponsePageInfo) RawJSON() string { return r.JSON.raw }
-func (r *OrganizationServiceAccountCredentialListResponsePageInfo) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 

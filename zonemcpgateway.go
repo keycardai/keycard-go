@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"slices"
 
 	"github.com/stainless-sdks/keycard-api-go/internal/apijson"
@@ -36,8 +37,9 @@ func NewZoneMcpGatewayService(opts ...option.RequestOption) (r ZoneMcpGatewaySer
 }
 
 // Creates all resources required to access an MCP server through an MCP gateway
-func (r *ZoneMcpGatewayService) NewServer(ctx context.Context, applicationID string, params ZoneMcpGatewayNewServerParams, opts ...option.RequestOption) (res *ZoneMcpGatewayNewServerResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+func (r *ZoneMcpGatewayService) NewMcpServer(ctx context.Context, applicationID string, params ZoneMcpGatewayNewMcpServerParams, opts ...option.RequestOption) (res *ZoneMcpGatewayNewMcpServerResponse, err error) {
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -46,14 +48,14 @@ func (r *ZoneMcpGatewayService) NewServer(ctx context.Context, applicationID str
 		err = errors.New("missing required applicationId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/mcp-gateways/%s/mcp-servers", params.ZoneID, applicationID)
+	path := fmt.Sprintf("zones/%s/mcp-gateways/%s/mcp-servers", url.PathEscape(params.ZoneID), url.PathEscape(applicationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
 	return
 }
 
 // Response containing the created upstream provider, upstream resource, and
 // downstream resource for an MCP server
-type ZoneMcpGatewayNewServerResponse struct {
+type ZoneMcpGatewayNewMcpServerResponse struct {
 	// A Resource is a system that exposes protected information or functionality. It
 	// requires authentication of the requesting actor, which may be a user or
 	// application, before allowing access.
@@ -76,49 +78,49 @@ type ZoneMcpGatewayNewServerResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ZoneMcpGatewayNewServerResponse) RawJSON() string { return r.JSON.raw }
-func (r *ZoneMcpGatewayNewServerResponse) UnmarshalJSON(data []byte) error {
+func (r ZoneMcpGatewayNewMcpServerResponse) RawJSON() string { return r.JSON.raw }
+func (r *ZoneMcpGatewayNewMcpServerResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type ZoneMcpGatewayNewServerParams struct {
+type ZoneMcpGatewayNewMcpServerParams struct {
 	ZoneID string `path:"zoneId,required" json:"-"`
 	// Downstream MCP server config
-	Downstream ZoneMcpGatewayNewServerParamsDownstream `json:"downstream,omitzero,required"`
+	Downstream ZoneMcpGatewayNewMcpServerParamsDownstream `json:"downstream,omitzero,required"`
 	// Upstream MCP server config
-	Upstream ZoneMcpGatewayNewServerParamsUpstream `json:"upstream,omitzero,required"`
+	Upstream ZoneMcpGatewayNewMcpServerParamsUpstream `json:"upstream,omitzero,required"`
 	// Credential provider for the upstream connection
-	UpstreamProvider ZoneMcpGatewayNewServerParamsUpstreamProvider `json:"upstream_provider,omitzero,required"`
+	UpstreamProvider ZoneMcpGatewayNewMcpServerParamsUpstreamProvider `json:"upstream_provider,omitzero,required"`
 	paramObj
 }
 
-func (r ZoneMcpGatewayNewServerParams) MarshalJSON() (data []byte, err error) {
-	type shadow ZoneMcpGatewayNewServerParams
+func (r ZoneMcpGatewayNewMcpServerParams) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneMcpGatewayNewMcpServerParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *ZoneMcpGatewayNewServerParams) UnmarshalJSON(data []byte) error {
+func (r *ZoneMcpGatewayNewMcpServerParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Downstream MCP server config
-type ZoneMcpGatewayNewServerParamsDownstream struct {
+type ZoneMcpGatewayNewMcpServerParamsDownstream struct {
 	// URL-safe identifier, unique within the zone
 	Slug param.Opt[string] `json:"slug,omitzero"`
 	paramObj
 }
 
-func (r ZoneMcpGatewayNewServerParamsDownstream) MarshalJSON() (data []byte, err error) {
-	type shadow ZoneMcpGatewayNewServerParamsDownstream
+func (r ZoneMcpGatewayNewMcpServerParamsDownstream) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneMcpGatewayNewMcpServerParamsDownstream
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *ZoneMcpGatewayNewServerParamsDownstream) UnmarshalJSON(data []byte) error {
+func (r *ZoneMcpGatewayNewMcpServerParamsDownstream) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Upstream MCP server config
 //
 // The properties Identifier, Name are required.
-type ZoneMcpGatewayNewServerParamsUpstream struct {
+type ZoneMcpGatewayNewMcpServerParamsUpstream struct {
 	// User specified identifier, unique within the zone
 	Identifier string `json:"identifier,required"`
 	// Human-readable name
@@ -126,18 +128,18 @@ type ZoneMcpGatewayNewServerParamsUpstream struct {
 	paramObj
 }
 
-func (r ZoneMcpGatewayNewServerParamsUpstream) MarshalJSON() (data []byte, err error) {
-	type shadow ZoneMcpGatewayNewServerParamsUpstream
+func (r ZoneMcpGatewayNewMcpServerParamsUpstream) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneMcpGatewayNewMcpServerParamsUpstream
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *ZoneMcpGatewayNewServerParamsUpstream) UnmarshalJSON(data []byte) error {
+func (r *ZoneMcpGatewayNewMcpServerParamsUpstream) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Credential provider for the upstream connection
 //
 // The properties Identifier, Name are required.
-type ZoneMcpGatewayNewServerParamsUpstreamProvider struct {
+type ZoneMcpGatewayNewMcpServerParamsUpstreamProvider struct {
 	// User specified identifier, unique within the zone
 	Identifier string `json:"identifier,required"`
 	// Human-readable name
@@ -145,10 +147,10 @@ type ZoneMcpGatewayNewServerParamsUpstreamProvider struct {
 	paramObj
 }
 
-func (r ZoneMcpGatewayNewServerParamsUpstreamProvider) MarshalJSON() (data []byte, err error) {
-	type shadow ZoneMcpGatewayNewServerParamsUpstreamProvider
+func (r ZoneMcpGatewayNewMcpServerParamsUpstreamProvider) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneMcpGatewayNewMcpServerParamsUpstreamProvider
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *ZoneMcpGatewayNewServerParamsUpstreamProvider) UnmarshalJSON(data []byte) error {
+func (r *ZoneMcpGatewayNewMcpServerParamsUpstreamProvider) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }

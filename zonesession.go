@@ -41,7 +41,8 @@ func NewZoneSessionService(opts ...option.RequestOption) (r ZoneSessionService) 
 
 // Returns details of a specific session by session ID
 func (r *ZoneSessionService) Get(ctx context.Context, id string, query ZoneSessionGetParams, opts ...option.RequestOption) (res *SessionUnion, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -50,14 +51,15 @@ func (r *ZoneSessionService) Get(ctx context.Context, id string, query ZoneSessi
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/sessions/%s", query.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/sessions/%s", url.PathEscape(query.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
 
 // Revokes an active session
 func (r *ZoneSessionService) Update(ctx context.Context, id string, params ZoneSessionUpdateParams, opts ...option.RequestOption) (res *SessionUnion, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -66,7 +68,7 @@ func (r *ZoneSessionService) Update(ctx context.Context, id string, params ZoneS
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/sessions/%s", params.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/sessions/%s", url.PathEscape(params.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
 	return
 }
@@ -77,19 +79,21 @@ func (r *ZoneSessionService) Update(ctx context.Context, id string, params ZoneS
 // only sessions with an initiator. Can be filtered by session type, status, user,
 // and parent.
 func (r *ZoneSessionService) List(ctx context.Context, zoneID string, query ZoneSessionListParams, opts ...option.RequestOption) (res *ZoneSessionListResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/sessions", zoneID)
+	path := fmt.Sprintf("zones/%s/sessions", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
 }
 
 // Permanently deletes a session, effectively logging out the user or application
 func (r *ZoneSessionService) Delete(ctx context.Context, id string, body ZoneSessionDeleteParams, opts ...option.RequestOption) (err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -99,7 +103,7 @@ func (r *ZoneSessionService) Delete(ctx context.Context, id string, body ZoneSes
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/sessions/%s", body.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/sessions/%s", url.PathEscape(body.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
 	return
 }

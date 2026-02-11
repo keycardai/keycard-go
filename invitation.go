@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"slices"
 	"time"
 
@@ -41,12 +42,13 @@ func (r *InvitationService) Get(ctx context.Context, token string, query Invitat
 	if !param.IsOmitted(query.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", query.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if token == "" {
 		err = errors.New("missing required token parameter")
 		return
 	}
-	path := fmt.Sprintf("invitations/%s", token)
+	path := fmt.Sprintf("invitations/%s", url.PathEscape(token))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
@@ -56,12 +58,13 @@ func (r *InvitationService) Accept(ctx context.Context, token string, body Invit
 	if !param.IsOmitted(body.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", body.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if token == "" {
 		err = errors.New("missing required token parameter")
 		return
 	}
-	path := fmt.Sprintf("invitations/%s/accept", token)
+	path := fmt.Sprintf("invitations/%s/accept", url.PathEscape(token))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
 	return
 }
@@ -79,11 +82,11 @@ type InvitationGetResponse struct {
 	// Role that will be assigned when invitation is accepted
 	//
 	// Any of "org_admin", "org_member", "org_viewer".
-	Role InvitationGetResponseRole `json:"role,required"`
+	Role OrganizationRole `json:"role,required"`
 	// Status of an invitation
 	//
 	// Any of "pending", "accepted", "expired", "revoked".
-	Status InvitationGetResponseStatus `json:"status,required"`
+	Status InvitationStatus `json:"status,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		CreatedByName    respjson.Field
@@ -102,25 +105,6 @@ func (r InvitationGetResponse) RawJSON() string { return r.JSON.raw }
 func (r *InvitationGetResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-// Role that will be assigned when invitation is accepted
-type InvitationGetResponseRole string
-
-const (
-	InvitationGetResponseRoleOrgAdmin  InvitationGetResponseRole = "org_admin"
-	InvitationGetResponseRoleOrgMember InvitationGetResponseRole = "org_member"
-	InvitationGetResponseRoleOrgViewer InvitationGetResponseRole = "org_viewer"
-)
-
-// Status of an invitation
-type InvitationGetResponseStatus string
-
-const (
-	InvitationGetResponseStatusPending  InvitationGetResponseStatus = "pending"
-	InvitationGetResponseStatusAccepted InvitationGetResponseStatus = "accepted"
-	InvitationGetResponseStatusExpired  InvitationGetResponseStatus = "expired"
-	InvitationGetResponseStatusRevoked  InvitationGetResponseStatus = "revoked"
-)
 
 // Result of accepting an invitation
 type InvitationAcceptResponse struct {

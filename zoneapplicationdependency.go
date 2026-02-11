@@ -40,7 +40,8 @@ func NewZoneApplicationDependencyService(opts ...option.RequestOption) (r ZoneAp
 
 // Retrieves a specific resource dependency of an application
 func (r *ZoneApplicationDependencyService) Get(ctx context.Context, dependencyID string, query ZoneApplicationDependencyGetParams, opts ...option.RequestOption) (res *Resource, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -53,14 +54,15 @@ func (r *ZoneApplicationDependencyService) Get(ctx context.Context, dependencyID
 		err = errors.New("missing required dependencyId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/applications/%s/dependencies/%s", query.ZoneID, query.ID, dependencyID)
+	path := fmt.Sprintf("zones/%s/applications/%s/dependencies/%s", url.PathEscape(query.ZoneID), url.PathEscape(query.ID), url.PathEscape(dependencyID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
 
 // Returns resource dependencies for an application
 func (r *ZoneApplicationDependencyService) List(ctx context.Context, id string, params ZoneApplicationDependencyListParams, opts ...option.RequestOption) (res *ZoneApplicationDependencyListResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -69,14 +71,15 @@ func (r *ZoneApplicationDependencyService) List(ctx context.Context, id string, 
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/applications/%s/dependencies", params.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/applications/%s/dependencies", url.PathEscape(params.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
 	return
 }
 
 // Adds a resource dependency to an application
 func (r *ZoneApplicationDependencyService) Add(ctx context.Context, dependencyID string, params ZoneApplicationDependencyAddParams, opts ...option.RequestOption) (err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -90,14 +93,15 @@ func (r *ZoneApplicationDependencyService) Add(ctx context.Context, dependencyID
 		err = errors.New("missing required dependencyId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/applications/%s/dependencies/%s", params.ZoneID, params.ID, dependencyID)
+	path := fmt.Sprintf("zones/%s/applications/%s/dependencies/%s", url.PathEscape(params.ZoneID), url.PathEscape(params.ID), url.PathEscape(dependencyID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, params, nil, opts...)
 	return
 }
 
 // Removes a resource dependency from an application
 func (r *ZoneApplicationDependencyService) Remove(ctx context.Context, dependencyID string, body ZoneApplicationDependencyRemoveParams, opts ...option.RequestOption) (err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -111,7 +115,7 @@ func (r *ZoneApplicationDependencyService) Remove(ctx context.Context, dependenc
 		err = errors.New("missing required dependencyId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/applications/%s/dependencies/%s", body.ZoneID, body.ID, dependencyID)
+	path := fmt.Sprintf("zones/%s/applications/%s/dependencies/%s", url.PathEscape(body.ZoneID), url.PathEscape(body.ID), url.PathEscape(dependencyID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
 	return
 }

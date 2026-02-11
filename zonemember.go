@@ -40,7 +40,8 @@ func NewZoneMemberService(opts ...option.RequestOption) (r ZoneMemberService) {
 
 // Returns detailed information about a specific organization user in a zone.
 func (r *ZoneMemberService) Get(ctx context.Context, organizationUserID string, query ZoneMemberGetParams, opts ...option.RequestOption) (res *ZoneMember, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -49,7 +50,7 @@ func (r *ZoneMemberService) Get(ctx context.Context, organizationUserID string, 
 		err = errors.New("missing required organizationUserId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/members/%s", query.ZoneID, organizationUserID)
+	path := fmt.Sprintf("zones/%s/members/%s", url.PathEscape(query.ZoneID), url.PathEscape(organizationUserID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
@@ -57,7 +58,8 @@ func (r *ZoneMemberService) Get(ctx context.Context, organizationUserID string, 
 // Updates the role of an existing zone member. Only organization administrators
 // can perform this action.
 func (r *ZoneMemberService) Update(ctx context.Context, organizationUserID string, params ZoneMemberUpdateParams, opts ...option.RequestOption) (res *ZoneMember, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -66,7 +68,7 @@ func (r *ZoneMemberService) Update(ctx context.Context, organizationUserID strin
 		err = errors.New("missing required organizationUserId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/members/%s", params.ZoneID, organizationUserID)
+	path := fmt.Sprintf("zones/%s/members/%s", url.PathEscape(params.ZoneID), url.PathEscape(organizationUserID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
 	return
 }
@@ -74,12 +76,13 @@ func (r *ZoneMemberService) Update(ctx context.Context, organizationUserID strin
 // Lists all organization users in a zone with their roles and metadata. Supports
 // cursor-based pagination.
 func (r *ZoneMemberService) List(ctx context.Context, zoneID string, query ZoneMemberListParams, opts ...option.RequestOption) (res *ZoneMemberListResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/members", zoneID)
+	path := fmt.Sprintf("zones/%s/members", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
 }
@@ -87,7 +90,8 @@ func (r *ZoneMemberService) List(ctx context.Context, zoneID string, query ZoneM
 // Removes an organization user's membership from a zone. Only organization
 // administrators can perform this action.
 func (r *ZoneMemberService) Delete(ctx context.Context, organizationUserID string, body ZoneMemberDeleteParams, opts ...option.RequestOption) (err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -97,19 +101,20 @@ func (r *ZoneMemberService) Delete(ctx context.Context, organizationUserID strin
 		err = errors.New("missing required organizationUserId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/members/%s", body.ZoneID, organizationUserID)
+	path := fmt.Sprintf("zones/%s/members/%s", url.PathEscape(body.ZoneID), url.PathEscape(organizationUserID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
 	return
 }
 
 // Adds an organization user to a zone with the specified role.
 func (r *ZoneMemberService) Add(ctx context.Context, zoneID string, body ZoneMemberAddParams, opts ...option.RequestOption) (res *ZoneMember, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/members", zoneID)
+	path := fmt.Sprintf("zones/%s/members", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return
 }

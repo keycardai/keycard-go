@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"slices"
 	"time"
 
@@ -37,7 +38,8 @@ func NewZoneUserAgentService(opts ...option.RequestOption) (r ZoneUserAgentServi
 
 // Returns details of a specific user agent by user agent ID
 func (r *ZoneUserAgentService) Get(ctx context.Context, id string, query ZoneUserAgentGetParams, opts ...option.RequestOption) (res *UserAgent, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
@@ -46,7 +48,7 @@ func (r *ZoneUserAgentService) Get(ctx context.Context, id string, query ZoneUse
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/user-agents/%s", query.ZoneID, id)
+	path := fmt.Sprintf("zones/%s/user-agents/%s", url.PathEscape(query.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
@@ -55,12 +57,13 @@ func (r *ZoneUserAgentService) Get(ctx context.Context, id string, query ZoneUse
 // client software (browsers, desktop apps, CLI tools) registered via OAuth 2.0
 // Dynamic Client Registration.
 func (r *ZoneUserAgentService) List(ctx context.Context, zoneID string, opts ...option.RequestOption) (res *ZoneUserAgentListResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return
 	}
-	path := fmt.Sprintf("zones/%s/user-agents", zoneID)
+	path := fmt.Sprintf("zones/%s/user-agents", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
