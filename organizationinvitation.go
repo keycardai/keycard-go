@@ -179,13 +179,12 @@ func (r *OrganizationInvitationListResponse) UnmarshalJSON(data []byte) error {
 
 type OrganizationInvitationNewParams struct {
 	// Email address to invite
-	Email            string            `json:"email,required" format:"email"`
-	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// Role to assign when invitation is accepted (defaults to org_admin if not
-	// provided)
+	Email string `json:"email,required" format:"email"`
+	// Role to assign when invitation is accepted
 	//
 	// Any of "org_admin", "org_member", "org_viewer".
-	Role OrganizationRole `json:"role,omitzero"`
+	Role             OrganizationRole  `json:"role,omitzero,required"`
+	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 
