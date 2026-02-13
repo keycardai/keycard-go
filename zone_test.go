@@ -237,10 +237,9 @@ func TestZoneListSessionResourceAccessWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"zoneId",
 		keycardapi.ZoneListSessionResourceAccessParams{
-			HasInitiator: keycardapi.ZoneListSessionResourceAccessParamsHasInitiatorTrue,
-			ResourceID:   keycardapi.String("resource_id"),
-			SessionID:    keycardapi.String("session_id"),
-			UserID:       keycardapi.String("user_id"),
+			ResourceID: keycardapi.String("resource_id"),
+			SessionID:  keycardapi.String("session_id"),
+			UserID:     keycardapi.String("user_id"),
 		},
 	)
 	if err != nil {

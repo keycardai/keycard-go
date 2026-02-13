@@ -95,12 +95,10 @@ func TestZoneSessionListWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"zoneId",
 		keycardapi.ZoneSessionListParams{
-			Active:       keycardapi.ZoneSessionListParamsActiveTrue,
-			HasInitiator: keycardapi.ZoneSessionListParamsHasInitiatorTrue,
-			ParentID:     keycardapi.String("parent_id"),
-			SessionType:  keycardapi.ZoneSessionListParamsSessionTypeUser,
-			Status:       keycardapi.ZoneSessionListParamsStatusActive,
-			UserID:       keycardapi.String("user_id"),
+			Active:      keycardapi.ZoneSessionListParamsActiveTrue,
+			SessionType: keycardapi.ZoneSessionListParamsSessionTypeUser,
+			Status:      keycardapi.ZoneSessionListParamsStatusActive,
+			UserID:      keycardapi.String("user_id"),
 		},
 	)
 	if err != nil {

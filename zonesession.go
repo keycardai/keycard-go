@@ -73,11 +73,9 @@ func (r *ZoneSessionService) Update(ctx context.Context, id string, params ZoneS
 	return
 }
 
-// Returns a list of authentication sessions in the specified zone. By default,
-// returns sessions with an initiator (application or user agent). Use parent_id
-// parameter to filter by specific parent session, or has_initiator=true to show
-// only sessions with an initiator. Can be filtered by session type, status, user,
-// and parent.
+// Returns entry sessions in the specified zone. Entry sessions are app user
+// sessions with an initiator that are roots or direct children of a root user
+// session. Can be filtered by session type, status, and user.
 func (r *ZoneSessionService) List(ctx context.Context, zoneID string, query ZoneSessionListParams, opts ...option.RequestOption) (res *ZoneSessionListResponse, err error) {
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -458,16 +456,10 @@ const (
 )
 
 type ZoneSessionListParams struct {
-	// Filter by parent session ID. Omit to show only web sessions (no parent).
-	ParentID param.Opt[string] `query:"parent_id,omitzero" json:"-"`
 	// Filter by user ID
 	UserID param.Opt[string] `query:"user_id,omitzero" json:"-"`
 	// Any of "true".
 	Active ZoneSessionListParamsActive `query:"active,omitzero" json:"-"`
-	// Filter sessions that have an initiator (application_id OR user_agent_id is set).
-	//
-	// Any of "true".
-	HasInitiator ZoneSessionListParamsHasInitiator `query:"has_initiator,omitzero" json:"-"`
 	// Any of "user", "application".
 	SessionType ZoneSessionListParamsSessionType `query:"session_type,omitzero" json:"-"`
 	// Any of "active", "expired", "revoked".
@@ -487,13 +479,6 @@ type ZoneSessionListParamsActive string
 
 const (
 	ZoneSessionListParamsActiveTrue ZoneSessionListParamsActive = "true"
-)
-
-// Filter sessions that have an initiator (application_id OR user_agent_id is set).
-type ZoneSessionListParamsHasInitiator string
-
-const (
-	ZoneSessionListParamsHasInitiatorTrue ZoneSessionListParamsHasInitiator = "true"
 )
 
 type ZoneSessionListParamsSessionType string
