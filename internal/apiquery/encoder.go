@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/stainless-sdks/keycard-api-go/packages/param"
+	"github.com/keycardlabs/keycard-go/packages/param"
 )
 
 var encoders sync.Map // map[reflect.Type]encoderFunc

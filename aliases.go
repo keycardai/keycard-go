@@ -3,8 +3,8 @@
 package keycardapi
 
 import (
-	"github.com/stainless-sdks/keycard-api-go/internal/apierror"
-	"github.com/stainless-sdks/keycard-api-go/packages/param"
+	"github.com/keycardlabs/keycard-go/internal/apierror"
+	"github.com/keycardlabs/keycard-go/packages/param"
 )
 
 // aliased to make [param.APIUnion] private when embedding

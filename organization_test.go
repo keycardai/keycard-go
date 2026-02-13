@@ -8,9 +8,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stainless-sdks/keycard-api-go"
-	"github.com/stainless-sdks/keycard-api-go/internal/testutil"
-	"github.com/stainless-sdks/keycard-api-go/option"
+	"github.com/keycardlabs/keycard-go"
+	"github.com/keycardlabs/keycard-go/internal/testutil"
+	"github.com/keycardlabs/keycard-go/option"
 )
 
 func TestOrganizationNewWithOptionalParams(t *testing.T) {

@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stainless-sdks/keycard-api-go"
-	"github.com/stainless-sdks/keycard-api-go/internal"
-	"github.com/stainless-sdks/keycard-api-go/option"
+	"github.com/keycardlabs/keycard-go"
+	"github.com/keycardlabs/keycard-go/internal"
+	"github.com/keycardlabs/keycard-go/option"
 )
 
 type closureTransport struct {

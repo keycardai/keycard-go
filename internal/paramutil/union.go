@@ -2,7 +2,7 @@ package paramutil
 
 import (
 	"fmt"
-	"github.com/stainless-sdks/keycard-api-go/packages/param"
+	"github.com/keycardlabs/keycard-go/packages/param"
 	"reflect"
 )
 

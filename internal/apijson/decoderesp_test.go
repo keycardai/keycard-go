@@ -2,8 +2,8 @@ package apijson_test
 
 import (
 	"encoding/json"
-	"github.com/stainless-sdks/keycard-api-go/internal/apijson"
-	"github.com/stainless-sdks/keycard-api-go/packages/respjson"
+	"github.com/keycardlabs/keycard-go/internal/apijson"
+	"github.com/keycardlabs/keycard-go/packages/respjson"
 	"testing"
 )
 
