@@ -3,8 +3,8 @@ package respjson_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stainless-sdks/keycard-api-go/internal/apijson"
-	rj "github.com/stainless-sdks/keycard-api-go/packages/respjson"
+	"github.com/keycardlabs/keycard-go/internal/apijson"
+	rj "github.com/keycardlabs/keycard-go/packages/respjson"
 	"reflect"
 	"testing"
 )

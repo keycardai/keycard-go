@@ -10,11 +10,11 @@ import (
 	"net/url"
 	"slices"
 
-	"github.com/stainless-sdks/keycard-api-go/internal/apijson"
-	"github.com/stainless-sdks/keycard-api-go/internal/requestconfig"
-	"github.com/stainless-sdks/keycard-api-go/option"
-	"github.com/stainless-sdks/keycard-api-go/packages/param"
-	"github.com/stainless-sdks/keycard-api-go/packages/respjson"
+	"github.com/keycardlabs/keycard-go/internal/apijson"
+	"github.com/keycardlabs/keycard-go/internal/requestconfig"
+	"github.com/keycardlabs/keycard-go/option"
+	"github.com/keycardlabs/keycard-go/packages/param"
+	"github.com/keycardlabs/keycard-go/packages/respjson"
 )
 
 // ZoneMcpGatewayService contains methods and other services that help with

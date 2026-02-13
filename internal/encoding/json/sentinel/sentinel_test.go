@@ -1,8 +1,8 @@
 package sentinel_test
 
 import (
-	"github.com/stainless-sdks/keycard-api-go/internal/encoding/json/sentinel"
-	"github.com/stainless-sdks/keycard-api-go/packages/param"
+	"github.com/keycardlabs/keycard-go/internal/encoding/json/sentinel"
+	"github.com/keycardlabs/keycard-go/packages/param"
 	"reflect"
 	"slices"
 	"testing"

@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"net/http/httputil"
 
-	"github.com/stainless-sdks/keycard-api-go/internal/apijson"
-	"github.com/stainless-sdks/keycard-api-go/packages/respjson"
+	"github.com/keycardlabs/keycard-go/internal/apijson"
+	"github.com/keycardlabs/keycard-go/packages/respjson"
 )
 
 // Error represents an error that originates from the API, i.e. when a request is

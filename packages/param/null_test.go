@@ -2,7 +2,7 @@ package param_test
 
 import (
 	"encoding/json"
-	"github.com/stainless-sdks/keycard-api-go/packages/param"
+	"github.com/keycardlabs/keycard-go/packages/param"
 	"testing"
 )
 

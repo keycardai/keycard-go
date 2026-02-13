@@ -1,4 +1,4 @@
-module github.com/stainless-sdks/keycard-api-go
+module github.com/keycardlabs/keycard-go
 
 go 1.22
 
