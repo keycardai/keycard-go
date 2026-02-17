@@ -97,8 +97,11 @@ func TestZoneMemberListWithOptionalParams(t *testing.T) {
 		keycardapi.ZoneMemberListParams{
 			After:  keycardapi.String("after"),
 			Before: keycardapi.String("before"),
-			Limit:  keycardapi.Int(1),
-			Role:   keycardapi.ZoneMemberListParamsRoleZoneManager,
+			Expand: keycardapi.ZoneMemberListParamsExpandUnion{
+				OfZoneMemberListsExpandString: keycardapi.String("total_count"),
+			},
+			Limit: keycardapi.Int(1),
+			Role:  keycardapi.ZoneMemberListParamsRoleZoneManager,
 		},
 	)
 	if err != nil {

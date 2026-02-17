@@ -227,10 +227,13 @@ type ZoneMemberListResponse struct {
 	Items []ZoneMember `json:"items,required"`
 	// Pagination information
 	PageInfo PageInfoPagination `json:"page_info,required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneMemberListResponsePagination `json:"pagination,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
 		PageInfo    respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -239,6 +242,31 @@ type ZoneMemberListResponse struct {
 // Returns the unmodified JSON received from the API
 func (r ZoneMemberListResponse) RawJSON() string { return r.JSON.raw }
 func (r *ZoneMemberListResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Cursor-based pagination metadata
+type ZoneMemberListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor,required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor,required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneMemberListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneMemberListResponsePagination) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -271,7 +299,8 @@ type ZoneMemberListParams struct {
 	// Cursor for backward pagination
 	Before param.Opt[string] `query:"before,omitzero" json:"-"`
 	// Maximum number of members to return
-	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
+	Limit  param.Opt[int64]                `query:"limit,omitzero" json:"-"`
+	Expand ZoneMemberListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Filter members by role
 	//
 	// Any of "zone_manager", "zone_viewer".
@@ -286,6 +315,23 @@ func (r ZoneMemberListParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneMemberListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneMemberListsExpandString)
+	OfZoneMemberListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneMemberListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneMemberListParamsExpandString string
+
+const (
+	ZoneMemberListParamsExpandStringTotalCount ZoneMemberListParamsExpandString = "total_count"
+)
 
 // Filter members by role
 type ZoneMemberListParamsRole string

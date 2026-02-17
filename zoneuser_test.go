@@ -44,7 +44,7 @@ func TestZoneUserGet(t *testing.T) {
 	}
 }
 
-func TestZoneUserList(t *testing.T) {
+func TestZoneUserListWithOptionalParams(t *testing.T) {
 	t.Skip("Prism tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -59,7 +59,18 @@ func TestZoneUserList(t *testing.T) {
 		option.WithUsername("My Username"),
 		option.WithPassword("My Password"),
 	)
-	_, err := client.Zones.Users.List(context.TODO(), "zoneId")
+	_, err := client.Zones.Users.List(
+		context.TODO(),
+		"zoneId",
+		keycardapi.ZoneUserListParams{
+			After:  keycardapi.String("x"),
+			Before: keycardapi.String("x"),
+			Expand: keycardapi.ZoneUserListParamsExpandUnion{
+				OfZoneUserListsExpandString: keycardapi.String("total_count"),
+			},
+			Limit: keycardapi.Int(1),
+		},
+	)
 	if err != nil {
 		var apierr *keycardapi.Error
 		if errors.As(err, &apierr) {

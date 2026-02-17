@@ -271,10 +271,13 @@ type ZoneProviderListResponse struct {
 	Items []Provider `json:"items,required"`
 	// Pagination information
 	PageInfo PageInfoPagination `json:"page_info,required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneProviderListResponsePagination `json:"pagination,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
 		PageInfo    respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -283,6 +286,31 @@ type ZoneProviderListResponse struct {
 // Returns the unmodified JSON received from the API
 func (r ZoneProviderListResponse) RawJSON() string { return r.JSON.raw }
 func (r *ZoneProviderListResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Cursor-based pagination metadata
+type ZoneProviderListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor,required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor,required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneProviderListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneProviderListResponsePagination) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -475,10 +503,16 @@ func (r *ZoneProviderUpdateParamsProtocolsOpenid) UnmarshalJSON(data []byte) err
 }
 
 type ZoneProviderListParams struct {
+	// Cursor for forward pagination
+	After param.Opt[string] `query:"after,omitzero" json:"-"`
+	// Cursor for backward pagination
+	Before     param.Opt[string] `query:"before,omitzero" json:"-"`
 	Cursor     param.Opt[string] `query:"cursor,omitzero" json:"-"`
 	Identifier param.Opt[string] `query:"identifier,omitzero" json:"-"`
-	Limit      param.Opt[int64]  `query:"limit,omitzero" json:"-"`
-	Slug       param.Opt[string] `query:"slug,omitzero" json:"-"`
+	// Maximum number of items to return
+	Limit  param.Opt[int64]                  `query:"limit,omitzero" json:"-"`
+	Slug   param.Opt[string]                 `query:"slug,omitzero" json:"-"`
+	Expand ZoneProviderListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Any of "external", "keycard-vault", "keycard-sts".
 	Type ZoneProviderListParamsType `query:"type,omitzero" json:"-"`
 	paramObj
@@ -491,6 +525,23 @@ func (r ZoneProviderListParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneProviderListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneProviderListsExpandString)
+	OfZoneProviderListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneProviderListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneProviderListParamsExpandString string
+
+const (
+	ZoneProviderListParamsExpandStringTotalCount ZoneProviderListParamsExpandString = "total_count"
+)
 
 type ZoneProviderListParamsType string
 

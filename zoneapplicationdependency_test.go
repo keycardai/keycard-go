@@ -64,8 +64,13 @@ func TestZoneApplicationDependencyListWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"id",
 		keycardapi.ZoneApplicationDependencyListParams{
-			ZoneID:        "zoneId",
-			Cursor:        keycardapi.String("cursor"),
+			ZoneID: "zoneId",
+			After:  keycardapi.String("x"),
+			Before: keycardapi.String("x"),
+			Cursor: keycardapi.String("cursor"),
+			Expand: keycardapi.ZoneApplicationDependencyListParamsExpandUnion{
+				OfZoneApplicationDependencyListsExpandString: keycardapi.String("total_count"),
+			},
 			Limit:         keycardapi.Int(1),
 			WhenAccessing: keycardapi.String("when_accessing"),
 		},

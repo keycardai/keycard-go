@@ -12,8 +12,10 @@ import (
 	"time"
 
 	"github.com/keycardai/keycard-go/internal/apijson"
+	"github.com/keycardai/keycard-go/internal/apiquery"
 	"github.com/keycardai/keycard-go/internal/requestconfig"
 	"github.com/keycardai/keycard-go/option"
+	"github.com/keycardai/keycard-go/packages/param"
 	"github.com/keycardai/keycard-go/packages/respjson"
 )
 
@@ -54,7 +56,7 @@ func (r *ZoneUserService) Get(ctx context.Context, id string, query ZoneUserGetP
 }
 
 // Returns a list of users in the specified zone. Can be filtered by email address.
-func (r *ZoneUserService) List(ctx context.Context, zoneID string, opts ...option.RequestOption) (res *ZoneUserListResponse, err error) {
+func (r *ZoneUserService) List(ctx context.Context, zoneID string, query ZoneUserListParams, opts ...option.RequestOption) (res *ZoneUserListResponse, err error) {
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
@@ -62,7 +64,7 @@ func (r *ZoneUserService) List(ctx context.Context, zoneID string, opts ...optio
 		return
 	}
 	path := fmt.Sprintf("zones/%s/users", url.PathEscape(zoneID))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
 }
 
@@ -117,9 +119,12 @@ func (r *User) UnmarshalJSON(data []byte) error {
 
 type ZoneUserListResponse struct {
 	Items []User `json:"items,required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneUserListResponsePagination `json:"pagination,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -131,7 +136,68 @@ func (r *ZoneUserListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Cursor-based pagination metadata
+type ZoneUserListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor,required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor,required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneUserListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneUserListResponsePagination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type ZoneUserGetParams struct {
 	ZoneID string `path:"zoneId,required" json:"-"`
 	paramObj
 }
+
+type ZoneUserListParams struct {
+	// Cursor for forward pagination
+	After param.Opt[string] `query:"after,omitzero" json:"-"`
+	// Cursor for backward pagination
+	Before param.Opt[string] `query:"before,omitzero" json:"-"`
+	// Maximum number of items to return
+	Limit  param.Opt[int64]              `query:"limit,omitzero" json:"-"`
+	Expand ZoneUserListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [ZoneUserListParams]'s query parameters as `url.Values`.
+func (r ZoneUserListParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneUserListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneUserListsExpandString)
+	OfZoneUserListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneUserListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneUserListParamsExpandString string
+
+const (
+	ZoneUserListParamsExpandStringTotalCount ZoneUserListParamsExpandString = "total_count"
+)

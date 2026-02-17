@@ -195,9 +195,12 @@ const (
 
 type ZoneDelegatedGrantListResponse struct {
 	Items []Grant `json:"items,required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneDelegatedGrantListResponsePagination `json:"pagination,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -206,6 +209,31 @@ type ZoneDelegatedGrantListResponse struct {
 // Returns the unmodified JSON received from the API
 func (r ZoneDelegatedGrantListResponse) RawJSON() string { return r.JSON.raw }
 func (r *ZoneDelegatedGrantListResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Cursor-based pagination metadata
+type ZoneDelegatedGrantListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor,required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor,required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneDelegatedGrantListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneDelegatedGrantListResponsePagination) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -236,12 +264,19 @@ const (
 )
 
 type ZoneDelegatedGrantListParams struct {
+	// Cursor for forward pagination
+	After param.Opt[string] `query:"after,omitzero" json:"-"`
+	// Cursor for backward pagination
+	Before param.Opt[string] `query:"before,omitzero" json:"-"`
+	// Maximum number of items to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Filter by resource ID
 	ResourceID param.Opt[string] `query:"resource_id,omitzero" json:"-"`
 	// Filter by user ID
 	UserID param.Opt[string] `query:"user_id,omitzero" json:"-"`
 	// Any of "true".
-	Active ZoneDelegatedGrantListParamsActive `query:"active,omitzero" json:"-"`
+	Active ZoneDelegatedGrantListParamsActive      `query:"active,omitzero" json:"-"`
+	Expand ZoneDelegatedGrantListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Any of "active", "expired", "revoked".
 	Status ZoneDelegatedGrantListParamsStatus `query:"status,omitzero" json:"-"`
 	paramObj
@@ -260,6 +295,23 @@ type ZoneDelegatedGrantListParamsActive string
 
 const (
 	ZoneDelegatedGrantListParamsActiveTrue ZoneDelegatedGrantListParamsActive = "true"
+)
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneDelegatedGrantListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneDelegatedGrantListsExpandString)
+	OfZoneDelegatedGrantListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneDelegatedGrantListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneDelegatedGrantListParamsExpandString string
+
+const (
+	ZoneDelegatedGrantListParamsExpandStringTotalCount ZoneDelegatedGrantListParamsExpandString = "total_count"
 )
 
 type ZoneDelegatedGrantListParamsStatus string

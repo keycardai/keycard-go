@@ -319,10 +319,13 @@ type ZoneApplicationListResponse struct {
 	Items []Application `json:"items,required"`
 	// Pagination information
 	PageInfo PageInfoPagination `json:"page_info,required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneApplicationListResponsePagination `json:"pagination,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
 		PageInfo    respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -334,14 +337,42 @@ func (r *ZoneApplicationListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Cursor-based pagination metadata
+type ZoneApplicationListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor,required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor,required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneApplicationListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneApplicationListResponsePagination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type ZoneApplicationListCredentialsResponse struct {
 	Items []CredentialUnion `json:"items,required"`
 	// Pagination information
 	PageInfo PageInfoPagination `json:"page_info,required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneApplicationListCredentialsResponsePagination `json:"pagination,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
 		PageInfo    respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -353,14 +384,42 @@ func (r *ZoneApplicationListCredentialsResponse) UnmarshalJSON(data []byte) erro
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Cursor-based pagination metadata
+type ZoneApplicationListCredentialsResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor,required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor,required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneApplicationListCredentialsResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneApplicationListCredentialsResponsePagination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type ZoneApplicationListResourcesResponse struct {
 	Items []Resource `json:"items,required"`
 	// Pagination information
 	PageInfo PageInfoPagination `json:"page_info,required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneApplicationListResourcesResponsePagination `json:"pagination,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
 		PageInfo    respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -369,6 +428,31 @@ type ZoneApplicationListResourcesResponse struct {
 // Returns the unmodified JSON received from the API
 func (r ZoneApplicationListResourcesResponse) RawJSON() string { return r.JSON.raw }
 func (r *ZoneApplicationListResourcesResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Cursor-based pagination metadata
+type ZoneApplicationListResourcesResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor,required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor,required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneApplicationListResourcesResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneApplicationListResourcesResponsePagination) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -510,10 +594,16 @@ func (r *ZoneApplicationUpdateParamsProtocolsOauth2) UnmarshalJSON(data []byte) 
 }
 
 type ZoneApplicationListParams struct {
+	// Cursor for forward pagination
+	After param.Opt[string] `query:"after,omitzero" json:"-"`
+	// Cursor for backward pagination
+	Before     param.Opt[string] `query:"before,omitzero" json:"-"`
 	Cursor     param.Opt[string] `query:"cursor,omitzero" json:"-"`
 	Identifier param.Opt[string] `query:"identifier,omitzero" json:"-"`
-	Limit      param.Opt[int64]  `query:"limit,omitzero" json:"-"`
-	Slug       param.Opt[string] `query:"slug,omitzero" json:"-"`
+	// Maximum number of items to return
+	Limit  param.Opt[int64]                     `query:"limit,omitzero" json:"-"`
+	Slug   param.Opt[string]                    `query:"slug,omitzero" json:"-"`
+	Expand ZoneApplicationListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Filter by traits (OR matching - returns applications with any of the specified
 	// traits)
 	Traits []ApplicationTrait `query:"traits,omitzero" json:"-"`
@@ -532,15 +622,38 @@ func (r ZoneApplicationListParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneApplicationListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneApplicationListsExpandString)
+	OfZoneApplicationListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneApplicationListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneApplicationListParamsExpandString string
+
+const (
+	ZoneApplicationListParamsExpandStringTotalCount ZoneApplicationListParamsExpandString = "total_count"
+)
+
 type ZoneApplicationDeleteParams struct {
 	ZoneID string `path:"zoneId,required" json:"-"`
 	paramObj
 }
 
 type ZoneApplicationListCredentialsParams struct {
-	ZoneID string            `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId,required" json:"-"`
+	// Cursor for forward pagination
+	After param.Opt[string] `query:"after,omitzero" json:"-"`
+	// Cursor for backward pagination
+	Before param.Opt[string] `query:"before,omitzero" json:"-"`
 	Cursor param.Opt[string] `query:"cursor,omitzero" json:"-"`
-	Limit  param.Opt[int64]  `query:"limit,omitzero" json:"-"`
+	// Maximum number of items to return
+	Limit  param.Opt[int64]                                `query:"limit,omitzero" json:"-"`
+	Expand ZoneApplicationListCredentialsParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	paramObj
 }
 
@@ -553,10 +666,33 @@ func (r ZoneApplicationListCredentialsParams) URLQuery() (v url.Values, err erro
 	})
 }
 
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneApplicationListCredentialsParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneApplicationListCredentialssExpandString)
+	OfZoneApplicationListCredentialssExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneApplicationListCredentialssExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneApplicationListCredentialsParamsExpandString string
+
+const (
+	ZoneApplicationListCredentialsParamsExpandStringTotalCount ZoneApplicationListCredentialsParamsExpandString = "total_count"
+)
+
 type ZoneApplicationListResourcesParams struct {
-	ZoneID string            `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId,required" json:"-"`
+	// Cursor for forward pagination
+	After param.Opt[string] `query:"after,omitzero" json:"-"`
+	// Cursor for backward pagination
+	Before param.Opt[string] `query:"before,omitzero" json:"-"`
 	Cursor param.Opt[string] `query:"cursor,omitzero" json:"-"`
-	Limit  param.Opt[int64]  `query:"limit,omitzero" json:"-"`
+	// Maximum number of items to return
+	Limit  param.Opt[int64]                              `query:"limit,omitzero" json:"-"`
+	Expand ZoneApplicationListResourcesParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	paramObj
 }
 
@@ -568,3 +704,20 @@ func (r ZoneApplicationListResourcesParams) URLQuery() (v url.Values, err error)
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneApplicationListResourcesParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneApplicationListResourcessExpandString)
+	OfZoneApplicationListResourcessExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneApplicationListResourcessExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneApplicationListResourcesParamsExpandString string
+
+const (
+	ZoneApplicationListResourcesParamsExpandStringTotalCount ZoneApplicationListResourcesParamsExpandString = "total_count"
+)

@@ -149,9 +149,14 @@ func TestZoneListWithOptionalParams(t *testing.T) {
 		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.List(context.TODO(), keycardapi.ZoneListParams{
+		After:  keycardapi.String("x"),
+		Before: keycardapi.String("x"),
 		Cursor: keycardapi.String("cursor"),
-		Limit:  keycardapi.Int(1),
-		Slug:   keycardapi.String("slug"),
+		Expand: keycardapi.ZoneListParamsExpandUnion{
+			OfZoneListsExpandString: keycardapi.String("total_count"),
+		},
+		Limit: keycardapi.Int(1),
+		Slug:  keycardapi.String("slug"),
 	})
 	if err != nil {
 		var apierr *keycardapi.Error
@@ -237,6 +242,12 @@ func TestZoneListSessionResourceAccessWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"zoneId",
 		keycardapi.ZoneListSessionResourceAccessParams{
+			After:  keycardapi.String("x"),
+			Before: keycardapi.String("x"),
+			Expand: keycardapi.ZoneListSessionResourceAccessParamsExpandUnion{
+				OfZoneListSessionResourceAccesssExpandString: keycardapi.String("total_count"),
+			},
+			Limit:      keycardapi.Int(1),
 			ResourceID: keycardapi.String("resource_id"),
 			SessionID:  keycardapi.String("session_id"),
 			UserID:     keycardapi.String("user_id"),

@@ -95,7 +95,13 @@ func TestZoneSessionListWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"zoneId",
 		keycardapi.ZoneSessionListParams{
-			Active:      keycardapi.ZoneSessionListParamsActiveTrue,
+			Active: keycardapi.ZoneSessionListParamsActiveTrue,
+			After:  keycardapi.String("x"),
+			Before: keycardapi.String("x"),
+			Expand: keycardapi.ZoneSessionListParamsExpandUnion{
+				OfZoneSessionListsExpandString: keycardapi.String("total_count"),
+			},
+			Limit:       keycardapi.Int(1),
 			SessionType: keycardapi.ZoneSessionListParamsSessionTypeUser,
 			Status:      keycardapi.ZoneSessionListParamsStatusActive,
 			UserID:      keycardapi.String("user_id"),

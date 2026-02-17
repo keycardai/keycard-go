@@ -95,7 +95,13 @@ func TestZoneDelegatedGrantListWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"zoneId",
 		keycardapi.ZoneDelegatedGrantListParams{
-			Active:     keycardapi.ZoneDelegatedGrantListParamsActiveTrue,
+			Active: keycardapi.ZoneDelegatedGrantListParamsActiveTrue,
+			After:  keycardapi.String("x"),
+			Before: keycardapi.String("x"),
+			Expand: keycardapi.ZoneDelegatedGrantListParamsExpandUnion{
+				OfZoneDelegatedGrantListsExpandString: keycardapi.String("total_count"),
+			},
+			Limit:      keycardapi.Int(1),
 			ResourceID: keycardapi.String("resource_id"),
 			Status:     keycardapi.ZoneDelegatedGrantListParamsStatusActive,
 			UserID:     keycardapi.String("user_id"),

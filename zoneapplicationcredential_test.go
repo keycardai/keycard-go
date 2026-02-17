@@ -134,10 +134,15 @@ func TestZoneApplicationCredentialListWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"zoneId",
 		keycardapi.ZoneApplicationCredentialListParams{
+			After:         keycardapi.String("x"),
 			ApplicationID: keycardapi.String("applicationId"),
+			Before:        keycardapi.String("x"),
 			Cursor:        keycardapi.String("cursor"),
-			Limit:         keycardapi.Int(1),
-			Slug:          keycardapi.String("slug"),
+			Expand: keycardapi.ZoneApplicationCredentialListParamsExpandUnion{
+				OfZoneApplicationCredentialListsExpandString: keycardapi.String("total_count"),
+			},
+			Limit: keycardapi.Int(1),
+			Slug:  keycardapi.String("slug"),
 		},
 	)
 	if err != nil {

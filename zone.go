@@ -402,10 +402,13 @@ type ZoneListResponse struct {
 	Items []Zone `json:"items,required"`
 	// Pagination information
 	PageInfo PageInfoPagination `json:"page_info,required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneListResponsePagination `json:"pagination,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
 		PageInfo    respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -417,11 +420,39 @@ func (r *ZoneListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Cursor-based pagination metadata
+type ZoneListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor,required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor,required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneListResponsePagination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type ZoneListSessionResourceAccessResponse struct {
 	Items []ZoneListSessionResourceAccessResponseItem `json:"items,required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneListSessionResourceAccessResponsePagination `json:"pagination,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -463,6 +494,31 @@ type ZoneListSessionResourceAccessResponseItem struct {
 // Returns the unmodified JSON received from the API
 func (r ZoneListSessionResourceAccessResponseItem) RawJSON() string { return r.JSON.raw }
 func (r *ZoneListSessionResourceAccessResponseItem) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Cursor-based pagination metadata
+type ZoneListSessionResourceAccessResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor,required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor,required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneListSessionResourceAccessResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneListSessionResourceAccessResponsePagination) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -672,9 +728,15 @@ func (r *ZoneUpdateParamsProtocolsOauth2) UnmarshalJSON(data []byte) error {
 }
 
 type ZoneListParams struct {
+	// Cursor for forward pagination
+	After param.Opt[string] `query:"after,omitzero" json:"-"`
+	// Cursor for backward pagination
+	Before param.Opt[string] `query:"before,omitzero" json:"-"`
 	Cursor param.Opt[string] `query:"cursor,omitzero" json:"-"`
-	Limit  param.Opt[int64]  `query:"limit,omitzero" json:"-"`
-	Slug   param.Opt[string] `query:"slug,omitzero" json:"-"`
+	// Maximum number of items to return
+	Limit  param.Opt[int64]          `query:"limit,omitzero" json:"-"`
+	Slug   param.Opt[string]         `query:"slug,omitzero" json:"-"`
+	Expand ZoneListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	paramObj
 }
 
@@ -686,18 +748,43 @@ func (r ZoneListParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneListsExpandString)
+	OfZoneListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneListParamsExpandString string
+
+const (
+	ZoneListParamsExpandStringTotalCount  ZoneListParamsExpandString = "total_count"
+	ZoneListParamsExpandStringPermissions ZoneListParamsExpandString = "permissions"
+)
+
 type ZoneDeleteMcpServerParams struct {
 	ZoneID string `path:"zoneId,required" json:"-"`
 	paramObj
 }
 
 type ZoneListSessionResourceAccessParams struct {
+	// Cursor for forward pagination
+	After param.Opt[string] `query:"after,omitzero" json:"-"`
+	// Cursor for backward pagination
+	Before param.Opt[string] `query:"before,omitzero" json:"-"`
+	// Maximum number of items to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Filter by resource ID
 	ResourceID param.Opt[string] `query:"resource_id,omitzero" json:"-"`
 	// Filter by session ID
 	SessionID param.Opt[string] `query:"session_id,omitzero" json:"-"`
 	// Filter by user ID
-	UserID param.Opt[string] `query:"user_id,omitzero" json:"-"`
+	UserID param.Opt[string]                              `query:"user_id,omitzero" json:"-"`
+	Expand ZoneListSessionResourceAccessParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	paramObj
 }
 
@@ -709,3 +796,20 @@ func (r ZoneListSessionResourceAccessParams) URLQuery() (v url.Values, err error
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneListSessionResourceAccessParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneListSessionResourceAccesssExpandString)
+	OfZoneListSessionResourceAccesssExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneListSessionResourceAccesssExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneListSessionResourceAccessParamsExpandString string
+
+const (
+	ZoneListSessionResourceAccessParamsExpandStringTotalCount ZoneListSessionResourceAccessParamsExpandString = "total_count"
+)

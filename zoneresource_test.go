@@ -142,9 +142,15 @@ func TestZoneResourceListWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"zoneId",
 		keycardapi.ZoneResourceListParams{
+			After:                keycardapi.String("x"),
+			Before:               keycardapi.String("x"),
 			CredentialProviderID: keycardapi.String("credentialProviderId"),
-			Identifier:           keycardapi.String("identifier"),
-			Slug:                 keycardapi.String("slug"),
+			Expand: keycardapi.ZoneResourceListParamsExpandUnion{
+				OfZoneResourceListsExpandString: keycardapi.String("total_count"),
+			},
+			Identifier: keycardapi.String("identifier"),
+			Limit:      keycardapi.Int(1),
+			Slug:       keycardapi.String("slug"),
 		},
 	)
 	if err != nil {

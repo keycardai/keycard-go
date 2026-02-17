@@ -118,9 +118,12 @@ func (r *ZoneResourceService) Delete(ctx context.Context, id string, body ZoneRe
 
 type ZoneResourceListResponse struct {
 	Items []Resource `json:"items,required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneResourceListResponsePagination `json:"pagination,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -129,6 +132,31 @@ type ZoneResourceListResponse struct {
 // Returns the unmodified JSON received from the API
 func (r ZoneResourceListResponse) RawJSON() string { return r.JSON.raw }
 func (r *ZoneResourceListResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Cursor-based pagination metadata
+type ZoneResourceListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor,required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor,required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneResourceListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneResourceListResponsePagination) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -192,11 +220,18 @@ func (r *ZoneResourceUpdateParams) UnmarshalJSON(data []byte) error {
 }
 
 type ZoneResourceListParams struct {
+	// Cursor for forward pagination
+	After param.Opt[string] `query:"after,omitzero" json:"-"`
+	// Cursor for backward pagination
+	Before param.Opt[string] `query:"before,omitzero" json:"-"`
 	// Filter resources by credential provider ID
 	CredentialProviderID param.Opt[string] `query:"credentialProviderId,omitzero" json:"-"`
 	// Filter resources by identifier
 	Identifier param.Opt[string] `query:"identifier,omitzero" json:"-"`
-	Slug       param.Opt[string] `query:"slug,omitzero" json:"-"`
+	// Maximum number of items to return
+	Limit  param.Opt[int64]                  `query:"limit,omitzero" json:"-"`
+	Slug   param.Opt[string]                 `query:"slug,omitzero" json:"-"`
+	Expand ZoneResourceListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	paramObj
 }
 
@@ -207,6 +242,23 @@ func (r ZoneResourceListParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneResourceListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneResourceListsExpandString)
+	OfZoneResourceListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneResourceListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneResourceListParamsExpandString string
+
+const (
+	ZoneResourceListParamsExpandStringTotalCount ZoneResourceListParamsExpandString = "total_count"
+)
 
 type ZoneResourceDeleteParams struct {
 	ZoneID string `path:"zoneId,required" json:"-"`

@@ -172,7 +172,12 @@ func TestZoneProviderListWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"zoneId",
 		keycardapi.ZoneProviderListParams{
-			Cursor:     keycardapi.String("cursor"),
+			After:  keycardapi.String("x"),
+			Before: keycardapi.String("x"),
+			Cursor: keycardapi.String("cursor"),
+			Expand: keycardapi.ZoneProviderListParamsExpandUnion{
+				OfZoneProviderListsExpandString: keycardapi.String("total_count"),
+			},
 			Identifier: keycardapi.String("identifier"),
 			Limit:      keycardapi.Int(1),
 			Slug:       keycardapi.String("slug"),

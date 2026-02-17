@@ -154,7 +154,12 @@ func TestZoneApplicationListWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"zoneId",
 		keycardapi.ZoneApplicationListParams{
-			Cursor:     keycardapi.String("cursor"),
+			After:  keycardapi.String("x"),
+			Before: keycardapi.String("x"),
+			Cursor: keycardapi.String("cursor"),
+			Expand: keycardapi.ZoneApplicationListParamsExpandUnion{
+				OfZoneApplicationListsExpandString: keycardapi.String("total_count"),
+			},
 			Identifier: keycardapi.String("identifier"),
 			Limit:      keycardapi.Int(1),
 			Slug:       keycardapi.String("slug"),
@@ -222,8 +227,13 @@ func TestZoneApplicationListCredentialsWithOptionalParams(t *testing.T) {
 		"id",
 		keycardapi.ZoneApplicationListCredentialsParams{
 			ZoneID: "zoneId",
+			After:  keycardapi.String("x"),
+			Before: keycardapi.String("x"),
 			Cursor: keycardapi.String("cursor"),
-			Limit:  keycardapi.Int(1),
+			Expand: keycardapi.ZoneApplicationListCredentialsParamsExpandUnion{
+				OfZoneApplicationListCredentialssExpandString: keycardapi.String("total_count"),
+			},
+			Limit: keycardapi.Int(1),
 		},
 	)
 	if err != nil {
@@ -255,8 +265,13 @@ func TestZoneApplicationListResourcesWithOptionalParams(t *testing.T) {
 		"id",
 		keycardapi.ZoneApplicationListResourcesParams{
 			ZoneID: "zoneId",
+			After:  keycardapi.String("x"),
+			Before: keycardapi.String("x"),
 			Cursor: keycardapi.String("cursor"),
-			Limit:  keycardapi.Int(1),
+			Expand: keycardapi.ZoneApplicationListResourcesParamsExpandUnion{
+				OfZoneApplicationListResourcessExpandString: keycardapi.String("total_count"),
+			},
+			Limit: keycardapi.Int(1),
 		},
 	)
 	if err != nil {

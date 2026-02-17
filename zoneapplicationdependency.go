@@ -197,10 +197,13 @@ type ZoneApplicationDependencyListResponse struct {
 	Items []Resource `json:"items,required"`
 	// Pagination information
 	PageInfo PageInfoPagination `json:"page_info,required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneApplicationDependencyListResponsePagination `json:"pagination,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
 		PageInfo    respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -212,6 +215,31 @@ func (r *ZoneApplicationDependencyListResponse) UnmarshalJSON(data []byte) error
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Cursor-based pagination metadata
+type ZoneApplicationDependencyListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor,required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor,required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneApplicationDependencyListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneApplicationDependencyListResponsePagination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type ZoneApplicationDependencyGetParams struct {
 	ZoneID string `path:"zoneId,required" json:"-"`
 	ID     string `path:"id,required" json:"-"`
@@ -219,10 +247,16 @@ type ZoneApplicationDependencyGetParams struct {
 }
 
 type ZoneApplicationDependencyListParams struct {
-	ZoneID        string            `path:"zoneId,required" json:"-"`
-	Cursor        param.Opt[string] `query:"cursor,omitzero" json:"-"`
-	Limit         param.Opt[int64]  `query:"limit,omitzero" json:"-"`
-	WhenAccessing param.Opt[string] `query:"when_accessing,omitzero" json:"-"`
+	ZoneID string `path:"zoneId,required" json:"-"`
+	// Cursor for forward pagination
+	After param.Opt[string] `query:"after,omitzero" json:"-"`
+	// Cursor for backward pagination
+	Before param.Opt[string] `query:"before,omitzero" json:"-"`
+	Cursor param.Opt[string] `query:"cursor,omitzero" json:"-"`
+	// Maximum number of items to return
+	Limit         param.Opt[int64]                               `query:"limit,omitzero" json:"-"`
+	WhenAccessing param.Opt[string]                              `query:"when_accessing,omitzero" json:"-"`
+	Expand        ZoneApplicationDependencyListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	paramObj
 }
 
@@ -234,6 +268,23 @@ func (r ZoneApplicationDependencyListParams) URLQuery() (v url.Values, err error
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneApplicationDependencyListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneApplicationDependencyListsExpandString)
+	OfZoneApplicationDependencyListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneApplicationDependencyListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneApplicationDependencyListParamsExpandString string
+
+const (
+	ZoneApplicationDependencyListParamsExpandStringTotalCount ZoneApplicationDependencyListParamsExpandString = "total_count"
+)
 
 type ZoneApplicationDependencyAddParams struct {
 	ZoneID        string   `path:"zoneId,required" json:"-"`
