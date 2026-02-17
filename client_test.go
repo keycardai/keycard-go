@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/keycardlabs/keycard-go"
-	"github.com/keycardlabs/keycard-go/internal"
-	"github.com/keycardlabs/keycard-go/option"
+	"github.com/keycardai/keycard-go"
+	"github.com/keycardai/keycard-go/internal"
+	"github.com/keycardai/keycard-go/option"
 )
 
 type closureTransport struct {

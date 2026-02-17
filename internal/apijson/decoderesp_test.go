@@ -2,8 +2,8 @@ package apijson_test
 
 import (
 	"encoding/json"
-	"github.com/keycardlabs/keycard-go/internal/apijson"
-	"github.com/keycardlabs/keycard-go/packages/respjson"
+	"github.com/keycardai/keycard-go/internal/apijson"
+	"github.com/keycardai/keycard-go/packages/respjson"
 	"testing"
 )
 

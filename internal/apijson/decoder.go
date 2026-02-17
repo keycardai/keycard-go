@@ -7,7 +7,7 @@ package apijson
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/keycardlabs/keycard-go/packages/param"
+	"github.com/keycardai/keycard-go/packages/param"
 	"reflect"
 	"strconv"
 	"sync"

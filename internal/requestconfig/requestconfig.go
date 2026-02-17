@@ -19,10 +19,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/keycardlabs/keycard-go/internal"
-	"github.com/keycardlabs/keycard-go/internal/apierror"
-	"github.com/keycardlabs/keycard-go/internal/apiform"
-	"github.com/keycardlabs/keycard-go/internal/apiquery"
+	"github.com/keycardai/keycard-go/internal"
+	"github.com/keycardai/keycard-go/internal/apierror"
+	"github.com/keycardai/keycard-go/internal/apiform"
+	"github.com/keycardai/keycard-go/internal/apiquery"
 )
 
 func getDefaultHeaders() map[string]string {

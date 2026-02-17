@@ -8,9 +8,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/keycardlabs/keycard-go"
-	"github.com/keycardlabs/keycard-go/internal/testutil"
-	"github.com/keycardlabs/keycard-go/option"
+	"github.com/keycardai/keycard-go"
+	"github.com/keycardai/keycard-go/internal/testutil"
+	"github.com/keycardai/keycard-go/option"
 )
 
 func TestOrganizationServiceAccountNewWithOptionalParams(t *testing.T) {

@@ -3,8 +3,8 @@
 package keycardapi
 
 import (
-	"github.com/keycardlabs/keycard-go/internal/apierror"
-	"github.com/keycardlabs/keycard-go/packages/param"
+	"github.com/keycardai/keycard-go/internal/apierror"
+	"github.com/keycardai/keycard-go/packages/param"
 )
 
 // aliased to make [param.APIUnion] private when embedding

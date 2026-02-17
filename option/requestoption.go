@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/keycardlabs/keycard-go/internal/requestconfig"
+	"github.com/keycardai/keycard-go/internal/requestconfig"
 	"github.com/tidwall/sjson"
 )
 
@@ -19,7 +19,7 @@ import (
 // which can be supplied to clients, services, and methods. You can read more about this functional
 // options pattern in our [README].
 //
-// [README]: https://pkg.go.dev/github.com/keycardlabs/keycard-go#readme-requestoptions
+// [README]: https://pkg.go.dev/github.com/keycardai/keycard-go#readme-requestoptions
 type RequestOption = requestconfig.RequestOption
 
 // WithBaseURL returns a RequestOption that sets the BaseURL for the client.
@@ -263,7 +263,7 @@ func WithRequestTimeout(dur time.Duration) RequestOption {
 // environment to be the "production" environment. An environment specifies which base URL
 // to use by default.
 func WithEnvironmentProduction() RequestOption {
-	return requestconfig.WithDefaultBaseURL("https://api.example.com/")
+	return requestconfig.WithDefaultBaseURL("https://api.keycard.ai/")
 }
 
 // WithAPIKey returns a RequestOption that sets the client setting "api_key".

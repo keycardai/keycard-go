@@ -11,10 +11,10 @@ import (
 	"slices"
 	"time"
 
-	"github.com/keycardlabs/keycard-go/internal/apijson"
-	"github.com/keycardlabs/keycard-go/internal/requestconfig"
-	"github.com/keycardlabs/keycard-go/option"
-	"github.com/keycardlabs/keycard-go/packages/respjson"
+	"github.com/keycardai/keycard-go/internal/apijson"
+	"github.com/keycardai/keycard-go/internal/requestconfig"
+	"github.com/keycardai/keycard-go/option"
+	"github.com/keycardai/keycard-go/packages/respjson"
 )
 
 // ZoneUserAgentService contains methods and other services that help with

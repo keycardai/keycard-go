@@ -1,7 +1,7 @@
 package apiform
 
 import (
-	"github.com/keycardlabs/keycard-go/packages/param"
+	"github.com/keycardai/keycard-go/packages/param"
 	"mime/multipart"
 	"reflect"
 )

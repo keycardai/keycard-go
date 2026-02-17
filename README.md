@@ -2,11 +2,11 @@
 
 <!-- x-release-please-start-version -->
 
-<a href="https://pkg.go.dev/github.com/keycardlabs/keycard-go"><img src="https://pkg.go.dev/badge/github.com/keycardlabs/keycard-go.svg" alt="Go Reference"></a>
+<a href="https://pkg.go.dev/github.com/keycardai/keycard-go"><img src="https://pkg.go.dev/badge/github.com/keycardai/keycard-go.svg" alt="Go Reference"></a>
 
 <!-- x-release-please-end -->
 
-The Keycard API Go library provides convenient access to the Keycard API REST API
+The Keycard API Go library provides convenient access to the [Keycard API REST API](https://docs.keycard.ai)
 from applications written in Go.
 
 It is generated with [Stainless](https://www.stainless.com/).
@@ -17,7 +17,7 @@ It is generated with [Stainless](https://www.stainless.com/).
 
 ```go
 import (
-	"github.com/keycardlabs/keycard-go" // imported as keycardapi
+	"github.com/keycardai/keycard-go" // imported as keycardapi
 )
 ```
 
@@ -28,7 +28,7 @@ Or to pin the version:
 <!-- x-release-please-start-version -->
 
 ```sh
-go get -u 'github.com/keycardlabs/keycard-go@v0.1.0'
+go get -u 'github.com/keycardai/keycard-go@v0.1.0'
 ```
 
 <!-- x-release-please-end -->
@@ -48,7 +48,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/keycardlabs/keycard-go"
+	"github.com/keycardai/keycard-go"
 )
 
 func main() {
@@ -273,7 +273,7 @@ client.Zones.List(context.TODO(), ...,
 
 The request option `option.WithDebugLog(nil)` may be helpful while debugging.
 
-See the [full list of request options](https://pkg.go.dev/github.com/keycardlabs/keycard-go/option).
+See the [full list of request options](https://pkg.go.dev/github.com/keycardai/keycard-go/option).
 
 ### Pagination
 
@@ -479,7 +479,7 @@ This package generally follows [SemVer](https://semver.org/spec/v2.0.0.html) con
 
 We take backwards-compatibility seriously and work hard to ensure you can rely on a smooth upgrade experience.
 
-We are keen for your feedback; please open an [issue](https://www.github.com/keycardlabs/keycard-go/issues) with questions, bugs, or suggestions.
+We are keen for your feedback; please open an [issue](https://www.github.com/keycardai/keycard-go/issues) with questions, bugs, or suggestions.
 
 ## Contributing
 

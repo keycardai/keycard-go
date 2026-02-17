@@ -2,7 +2,7 @@ package apijson
 
 import (
 	"errors"
-	"github.com/keycardlabs/keycard-go/packages/param"
+	"github.com/keycardai/keycard-go/packages/param"
 	"reflect"
 
 	"github.com/tidwall/gjson"

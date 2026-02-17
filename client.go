@@ -8,8 +8,8 @@ import (
 	"os"
 	"slices"
 
-	"github.com/keycardlabs/keycard-go/internal/requestconfig"
-	"github.com/keycardlabs/keycard-go/option"
+	"github.com/keycardai/keycard-go/internal/requestconfig"
+	"github.com/keycardai/keycard-go/option"
 )
 
 // Client creates a struct with services and top level methods that help with
