@@ -48,7 +48,7 @@ func NewOrganizationService(opts ...option.RequestOption) (r OrganizationService
 
 func (r *OrganizationService) New(ctx context.Context, params OrganizationNewParams, opts ...option.RequestOption) (res *Organization, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -60,7 +60,7 @@ func (r *OrganizationService) New(ctx context.Context, params OrganizationNewPar
 // Get organization by ID or label
 func (r *OrganizationService) Get(ctx context.Context, organizationID string, params OrganizationGetParams, opts ...option.RequestOption) (res *Organization, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -76,7 +76,7 @@ func (r *OrganizationService) Get(ctx context.Context, organizationID string, pa
 // Update organization details
 func (r *OrganizationService) Update(ctx context.Context, organizationID string, params OrganizationUpdateParams, opts ...option.RequestOption) (res *Organization, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -92,7 +92,7 @@ func (r *OrganizationService) Update(ctx context.Context, organizationID string,
 // List organizations for the current user
 func (r *OrganizationService) List(ctx context.Context, params OrganizationListParams, opts ...option.RequestOption) (res *OrganizationListResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -104,7 +104,7 @@ func (r *OrganizationService) List(ctx context.Context, params OrganizationListP
 // Exchange user token for organization-scoped M2M token
 func (r *OrganizationService) ExchangeToken(ctx context.Context, organizationID string, body OrganizationExchangeTokenParams, opts ...option.RequestOption) (res *TokenResponse, err error) {
 	if !param.IsOmitted(body.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", body.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", body.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -120,7 +120,7 @@ func (r *OrganizationService) ExchangeToken(ctx context.Context, organizationID 
 // List unified view of users and invitations in an organization
 func (r *OrganizationService) ListIdentities(ctx context.Context, organizationID string, params OrganizationListIdentitiesParams, opts ...option.RequestOption) (res *OrganizationListIdentitiesResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -144,7 +144,7 @@ func (r *OrganizationService) ListIdentities(ctx context.Context, organizationID
 // - `scope`: Whether the role applies at organization or zone level
 func (r *OrganizationService) ListRoles(ctx context.Context, organizationID string, params OrganizationListRolesParams, opts ...option.RequestOption) (res *OrganizationListRolesResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)

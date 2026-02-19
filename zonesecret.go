@@ -41,7 +41,7 @@ func NewZoneSecretService(opts ...option.RequestOption) (r ZoneSecretService) {
 
 func (r *ZoneSecretService) New(ctx context.Context, zoneID string, params ZoneSecretNewParams, opts ...option.RequestOption) (res *Secret, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithVaultAPIBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -56,7 +56,7 @@ func (r *ZoneSecretService) New(ctx context.Context, zoneID string, params ZoneS
 
 func (r *ZoneSecretService) Get(ctx context.Context, id string, params ZoneSecretGetParams, opts ...option.RequestOption) (res *ZoneSecretGetResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithVaultAPIBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -75,7 +75,7 @@ func (r *ZoneSecretService) Get(ctx context.Context, id string, params ZoneSecre
 
 func (r *ZoneSecretService) Update(ctx context.Context, id string, params ZoneSecretUpdateParams, opts ...option.RequestOption) (res *Secret, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithVaultAPIBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -94,7 +94,7 @@ func (r *ZoneSecretService) Update(ctx context.Context, id string, params ZoneSe
 
 func (r *ZoneSecretService) List(ctx context.Context, zoneID string, params ZoneSecretListParams, opts ...option.RequestOption) (res *[]Secret, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithVaultAPIBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -109,7 +109,7 @@ func (r *ZoneSecretService) List(ctx context.Context, zoneID string, params Zone
 
 func (r *ZoneSecretService) Delete(ctx context.Context, id string, params ZoneSecretDeleteParams, opts ...option.RequestOption) (err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithVaultAPIBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)

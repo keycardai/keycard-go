@@ -40,7 +40,7 @@ func NewInvitationService(opts ...option.RequestOption) (r InvitationService) {
 // View invitation details by token without consuming the token
 func (r *InvitationService) Get(ctx context.Context, token string, query InvitationGetParams, opts ...option.RequestOption) (res *InvitationGetResponse, err error) {
 	if !param.IsOmitted(query.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", query.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", query.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -56,7 +56,7 @@ func (r *InvitationService) Get(ctx context.Context, token string, query Invitat
 // Accept and consume an invitation token to join the organization
 func (r *InvitationService) Accept(ctx context.Context, token string, body InvitationAcceptParams, opts ...option.RequestOption) (res *InvitationAcceptResponse, err error) {
 	if !param.IsOmitted(body.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", body.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", body.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)

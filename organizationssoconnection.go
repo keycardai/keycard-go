@@ -42,7 +42,7 @@ func NewOrganizationSSOConnectionService(opts ...option.RequestOption) (r Organi
 // Get SSO connection configuration for organization
 func (r *OrganizationSSOConnectionService) Get(ctx context.Context, organizationID string, params OrganizationSSOConnectionGetParams, opts ...option.RequestOption) (res *SSOConnection, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -58,7 +58,7 @@ func (r *OrganizationSSOConnectionService) Get(ctx context.Context, organization
 // Update SSO connection configuration
 func (r *OrganizationSSOConnectionService) Update(ctx context.Context, organizationID string, params OrganizationSSOConnectionUpdateParams, opts ...option.RequestOption) (res *SSOConnection, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -74,7 +74,7 @@ func (r *OrganizationSSOConnectionService) Update(ctx context.Context, organizat
 // Disable SSO for organization
 func (r *OrganizationSSOConnectionService) Disable(ctx context.Context, organizationID string, body OrganizationSSOConnectionDisableParams, opts ...option.RequestOption) (err error) {
 	if !param.IsOmitted(body.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", body.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", body.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -91,7 +91,7 @@ func (r *OrganizationSSOConnectionService) Disable(ctx context.Context, organiza
 // Enable SSO for organization
 func (r *OrganizationSSOConnectionService) Enable(ctx context.Context, organizationID string, params OrganizationSSOConnectionEnableParams, opts ...option.RequestOption) (res *SSOConnection, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)

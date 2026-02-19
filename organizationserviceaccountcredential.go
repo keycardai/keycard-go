@@ -42,7 +42,7 @@ func NewOrganizationServiceAccountCredentialService(opts ...option.RequestOption
 // Create a new credential for a service account
 func (r *OrganizationServiceAccountCredentialService) New(ctx context.Context, serviceAccountID string, params OrganizationServiceAccountCredentialNewParams, opts ...option.RequestOption) (res *OrganizationServiceAccountCredentialNewResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -62,7 +62,7 @@ func (r *OrganizationServiceAccountCredentialService) New(ctx context.Context, s
 // Get a specific service account credential
 func (r *OrganizationServiceAccountCredentialService) Get(ctx context.Context, credentialID string, params OrganizationServiceAccountCredentialGetParams, opts ...option.RequestOption) (res *ServiceAccountCredential, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -86,7 +86,7 @@ func (r *OrganizationServiceAccountCredentialService) Get(ctx context.Context, c
 // Update a service account credential
 func (r *OrganizationServiceAccountCredentialService) Update(ctx context.Context, credentialID string, params OrganizationServiceAccountCredentialUpdateParams, opts ...option.RequestOption) (res *ServiceAccountCredential, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -110,7 +110,7 @@ func (r *OrganizationServiceAccountCredentialService) Update(ctx context.Context
 // List credentials for a service account
 func (r *OrganizationServiceAccountCredentialService) List(ctx context.Context, serviceAccountID string, params OrganizationServiceAccountCredentialListParams, opts ...option.RequestOption) (res *OrganizationServiceAccountCredentialListResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -130,7 +130,7 @@ func (r *OrganizationServiceAccountCredentialService) List(ctx context.Context, 
 // Delete a service account credential
 func (r *OrganizationServiceAccountCredentialService) Delete(ctx context.Context, credentialID string, params OrganizationServiceAccountCredentialDeleteParams, opts ...option.RequestOption) (err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)

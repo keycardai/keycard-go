@@ -41,7 +41,7 @@ func NewOrganizationInvitationService(opts ...option.RequestOption) (r Organizat
 // Create an invitation to join an organization
 func (r *OrganizationInvitationService) New(ctx context.Context, organizationID string, params OrganizationInvitationNewParams, opts ...option.RequestOption) (res *Invitation, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -57,7 +57,7 @@ func (r *OrganizationInvitationService) New(ctx context.Context, organizationID 
 // List invitations for an organization
 func (r *OrganizationInvitationService) List(ctx context.Context, organizationID string, params OrganizationInvitationListParams, opts ...option.RequestOption) (res *OrganizationInvitationListResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -73,7 +73,7 @@ func (r *OrganizationInvitationService) List(ctx context.Context, organizationID
 // Delete an invitation
 func (r *OrganizationInvitationService) Delete(ctx context.Context, invitationID string, params OrganizationInvitationDeleteParams, opts ...option.RequestOption) (err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)

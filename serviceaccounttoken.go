@@ -36,7 +36,7 @@ func NewServiceAccountTokenService(opts ...option.RequestOption) (r ServiceAccou
 // Exchange service account credentials for organization-scoped M2M token
 func (r *ServiceAccountTokenService) New(ctx context.Context, params ServiceAccountTokenNewParams, opts ...option.RequestOption) (res *TokenResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
