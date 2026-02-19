@@ -198,6 +198,8 @@ func (r *ProviderProtocols) UnmarshalJSON(data []byte) error {
 
 // OAuth 2.0 protocol configuration
 type ProviderProtocolsOauth2 struct {
+	// OIDC issuer URL used for discovery and token validation.
+	Issuer                string `json:"issuer,required" format:"uri"`
 	AuthorizationEndpoint string `json:"authorization_endpoint,nullable" format:"uri"`
 	// Whether to include the resource parameter in authorization requests.
 	AuthorizationResourceEnabled bool `json:"authorization_resource_enabled,nullable"`
@@ -220,6 +222,7 @@ type ProviderProtocolsOauth2 struct {
 	TokenResponseAccessTokenPointer string `json:"token_response_access_token_pointer,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		Issuer                          respjson.Field
 		AuthorizationEndpoint           respjson.Field
 		AuthorizationResourceEnabled    respjson.Field
 		AuthorizationResourceParameter  respjson.Field
@@ -365,8 +368,11 @@ type ZoneProviderNewParamsProtocolsOauth2 struct {
 	// The resource parameter value to include in authorization requests. Defaults to
 	// "resource" when authorization_resource_enabled is true.
 	AuthorizationResourceParameter param.Opt[string] `json:"authorization_resource_parameter,omitzero"`
-	JwksUri                        param.Opt[string] `json:"jwks_uri,omitzero" format:"uri"`
-	RegistrationEndpoint           param.Opt[string] `json:"registration_endpoint,omitzero" format:"uri"`
+	// OIDC issuer URL for discovery and token validation. When omitted, the provider
+	// identifier is used as the issuer. New clients should always set this explicitly.
+	Issuer               param.Opt[string] `json:"issuer,omitzero" format:"uri"`
+	JwksUri              param.Opt[string] `json:"jwks_uri,omitzero" format:"uri"`
+	RegistrationEndpoint param.Opt[string] `json:"registration_endpoint,omitzero" format:"uri"`
 	// The query parameter name for scopes in authorization requests. Defaults to
 	// "scope". Slack v2 uses "user_scope".
 	ScopeParameter param.Opt[string] `json:"scope_parameter,omitzero"`
@@ -475,8 +481,10 @@ type ZoneProviderUpdateParamsProtocolsOauth2 struct {
 	// Dot-separated path to the access token in the token response body. Defaults to
 	// "access_token". Set to null to unset.
 	TokenResponseAccessTokenPointer param.Opt[string] `json:"token_response_access_token_pointer,omitzero"`
-	CodeChallengeMethodsSupported   []string          `json:"code_challenge_methods_supported,omitzero"`
-	ScopesSupported                 []string          `json:"scopes_supported,omitzero"`
+	// OIDC issuer URL for discovery and token validation. Cannot be set to null.
+	Issuer                        param.Opt[string] `json:"issuer,omitzero" format:"uri"`
+	CodeChallengeMethodsSupported []string          `json:"code_challenge_methods_supported,omitzero"`
+	ScopesSupported               []string          `json:"scopes_supported,omitzero"`
 	paramObj
 }
 
