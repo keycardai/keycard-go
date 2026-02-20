@@ -20,6 +20,8 @@ jobs:
           app-id: ${{ secrets.GH_REPO_ACCESS_APP_ID }}
           private-key: ${{ secrets.GH_REPO_ACCESS_PRIVATE_KEY }}
           owner: keycardai
+          repositories: |
+            keycard-go
 
       - name: Push to mirror
         run: |
