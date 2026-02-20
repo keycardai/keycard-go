@@ -139,10 +139,9 @@ func (r *ZoneService) DeleteMcpServer(ctx context.Context, downstreamID string, 
 	return
 }
 
-// Returns aggregated access records per session-resource pair. At least one of
-// user_id, session_id, or resource_id must be provided. By default when filtering
-// by user_id, returns sessions with an initiator (application or user agent). Use
-// has_initiator=true to explicitly filter to sessions with an initiator.
+// Returns aggregated access records per entry session-resource pair, including
+// access from descendant sessions. At least one of user_id, session_id, or
+// resource_id must be provided.
 func (r *ZoneService) ListSessionResourceAccess(ctx context.Context, zoneID string, query ZoneListSessionResourceAccessParams, opts ...option.RequestOption) (res *ZoneListSessionResourceAccessResponse, err error) {
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -699,10 +698,6 @@ type ZoneListSessionResourceAccessParams struct {
 	SessionID param.Opt[string] `query:"session_id,omitzero" json:"-"`
 	// Filter by user ID
 	UserID param.Opt[string] `query:"user_id,omitzero" json:"-"`
-	// Filter sessions that have an initiator (application_id OR user_agent_id is set).
-	//
-	// Any of "true".
-	HasInitiator ZoneListSessionResourceAccessParamsHasInitiator `query:"has_initiator,omitzero" json:"-"`
 	paramObj
 }
 
@@ -714,10 +709,3 @@ func (r ZoneListSessionResourceAccessParams) URLQuery() (v url.Values, err error
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
-
-// Filter sessions that have an initiator (application_id OR user_agent_id is set).
-type ZoneListSessionResourceAccessParamsHasInitiator string
-
-const (
-	ZoneListSessionResourceAccessParamsHasInitiatorTrue ZoneListSessionResourceAccessParamsHasInitiator = "true"
-)

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0 (2026-02-13)
+
+Full Changelog: [v0.1.0...v0.2.0](https://github.com/keycardlabs/keycard-go/compare/v0.1.0...v0.2.0)
+
+### Features
+
+* PREVIEW: sync svc-iam.yaml from svc-iam/larry/slack-v2-oauth-provider-config ([2c9e361](https://github.com/keycardlabs/keycard-go/commit/2c9e361e55277bc741ea635c01ff015af192e736))
+* PREVIEW: sync svc-iam.yaml from svc-iam/seriousben/fix-session-resource-access-aggregation ([331a81b](https://github.com/keycardlabs/keycard-go/commit/331a81b484059bc5b37f41e18bb8aa86ac34cbc6))
+* PREVIEW: sync svc-org-management.yaml from svc-org-management/sean/COR-145-role-required ([b447d9a](https://github.com/keycardlabs/keycard-go/commit/b447d9a3b9eb529fb4c356ec849366722d0cb094))
+
 ## 0.1.0 (2026-02-13)
 
 Full Changelog: [v0.0.1...v0.1.0](https://github.com/keycardlabs/keycard-go/compare/v0.0.1...v0.1.0)

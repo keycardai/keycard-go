@@ -207,20 +207,32 @@ type ProviderProtocolsOauth2 struct {
 	CodeChallengeMethodsSupported  []string `json:"code_challenge_methods_supported,nullable"`
 	JwksUri                        string   `json:"jwks_uri,nullable" format:"uri"`
 	RegistrationEndpoint           string   `json:"registration_endpoint,nullable" format:"uri"`
-	ScopesSupported                []string `json:"scopes_supported,nullable"`
-	TokenEndpoint                  string   `json:"token_endpoint,nullable" format:"uri"`
+	// The query parameter name for scopes in authorization requests. Defaults to
+	// "scope". Slack v2 uses "user_scope".
+	ScopeParameter string `json:"scope_parameter,nullable"`
+	// The separator character for scope values. Defaults to " " (space). Slack v2 uses
+	// ",".
+	ScopeSeparator  string   `json:"scope_separator,nullable"`
+	ScopesSupported []string `json:"scopes_supported,nullable"`
+	TokenEndpoint   string   `json:"token_endpoint,nullable" format:"uri"`
+	// Dot-separated path to the access token in the token response body. Defaults to
+	// "access_token". Slack v2 uses "authed_user.access_token".
+	TokenResponseAccessTokenPointer string `json:"token_response_access_token_pointer,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		AuthorizationEndpoint          respjson.Field
-		AuthorizationResourceEnabled   respjson.Field
-		AuthorizationResourceParameter respjson.Field
-		CodeChallengeMethodsSupported  respjson.Field
-		JwksUri                        respjson.Field
-		RegistrationEndpoint           respjson.Field
-		ScopesSupported                respjson.Field
-		TokenEndpoint                  respjson.Field
-		ExtraFields                    map[string]respjson.Field
-		raw                            string
+		AuthorizationEndpoint           respjson.Field
+		AuthorizationResourceEnabled    respjson.Field
+		AuthorizationResourceParameter  respjson.Field
+		CodeChallengeMethodsSupported   respjson.Field
+		JwksUri                         respjson.Field
+		RegistrationEndpoint            respjson.Field
+		ScopeParameter                  respjson.Field
+		ScopeSeparator                  respjson.Field
+		ScopesSupported                 respjson.Field
+		TokenEndpoint                   respjson.Field
+		TokenResponseAccessTokenPointer respjson.Field
+		ExtraFields                     map[string]respjson.Field
+		raw                             string
 	} `json:"-"`
 }
 
@@ -327,9 +339,18 @@ type ZoneProviderNewParamsProtocolsOauth2 struct {
 	AuthorizationResourceParameter param.Opt[string] `json:"authorization_resource_parameter,omitzero"`
 	JwksUri                        param.Opt[string] `json:"jwks_uri,omitzero" format:"uri"`
 	RegistrationEndpoint           param.Opt[string] `json:"registration_endpoint,omitzero" format:"uri"`
-	TokenEndpoint                  param.Opt[string] `json:"token_endpoint,omitzero" format:"uri"`
-	CodeChallengeMethodsSupported  []string          `json:"code_challenge_methods_supported,omitzero"`
-	ScopesSupported                []string          `json:"scopes_supported,omitzero"`
+	// The query parameter name for scopes in authorization requests. Defaults to
+	// "scope". Slack v2 uses "user_scope".
+	ScopeParameter param.Opt[string] `json:"scope_parameter,omitzero"`
+	// The separator character for scope values. Defaults to " " (space). Slack v2 uses
+	// ",".
+	ScopeSeparator param.Opt[string] `json:"scope_separator,omitzero"`
+	TokenEndpoint  param.Opt[string] `json:"token_endpoint,omitzero" format:"uri"`
+	// Dot-separated path to the access token in the token response body. Defaults to
+	// "access_token". Slack v2 uses "authed_user.access_token".
+	TokenResponseAccessTokenPointer param.Opt[string] `json:"token_response_access_token_pointer,omitzero"`
+	CodeChallengeMethodsSupported   []string          `json:"code_challenge_methods_supported,omitzero"`
+	ScopesSupported                 []string          `json:"scopes_supported,omitzero"`
 	paramObj
 }
 
@@ -416,9 +437,18 @@ type ZoneProviderUpdateParamsProtocolsOauth2 struct {
 	AuthorizationResourceParameter param.Opt[string] `json:"authorization_resource_parameter,omitzero"`
 	JwksUri                        param.Opt[string] `json:"jwks_uri,omitzero" format:"uri"`
 	RegistrationEndpoint           param.Opt[string] `json:"registration_endpoint,omitzero" format:"uri"`
-	TokenEndpoint                  param.Opt[string] `json:"token_endpoint,omitzero" format:"uri"`
-	CodeChallengeMethodsSupported  []string          `json:"code_challenge_methods_supported,omitzero"`
-	ScopesSupported                []string          `json:"scopes_supported,omitzero"`
+	// The query parameter name for scopes in authorization requests. Defaults to
+	// "scope". Set to null to unset.
+	ScopeParameter param.Opt[string] `json:"scope_parameter,omitzero"`
+	// The separator character for scope values. Defaults to " " (space). Set to null
+	// to unset.
+	ScopeSeparator param.Opt[string] `json:"scope_separator,omitzero"`
+	TokenEndpoint  param.Opt[string] `json:"token_endpoint,omitzero" format:"uri"`
+	// Dot-separated path to the access token in the token response body. Defaults to
+	// "access_token". Set to null to unset.
+	TokenResponseAccessTokenPointer param.Opt[string] `json:"token_response_access_token_pointer,omitzero"`
+	CodeChallengeMethodsSupported   []string          `json:"code_challenge_methods_supported,omitzero"`
+	ScopesSupported                 []string          `json:"scopes_supported,omitzero"`
 	paramObj
 }
 
