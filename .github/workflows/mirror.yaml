@@ -27,10 +27,22 @@ jobs:
           repositories: |
             keycard-go
 
-      - name: Push to mirror
+      - name: Debug token access
+        env:
+          TOKEN: ${{ steps.token.outputs.token }}
         run: |
-          git remote add mirror \
-            "https://x-access-token:${{ steps.token.outputs.token }}@github.com/keycardai/keycard-go.git"
+          curl -s -H "Authorization: Bearer ${TOKEN}" \
+            https://api.github.com/installation/repositories | jq '.repositories[].full_name'
+          curl -s -o /dev/null -w "repo status: %{http_code}\n" -H "Authorization: Bearer ${TOKEN}" \
+            https://api.github.com/repos/keycardai/keycard-go
+
+      - name: Push to mirror
+        env:
+          MIRROR_TOKEN: ${{ steps.token.outputs.token }}
+        run: |
+          git remote add mirror https://github.com/keycardai/keycard-go.git
+          git config --local "http.https://github.com/keycardai/.extraheader" \
+            "AUTHORIZATION: basic $(printf 'x-access-token:%s' "${MIRROR_TOKEN}" | base64)"
           git push mirror --all --force
           git push mirror --tags --force
           git push mirror --prune
