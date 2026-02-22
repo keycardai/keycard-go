@@ -27,15 +27,6 @@ jobs:
           repositories: |
             keycard-go
 
-      - name: Debug token access
-        env:
-          TOKEN: ${{ steps.token.outputs.token }}
-        run: |
-          curl -s -H "Authorization: Bearer ${TOKEN}" \
-            https://api.github.com/installation/repositories | jq '.repositories[].full_name'
-          curl -s -o /dev/null -w "repo status: %{http_code}\n" -H "Authorization: Bearer ${TOKEN}" \
-            https://api.github.com/repos/keycardai/keycard-go
-
       - name: Push to mirror
         env:
           MIRROR_TOKEN: ${{ steps.token.outputs.token }}
