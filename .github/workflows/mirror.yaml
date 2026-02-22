@@ -15,6 +15,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Generate installation token for target org
         id: token
@@ -25,18 +26,6 @@ jobs:
           owner: keycardai
           repositories: |
             keycard-go
-
-      - name: Debug token access
-        env:
-          TOKEN: ${{ steps.token.outputs.token }}
-        run: |
-          # Check what repos the token can access
-          curl -s -H "Authorization: Bearer ${TOKEN}" \
-            https://api.github.com/installation/repositories | jq '.repositories[].full_name'
-
-          # Check the specific repo
-          curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer ${TOKEN}" \
-            https://api.github.com/repos/keycardai/keycard-go
 
       - name: Push to mirror
         run: |
