@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -22,7 +22,7 @@ func TestZoneDelegatedGrantGet(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -31,12 +31,12 @@ func TestZoneDelegatedGrantGet(t *testing.T) {
 	_, err := client.Zones.DelegatedGrants.Get(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneDelegatedGrantGetParams{
+		keycard.ZoneDelegatedGrantGetParams{
 			ZoneID: "zoneId",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -53,7 +53,7 @@ func TestZoneDelegatedGrantUpdate(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -62,13 +62,13 @@ func TestZoneDelegatedGrantUpdate(t *testing.T) {
 	_, err := client.Zones.DelegatedGrants.Update(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneDelegatedGrantUpdateParams{
+		keycard.ZoneDelegatedGrantUpdateParams{
 			ZoneID: "zoneId",
-			Status: keycardapi.ZoneDelegatedGrantUpdateParamsStatusRevoked,
+			Status: keycard.ZoneDelegatedGrantUpdateParamsStatusRevoked,
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -85,7 +85,7 @@ func TestZoneDelegatedGrantListWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -94,21 +94,21 @@ func TestZoneDelegatedGrantListWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.DelegatedGrants.List(
 		context.TODO(),
 		"zoneId",
-		keycardapi.ZoneDelegatedGrantListParams{
-			Active: keycardapi.ZoneDelegatedGrantListParamsActiveTrue,
-			After:  keycardapi.String("x"),
-			Before: keycardapi.String("x"),
-			Expand: keycardapi.ZoneDelegatedGrantListParamsExpandUnion{
-				OfZoneDelegatedGrantListsExpandString: keycardapi.String("total_count"),
+		keycard.ZoneDelegatedGrantListParams{
+			Active: keycard.ZoneDelegatedGrantListParamsActiveTrue,
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Expand: keycard.ZoneDelegatedGrantListParamsExpandUnion{
+				OfZoneDelegatedGrantListsExpandString: keycard.String("total_count"),
 			},
-			Limit:      keycardapi.Int(1),
-			ResourceID: keycardapi.String("resource_id"),
-			Status:     keycardapi.ZoneDelegatedGrantListParamsStatusActive,
-			UserID:     keycardapi.String("user_id"),
+			Limit:      keycard.Int(1),
+			ResourceID: keycard.String("resource_id"),
+			Status:     keycard.ZoneDelegatedGrantListParamsStatusActive,
+			UserID:     keycard.String("user_id"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -125,7 +125,7 @@ func TestZoneDelegatedGrantDelete(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -134,12 +134,12 @@ func TestZoneDelegatedGrantDelete(t *testing.T) {
 	err := client.Zones.DelegatedGrants.Delete(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneDelegatedGrantDeleteParams{
+		keycard.ZoneDelegatedGrantDeleteParams{
 			ZoneID: "zoneId",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

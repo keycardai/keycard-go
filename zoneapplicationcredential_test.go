@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -22,7 +22,7 @@ func TestZoneApplicationCredentialNewWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -31,17 +31,17 @@ func TestZoneApplicationCredentialNewWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.ApplicationCredentials.New(
 		context.TODO(),
 		"zoneId",
-		keycardapi.ZoneApplicationCredentialNewParams{
-			OfApplicationCredentialCreateToken: &keycardapi.ZoneApplicationCredentialNewParamsBodyApplicationCredentialCreateToken{
+		keycard.ZoneApplicationCredentialNewParams{
+			OfApplicationCredentialCreateToken: &keycard.ZoneApplicationCredentialNewParamsBodyApplicationCredentialCreateToken{
 				ApplicationID: "application_id",
 				ProviderID:    "provider_id",
 				Type:          "token",
-				Subject:       keycardapi.String("subject"),
+				Subject:       keycard.String("subject"),
 			},
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -58,7 +58,7 @@ func TestZoneApplicationCredentialGet(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -67,12 +67,12 @@ func TestZoneApplicationCredentialGet(t *testing.T) {
 	_, err := client.Zones.ApplicationCredentials.Get(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneApplicationCredentialGetParams{
+		keycard.ZoneApplicationCredentialGetParams{
 			ZoneID: "zoneId",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -89,7 +89,7 @@ func TestZoneApplicationCredentialUpdateWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -98,16 +98,16 @@ func TestZoneApplicationCredentialUpdateWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.ApplicationCredentials.Update(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneApplicationCredentialUpdateParams{
+		keycard.ZoneApplicationCredentialUpdateParams{
 			ZoneID: "zoneId",
-			OfTokenCredentialUpdate: &keycardapi.ZoneApplicationCredentialUpdateParamsBodyTokenCredentialUpdate{
-				Subject: keycardapi.String("subject"),
+			OfTokenCredentialUpdate: &keycard.ZoneApplicationCredentialUpdateParamsBodyTokenCredentialUpdate{
+				Subject: keycard.String("subject"),
 				Type:    "token",
 			},
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -124,7 +124,7 @@ func TestZoneApplicationCredentialListWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -133,20 +133,20 @@ func TestZoneApplicationCredentialListWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.ApplicationCredentials.List(
 		context.TODO(),
 		"zoneId",
-		keycardapi.ZoneApplicationCredentialListParams{
-			After:         keycardapi.String("x"),
-			ApplicationID: keycardapi.String("applicationId"),
-			Before:        keycardapi.String("x"),
-			Cursor:        keycardapi.String("cursor"),
-			Expand: keycardapi.ZoneApplicationCredentialListParamsExpandUnion{
-				OfZoneApplicationCredentialListsExpandString: keycardapi.String("total_count"),
+		keycard.ZoneApplicationCredentialListParams{
+			After:         keycard.String("x"),
+			ApplicationID: keycard.String("applicationId"),
+			Before:        keycard.String("x"),
+			Cursor:        keycard.String("cursor"),
+			Expand: keycard.ZoneApplicationCredentialListParamsExpandUnion{
+				OfZoneApplicationCredentialListsExpandString: keycard.String("total_count"),
 			},
-			Limit: keycardapi.Int(1),
-			Slug:  keycardapi.String("slug"),
+			Limit: keycard.Int(1),
+			Slug:  keycard.String("slug"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -163,7 +163,7 @@ func TestZoneApplicationCredentialDelete(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -172,12 +172,12 @@ func TestZoneApplicationCredentialDelete(t *testing.T) {
 	err := client.Zones.ApplicationCredentials.Delete(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneApplicationCredentialDeleteParams{
+		keycard.ZoneApplicationCredentialDeleteParams{
 			ZoneID: "zoneId",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

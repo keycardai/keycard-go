@@ -17,7 +17,7 @@ It is generated with [Stainless](https://www.stainless.com/).
 
 ```go
 import (
-	"github.com/keycardai/keycard-go" // imported as keycardapi
+	"github.com/keycardai/keycard-go" // imported as keycard
 )
 ```
 
@@ -52,8 +52,8 @@ import (
 )
 
 func main() {
-	client := keycardapi.NewClient()
-	zones, err := client.Zones.List(context.TODO(), keycardapi.ZoneListParams{})
+	client := keycard.NewClient()
+	zones, err := client.Zones.List(context.TODO(), keycard.ZoneListParams{})
 	if err != nil {
 		panic(err.Error())
 	}
@@ -64,13 +64,13 @@ func main() {
 
 ### Request fields
 
-The keycardapi library uses the [`omitzero`](https://tip.golang.org/doc/go1.24#encodingjsonpkgencodingjson)
+The keycard library uses the [`omitzero`](https://tip.golang.org/doc/go1.24#encodingjsonpkgencodingjson)
 semantics from the Go 1.24+ `encoding/json` release for request fields.
 
 Required primitive fields (`int64`, `string`, etc.) feature the tag <code>\`json:"...,required"\`</code>. These
 fields are always serialized, even their zero values.
 
-Optional primitive types are wrapped in a `param.Opt[T]`. These fields can be set with the provided constructors, `keycardapi.String(string)`, `keycardapi.Int(int64)`, etc.
+Optional primitive types are wrapped in a `param.Opt[T]`. These fields can be set with the provided constructors, `keycard.String(string)`, `keycard.Int(int64)`, etc.
 
 Any `param.Opt[T]`, map, slice, struct or string enum uses the
 tag <code>\`json:"...,omitzero"\`</code>. Its zero value is considered omitted.
@@ -78,17 +78,17 @@ tag <code>\`json:"...,omitzero"\`</code>. Its zero value is considered omitted.
 The `param.IsOmitted(any)` function can confirm the presence of any `omitzero` field.
 
 ```go
-p := keycardapi.ExampleParams{
-	ID:   "id_xxx",                 // required property
-	Name: keycardapi.String("..."), // optional property
+p := keycard.ExampleParams{
+	ID:   "id_xxx",              // required property
+	Name: keycard.String("..."), // optional property
 
-	Point: keycardapi.Point{
-		X: 0,                 // required field will serialize as 0
-		Y: keycardapi.Int(1), // optional field will serialize as 1
+	Point: keycard.Point{
+		X: 0,              // required field will serialize as 0
+		Y: keycard.Int(1), // optional field will serialize as 1
 		// ... omitted non-required fields will not be serialized
 	},
 
-	Origin: keycardapi.Origin{}, // the zero value of [Origin] is considered omitted
+	Origin: keycard.Origin{}, // the zero value of [Origin] is considered omitted
 }
 ```
 
@@ -117,7 +117,7 @@ p.SetExtraFields(map[string]any{
 })
 
 // Send a number instead of an object
-custom := param.Override[keycardapi.FooParams](12)
+custom := param.Override[keycard.FooParams](12)
 ```
 
 ### Request unions
@@ -258,7 +258,7 @@ This library uses the functional options pattern. Functions defined in the
 requests. For example:
 
 ```go
-client := keycardapi.NewClient(
+client := keycard.NewClient(
 	// Adds a header to every request made by the client
 	option.WithHeader("X-Some-Header", "custom_header_info"),
 )
@@ -287,16 +287,16 @@ with additional helper methods like `.GetNextPage()`, e.g.:
 ### Errors
 
 When the API returns a non-success status code, we return an error with type
-`*keycardapi.Error`. This contains the `StatusCode`, `*http.Request`, and
+`*keycard.Error`. This contains the `StatusCode`, `*http.Request`, and
 `*http.Response` values of the request, as well as the JSON of the error body
 (much like other response objects in the SDK).
 
 To handle errors, we recommend that you use the `errors.As` pattern:
 
 ```go
-_, err := client.Zones.List(context.TODO(), keycardapi.ZoneListParams{})
+_, err := client.Zones.List(context.TODO(), keycard.ZoneListParams{})
 if err != nil {
-	var apierr *keycardapi.Error
+	var apierr *keycard.Error
 	if errors.As(err, &apierr) {
 		println(string(apierr.DumpRequest(true)))  // Prints the serialized HTTP request
 		println(string(apierr.DumpResponse(true))) // Prints the serialized HTTP response
@@ -321,7 +321,7 @@ ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 defer cancel()
 client.Zones.List(
 	ctx,
-	keycardapi.ZoneListParams{},
+	keycard.ZoneListParams{},
 	// This sets the per-retry timeout
 	option.WithRequestTimeout(20*time.Second),
 )
@@ -337,7 +337,7 @@ The file name and content-type can be customized by implementing `Name() string`
 string` on the run-time type of `io.Reader`. Note that `os.File` implements `Name() string`, so a
 file returned by `os.Open` will be sent with the file name on disk.
 
-We also provide a helper `keycardapi.File(reader io.Reader, filename string, contentType string)`
+We also provide a helper `keycard.File(reader io.Reader, filename string, contentType string)`
 which can be used to wrap any `io.Reader` with the appropriate file name and content type.
 
 ### Retries
@@ -350,14 +350,14 @@ You can use the `WithMaxRetries` option to configure or disable this:
 
 ```go
 // Configure the default for all requests:
-client := keycardapi.NewClient(
+client := keycard.NewClient(
 	option.WithMaxRetries(0), // default is 2
 )
 
 // Override per-request:
 client.Zones.List(
 	context.TODO(),
-	keycardapi.ZoneListParams{},
+	keycard.ZoneListParams{},
 	option.WithMaxRetries(5),
 )
 ```
@@ -372,7 +372,7 @@ you need to examine response headers, status codes, or other details.
 var response *http.Response
 zones, err := client.Zones.List(
 	context.TODO(),
-	keycardapi.ZoneListParams{},
+	keycard.ZoneListParams{},
 	option.WithResponseInto(&response),
 )
 if err != nil {
@@ -419,7 +419,7 @@ or the `option.WithJSONSet()` methods.
 params := FooNewParams{
     ID:   "id_xxxx",
     Data: FooNewParamsData{
-        FirstName: keycardapi.String("John"),
+        FirstName: keycard.String("John"),
     },
 }
 client.Foo.New(context.Background(), params, option.WithJSONSet("data.last_name", "Doe"))
@@ -454,7 +454,7 @@ func Logger(req *http.Request, next option.MiddlewareNext) (res *http.Response, 
     return res, err
 }
 
-client := keycardapi.NewClient(
+client := keycard.NewClient(
 	option.WithMiddleware(Logger),
 )
 ```

@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -355,8 +355,8 @@ func (SecretPasswordFields) implZoneSecretGetResponseDataUnion() {}
 // Use the following switch statement to find the correct variant
 //
 //	switch variant := ZoneSecretGetResponseDataUnion.AsAny().(type) {
-//	case keycardapi.SecretTokenFields:
-//	case keycardapi.SecretPasswordFields:
+//	case keycard.SecretTokenFields:
+//	case keycard.SecretPasswordFields:
 //	default:
 //	  fmt.Errorf("no variant present")
 //	}

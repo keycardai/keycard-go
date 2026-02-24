@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -22,7 +22,7 @@ func TestZoneResourceNewWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -31,20 +31,20 @@ func TestZoneResourceNewWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.Resources.New(
 		context.TODO(),
 		"zoneId",
-		keycardapi.ZoneResourceNewParams{
+		keycard.ZoneResourceNewParams{
 			Identifier:           "x",
 			Name:                 "x",
-			ApplicationID:        keycardapi.String("application_id"),
-			CredentialProviderID: keycardapi.String("credential_provider_id"),
-			Description:          keycardapi.String("description"),
-			Metadata: keycardapi.MetadataParam{
-				DocsURL: keycardapi.String("https://example.com"),
+			ApplicationID:        keycard.String("application_id"),
+			CredentialProviderID: keycard.String("credential_provider_id"),
+			Description:          keycard.String("description"),
+			Metadata: keycard.MetadataParam{
+				DocsURL: keycard.String("https://example.com"),
 			},
 			Scopes: []string{"string"},
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -61,7 +61,7 @@ func TestZoneResourceGet(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -70,12 +70,12 @@ func TestZoneResourceGet(t *testing.T) {
 	_, err := client.Zones.Resources.Get(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneResourceGetParams{
+		keycard.ZoneResourceGetParams{
 			ZoneID: "zoneId",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -92,7 +92,7 @@ func TestZoneResourceUpdateWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -101,21 +101,21 @@ func TestZoneResourceUpdateWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.Resources.Update(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneResourceUpdateParams{
+		keycard.ZoneResourceUpdateParams{
 			ZoneID:               "zoneId",
-			ApplicationID:        keycardapi.String("application_id"),
-			CredentialProviderID: keycardapi.String("credential_provider_id"),
-			Description:          keycardapi.String("description"),
-			Identifier:           keycardapi.String("x"),
-			Metadata: keycardapi.MetadataUpdateParam{
-				DocsURL: keycardapi.String("https://example.com"),
+			ApplicationID:        keycard.String("application_id"),
+			CredentialProviderID: keycard.String("credential_provider_id"),
+			Description:          keycard.String("description"),
+			Identifier:           keycard.String("x"),
+			Metadata: keycard.MetadataUpdateParam{
+				DocsURL: keycard.String("https://example.com"),
 			},
-			Name:   keycardapi.String("x"),
+			Name:   keycard.String("x"),
 			Scopes: []string{"x"},
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -132,7 +132,7 @@ func TestZoneResourceListWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -141,20 +141,20 @@ func TestZoneResourceListWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.Resources.List(
 		context.TODO(),
 		"zoneId",
-		keycardapi.ZoneResourceListParams{
-			After:                keycardapi.String("x"),
-			Before:               keycardapi.String("x"),
-			CredentialProviderID: keycardapi.String("credentialProviderId"),
-			Expand: keycardapi.ZoneResourceListParamsExpandUnion{
-				OfZoneResourceListsExpandString: keycardapi.String("total_count"),
+		keycard.ZoneResourceListParams{
+			After:                keycard.String("x"),
+			Before:               keycard.String("x"),
+			CredentialProviderID: keycard.String("credentialProviderId"),
+			Expand: keycard.ZoneResourceListParamsExpandUnion{
+				OfZoneResourceListsExpandString: keycard.String("total_count"),
 			},
-			Identifier: keycardapi.String("identifier"),
-			Limit:      keycardapi.Int(1),
-			Slug:       keycardapi.String("slug"),
+			Identifier: keycard.String("identifier"),
+			Limit:      keycard.Int(1),
+			Slug:       keycard.String("slug"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -171,7 +171,7 @@ func TestZoneResourceDelete(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -180,12 +180,12 @@ func TestZoneResourceDelete(t *testing.T) {
 	err := client.Zones.Resources.Delete(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneResourceDeleteParams{
+		keycard.ZoneResourceDeleteParams{
 			ZoneID: "zoneId",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

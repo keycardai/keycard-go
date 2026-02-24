@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -25,7 +25,7 @@ func (t *closureTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 
 func TestUserAgentHeader(t *testing.T) {
 	var userAgent string
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
 		option.WithPassword("My Password"),
@@ -40,7 +40,7 @@ func TestUserAgentHeader(t *testing.T) {
 			},
 		}),
 	)
-	client.Zones.List(context.Background(), keycardapi.ZoneListParams{})
+	client.Zones.List(context.Background(), keycard.ZoneListParams{})
 	if userAgent != fmt.Sprintf("KeycardAPI/Go %s", internal.PackageVersion) {
 		t.Errorf("Expected User-Agent to be correct, but got: %#v", userAgent)
 	}
@@ -48,7 +48,7 @@ func TestUserAgentHeader(t *testing.T) {
 
 func TestRetryAfter(t *testing.T) {
 	retryCountHeaders := make([]string, 0)
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
 		option.WithPassword("My Password"),
@@ -66,7 +66,7 @@ func TestRetryAfter(t *testing.T) {
 			},
 		}),
 	)
-	_, err := client.Zones.List(context.Background(), keycardapi.ZoneListParams{})
+	_, err := client.Zones.List(context.Background(), keycard.ZoneListParams{})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
 	}
@@ -84,7 +84,7 @@ func TestRetryAfter(t *testing.T) {
 
 func TestDeleteRetryCountHeader(t *testing.T) {
 	retryCountHeaders := make([]string, 0)
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
 		option.WithPassword("My Password"),
@@ -103,7 +103,7 @@ func TestDeleteRetryCountHeader(t *testing.T) {
 		}),
 		option.WithHeaderDel("X-Stainless-Retry-Count"),
 	)
-	_, err := client.Zones.List(context.Background(), keycardapi.ZoneListParams{})
+	_, err := client.Zones.List(context.Background(), keycard.ZoneListParams{})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
 	}
@@ -116,7 +116,7 @@ func TestDeleteRetryCountHeader(t *testing.T) {
 
 func TestOverwriteRetryCountHeader(t *testing.T) {
 	retryCountHeaders := make([]string, 0)
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
 		option.WithPassword("My Password"),
@@ -135,7 +135,7 @@ func TestOverwriteRetryCountHeader(t *testing.T) {
 		}),
 		option.WithHeader("X-Stainless-Retry-Count", "42"),
 	)
-	_, err := client.Zones.List(context.Background(), keycardapi.ZoneListParams{})
+	_, err := client.Zones.List(context.Background(), keycard.ZoneListParams{})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
 	}
@@ -148,7 +148,7 @@ func TestOverwriteRetryCountHeader(t *testing.T) {
 
 func TestRetryAfterMs(t *testing.T) {
 	attempts := 0
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
 		option.WithPassword("My Password"),
@@ -166,7 +166,7 @@ func TestRetryAfterMs(t *testing.T) {
 			},
 		}),
 	)
-	_, err := client.Zones.List(context.Background(), keycardapi.ZoneListParams{})
+	_, err := client.Zones.List(context.Background(), keycard.ZoneListParams{})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
 	}
@@ -176,7 +176,7 @@ func TestRetryAfterMs(t *testing.T) {
 }
 
 func TestContextCancel(t *testing.T) {
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
 		option.WithPassword("My Password"),
@@ -191,14 +191,14 @@ func TestContextCancel(t *testing.T) {
 	)
 	cancelCtx, cancel := context.WithCancel(context.Background())
 	cancel()
-	_, err := client.Zones.List(cancelCtx, keycardapi.ZoneListParams{})
+	_, err := client.Zones.List(cancelCtx, keycard.ZoneListParams{})
 	if err == nil {
 		t.Error("Expected there to be a cancel error")
 	}
 }
 
 func TestContextCancelDelay(t *testing.T) {
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
 		option.WithPassword("My Password"),
@@ -213,7 +213,7 @@ func TestContextCancelDelay(t *testing.T) {
 	)
 	cancelCtx, cancel := context.WithTimeout(context.Background(), 2*time.Millisecond)
 	defer cancel()
-	_, err := client.Zones.List(cancelCtx, keycardapi.ZoneListParams{})
+	_, err := client.Zones.List(cancelCtx, keycard.ZoneListParams{})
 	if err == nil {
 		t.Error("expected there to be a cancel error")
 	}
@@ -228,7 +228,7 @@ func TestContextDeadline(t *testing.T) {
 	defer cancel()
 
 	go func() {
-		client := keycardapi.NewClient(
+		client := keycard.NewClient(
 			option.WithAPIKey("My API Key"),
 			option.WithUsername("My Username"),
 			option.WithPassword("My Password"),
@@ -241,7 +241,7 @@ func TestContextDeadline(t *testing.T) {
 				},
 			}),
 		)
-		_, err := client.Zones.List(deadlineCtx, keycardapi.ZoneListParams{})
+		_, err := client.Zones.List(deadlineCtx, keycard.ZoneListParams{})
 		if err == nil {
 			t.Error("expected there to be a deadline error")
 		}

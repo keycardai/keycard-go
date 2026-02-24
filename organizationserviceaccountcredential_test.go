@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -22,7 +22,7 @@ func TestOrganizationServiceAccountCredentialNewWithOptionalParams(t *testing.T)
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -31,15 +31,15 @@ func TestOrganizationServiceAccountCredentialNewWithOptionalParams(t *testing.T)
 	_, err := client.Organizations.ServiceAccounts.Credentials.New(
 		context.TODO(),
 		"ab3def8hij2klm9opq5rst7uvw",
-		keycardapi.OrganizationServiceAccountCredentialNewParams{
+		keycard.OrganizationServiceAccountCredentialNewParams{
 			OrganizationID:   "x",
 			Name:             "name",
-			Description:      keycardapi.String("description"),
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Description:      keycard.String("description"),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -56,7 +56,7 @@ func TestOrganizationServiceAccountCredentialGetWithOptionalParams(t *testing.T)
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -65,15 +65,15 @@ func TestOrganizationServiceAccountCredentialGetWithOptionalParams(t *testing.T)
 	_, err := client.Organizations.ServiceAccounts.Credentials.Get(
 		context.TODO(),
 		"ab3def8hij2klm9opq5rst7uvw",
-		keycardapi.OrganizationServiceAccountCredentialGetParams{
+		keycard.OrganizationServiceAccountCredentialGetParams{
 			OrganizationID:   "x",
 			ServiceAccountID: "ab3def8hij2klm9opq5rst7uvw",
 			Expand:           []string{"permissions"},
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -90,7 +90,7 @@ func TestOrganizationServiceAccountCredentialUpdateWithOptionalParams(t *testing
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -99,16 +99,16 @@ func TestOrganizationServiceAccountCredentialUpdateWithOptionalParams(t *testing
 	_, err := client.Organizations.ServiceAccounts.Credentials.Update(
 		context.TODO(),
 		"ab3def8hij2klm9opq5rst7uvw",
-		keycardapi.OrganizationServiceAccountCredentialUpdateParams{
+		keycard.OrganizationServiceAccountCredentialUpdateParams{
 			OrganizationID:   "x",
 			ServiceAccountID: "ab3def8hij2klm9opq5rst7uvw",
-			Description:      keycardapi.String("description"),
-			Name:             keycardapi.String("name"),
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Description:      keycard.String("description"),
+			Name:             keycard.String("name"),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -125,7 +125,7 @@ func TestOrganizationServiceAccountCredentialListWithOptionalParams(t *testing.T
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -134,17 +134,17 @@ func TestOrganizationServiceAccountCredentialListWithOptionalParams(t *testing.T
 	_, err := client.Organizations.ServiceAccounts.Credentials.List(
 		context.TODO(),
 		"ab3def8hij2klm9opq5rst7uvw",
-		keycardapi.OrganizationServiceAccountCredentialListParams{
+		keycard.OrganizationServiceAccountCredentialListParams{
 			OrganizationID:   "x",
-			After:            keycardapi.String("x"),
-			Before:           keycardapi.String("x"),
+			After:            keycard.String("x"),
+			Before:           keycard.String("x"),
 			Expand:           []string{"permissions"},
-			Limit:            keycardapi.Int(1),
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Limit:            keycard.Int(1),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -161,7 +161,7 @@ func TestOrganizationServiceAccountCredentialDeleteWithOptionalParams(t *testing
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -170,14 +170,14 @@ func TestOrganizationServiceAccountCredentialDeleteWithOptionalParams(t *testing
 	err := client.Organizations.ServiceAccounts.Credentials.Delete(
 		context.TODO(),
 		"ab3def8hij2klm9opq5rst7uvw",
-		keycardapi.OrganizationServiceAccountCredentialDeleteParams{
+		keycard.OrganizationServiceAccountCredentialDeleteParams{
 			OrganizationID:   "x",
 			ServiceAccountID: "ab3def8hij2klm9opq5rst7uvw",
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

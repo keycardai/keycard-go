@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -22,7 +22,7 @@ func TestZoneSessionGet(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -31,12 +31,12 @@ func TestZoneSessionGet(t *testing.T) {
 	_, err := client.Zones.Sessions.Get(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneSessionGetParams{
+		keycard.ZoneSessionGetParams{
 			ZoneID: "zoneId",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -53,7 +53,7 @@ func TestZoneSessionUpdate(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -62,13 +62,13 @@ func TestZoneSessionUpdate(t *testing.T) {
 	_, err := client.Zones.Sessions.Update(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneSessionUpdateParams{
+		keycard.ZoneSessionUpdateParams{
 			ZoneID: "zoneId",
-			Status: keycardapi.ZoneSessionUpdateParamsStatusRevoked,
+			Status: keycard.ZoneSessionUpdateParamsStatusRevoked,
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -85,7 +85,7 @@ func TestZoneSessionListWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -94,21 +94,21 @@ func TestZoneSessionListWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.Sessions.List(
 		context.TODO(),
 		"zoneId",
-		keycardapi.ZoneSessionListParams{
-			Active: keycardapi.ZoneSessionListParamsActiveTrue,
-			After:  keycardapi.String("x"),
-			Before: keycardapi.String("x"),
-			Expand: keycardapi.ZoneSessionListParamsExpandUnion{
-				OfZoneSessionListsExpandString: keycardapi.String("total_count"),
+		keycard.ZoneSessionListParams{
+			Active: keycard.ZoneSessionListParamsActiveTrue,
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Expand: keycard.ZoneSessionListParamsExpandUnion{
+				OfZoneSessionListsExpandString: keycard.String("total_count"),
 			},
-			Limit:       keycardapi.Int(1),
-			SessionType: keycardapi.ZoneSessionListParamsSessionTypeUser,
-			Status:      keycardapi.ZoneSessionListParamsStatusActive,
-			UserID:      keycardapi.String("user_id"),
+			Limit:       keycard.Int(1),
+			SessionType: keycard.ZoneSessionListParamsSessionTypeUser,
+			Status:      keycard.ZoneSessionListParamsStatusActive,
+			UserID:      keycard.String("user_id"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -125,7 +125,7 @@ func TestZoneSessionDelete(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -134,12 +134,12 @@ func TestZoneSessionDelete(t *testing.T) {
 	err := client.Zones.Sessions.Delete(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneSessionDeleteParams{
+		keycard.ZoneSessionDeleteParams{
 			ZoneID: "zoneId",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

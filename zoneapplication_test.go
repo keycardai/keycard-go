@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -22,7 +22,7 @@ func TestZoneApplicationNewWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -31,28 +31,28 @@ func TestZoneApplicationNewWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.Applications.New(
 		context.TODO(),
 		"zoneId",
-		keycardapi.ZoneApplicationNewParams{
+		keycard.ZoneApplicationNewParams{
 			Identifier: "x",
 			Name:       "x",
-			Dependencies: []keycardapi.ZoneApplicationNewParamsDependency{{
+			Dependencies: []keycard.ZoneApplicationNewParamsDependency{{
 				ID:   "id",
-				Type: keycardapi.String("type"),
+				Type: keycard.String("type"),
 			}},
-			Description: keycardapi.String("description"),
-			Metadata: keycardapi.MetadataParam{
-				DocsURL: keycardapi.String("https://example.com"),
+			Description: keycard.String("description"),
+			Metadata: keycard.MetadataParam{
+				DocsURL: keycard.String("https://example.com"),
 			},
-			Protocols: keycardapi.ZoneApplicationNewParamsProtocols{
-				Oauth2: keycardapi.ZoneApplicationNewParamsProtocolsOauth2{
+			Protocols: keycard.ZoneApplicationNewParamsProtocols{
+				Oauth2: keycard.ZoneApplicationNewParamsProtocolsOauth2{
 					PostLogoutRedirectUris: []string{"https://example.com"},
 					RedirectUris:           []string{"https://example.com"},
 				},
 			},
-			Traits: []keycardapi.ApplicationTrait{keycardapi.ApplicationTraitGateway},
+			Traits: []keycard.ApplicationTrait{keycard.ApplicationTraitGateway},
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -69,7 +69,7 @@ func TestZoneApplicationGet(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -78,12 +78,12 @@ func TestZoneApplicationGet(t *testing.T) {
 	_, err := client.Zones.Applications.Get(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneApplicationGetParams{
+		keycard.ZoneApplicationGetParams{
 			ZoneID: "zoneId",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -100,7 +100,7 @@ func TestZoneApplicationUpdateWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -109,25 +109,25 @@ func TestZoneApplicationUpdateWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.Applications.Update(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneApplicationUpdateParams{
+		keycard.ZoneApplicationUpdateParams{
 			ZoneID:      "zoneId",
-			Description: keycardapi.String("description"),
-			Identifier:  keycardapi.String("x"),
-			Metadata: keycardapi.MetadataUpdateParam{
-				DocsURL: keycardapi.String("https://example.com"),
+			Description: keycard.String("description"),
+			Identifier:  keycard.String("x"),
+			Metadata: keycard.MetadataUpdateParam{
+				DocsURL: keycard.String("https://example.com"),
 			},
-			Name: keycardapi.String("x"),
-			Protocols: keycardapi.ZoneApplicationUpdateParamsProtocols{
-				Oauth2: keycardapi.ZoneApplicationUpdateParamsProtocolsOauth2{
+			Name: keycard.String("x"),
+			Protocols: keycard.ZoneApplicationUpdateParamsProtocols{
+				Oauth2: keycard.ZoneApplicationUpdateParamsProtocolsOauth2{
 					PostLogoutRedirectUris: []string{"https://example.com"},
 					RedirectUris:           []string{"https://example.com"},
 				},
 			},
-			Traits: []keycardapi.ApplicationTrait{keycardapi.ApplicationTraitGateway},
+			Traits: []keycard.ApplicationTrait{keycard.ApplicationTraitGateway},
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -144,7 +144,7 @@ func TestZoneApplicationListWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -153,22 +153,22 @@ func TestZoneApplicationListWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.Applications.List(
 		context.TODO(),
 		"zoneId",
-		keycardapi.ZoneApplicationListParams{
-			After:  keycardapi.String("x"),
-			Before: keycardapi.String("x"),
-			Cursor: keycardapi.String("cursor"),
-			Expand: keycardapi.ZoneApplicationListParamsExpandUnion{
-				OfZoneApplicationListsExpandString: keycardapi.String("total_count"),
+		keycard.ZoneApplicationListParams{
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Cursor: keycard.String("cursor"),
+			Expand: keycard.ZoneApplicationListParamsExpandUnion{
+				OfZoneApplicationListsExpandString: keycard.String("total_count"),
 			},
-			Identifier: keycardapi.String("identifier"),
-			Limit:      keycardapi.Int(1),
-			Slug:       keycardapi.String("slug"),
-			Traits:     []keycardapi.ApplicationTrait{keycardapi.ApplicationTraitGateway},
-			TraitsAll:  []keycardapi.ApplicationTrait{keycardapi.ApplicationTraitGateway},
+			Identifier: keycard.String("identifier"),
+			Limit:      keycard.Int(1),
+			Slug:       keycard.String("slug"),
+			Traits:     []keycard.ApplicationTrait{keycard.ApplicationTraitGateway},
+			TraitsAll:  []keycard.ApplicationTrait{keycard.ApplicationTraitGateway},
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -185,7 +185,7 @@ func TestZoneApplicationDelete(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -194,12 +194,12 @@ func TestZoneApplicationDelete(t *testing.T) {
 	err := client.Zones.Applications.Delete(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneApplicationDeleteParams{
+		keycard.ZoneApplicationDeleteParams{
 			ZoneID: "zoneId",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -216,7 +216,7 @@ func TestZoneApplicationListCredentialsWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -225,19 +225,19 @@ func TestZoneApplicationListCredentialsWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.Applications.ListCredentials(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneApplicationListCredentialsParams{
+		keycard.ZoneApplicationListCredentialsParams{
 			ZoneID: "zoneId",
-			After:  keycardapi.String("x"),
-			Before: keycardapi.String("x"),
-			Cursor: keycardapi.String("cursor"),
-			Expand: keycardapi.ZoneApplicationListCredentialsParamsExpandUnion{
-				OfZoneApplicationListCredentialssExpandString: keycardapi.String("total_count"),
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Cursor: keycard.String("cursor"),
+			Expand: keycard.ZoneApplicationListCredentialsParamsExpandUnion{
+				OfZoneApplicationListCredentialssExpandString: keycard.String("total_count"),
 			},
-			Limit: keycardapi.Int(1),
+			Limit: keycard.Int(1),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -254,7 +254,7 @@ func TestZoneApplicationListResourcesWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -263,19 +263,19 @@ func TestZoneApplicationListResourcesWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.Applications.ListResources(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneApplicationListResourcesParams{
+		keycard.ZoneApplicationListResourcesParams{
 			ZoneID: "zoneId",
-			After:  keycardapi.String("x"),
-			Before: keycardapi.String("x"),
-			Cursor: keycardapi.String("cursor"),
-			Expand: keycardapi.ZoneApplicationListResourcesParamsExpandUnion{
-				OfZoneApplicationListResourcessExpandString: keycardapi.String("total_count"),
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Cursor: keycard.String("cursor"),
+			Expand: keycard.ZoneApplicationListResourcesParamsExpandUnion{
+				OfZoneApplicationListResourcessExpandString: keycard.String("total_count"),
 			},
-			Limit: keycardapi.Int(1),
+			Limit: keycard.Int(1),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

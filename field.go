@@ -1,4 +1,4 @@
-package keycardapi
+package keycard
 
 import (
 	"github.com/keycardai/keycard-go/packages/param"

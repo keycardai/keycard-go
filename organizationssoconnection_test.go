@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -22,7 +22,7 @@ func TestOrganizationSSOConnectionGetWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -31,13 +31,13 @@ func TestOrganizationSSOConnectionGetWithOptionalParams(t *testing.T) {
 	_, err := client.Organizations.SSOConnection.Get(
 		context.TODO(),
 		"x",
-		keycardapi.OrganizationSSOConnectionGetParams{
+		keycard.OrganizationSSOConnectionGetParams{
 			Expand:           []string{"permissions"},
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -54,7 +54,7 @@ func TestOrganizationSSOConnectionUpdateWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -63,28 +63,28 @@ func TestOrganizationSSOConnectionUpdateWithOptionalParams(t *testing.T) {
 	_, err := client.Organizations.SSOConnection.Update(
 		context.TODO(),
 		"x",
-		keycardapi.OrganizationSSOConnectionUpdateParams{
-			ClientID:     keycardapi.String("client_id"),
-			ClientSecret: keycardapi.String("client_secret"),
-			Identifier:   keycardapi.String("x"),
-			Protocols: keycardapi.SSOConnectionProtocolParam{
-				Oauth2: keycardapi.SSOConnectionProtocolOauth2Param{
-					AuthorizationEndpoint:         keycardapi.String("https://example.com"),
+		keycard.OrganizationSSOConnectionUpdateParams{
+			ClientID:     keycard.String("client_id"),
+			ClientSecret: keycard.String("client_secret"),
+			Identifier:   keycard.String("x"),
+			Protocols: keycard.SSOConnectionProtocolParam{
+				Oauth2: keycard.SSOConnectionProtocolOauth2Param{
+					AuthorizationEndpoint:         keycard.String("https://example.com"),
 					CodeChallengeMethodsSupported: []string{"string"},
-					JwksUri:                       keycardapi.String("https://example.com"),
-					RegistrationEndpoint:          keycardapi.String("https://example.com"),
+					JwksUri:                       keycard.String("https://example.com"),
+					RegistrationEndpoint:          keycard.String("https://example.com"),
 					ScopesSupported:               []string{"string"},
-					TokenEndpoint:                 keycardapi.String("https://example.com"),
+					TokenEndpoint:                 keycard.String("https://example.com"),
 				},
-				Openid: keycardapi.SSOConnectionProtocolOpenidParam{
-					UserinfoEndpoint: keycardapi.String("https://example.com"),
+				Openid: keycard.SSOConnectionProtocolOpenidParam{
+					UserinfoEndpoint: keycard.String("https://example.com"),
 				},
 			},
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -101,7 +101,7 @@ func TestOrganizationSSOConnectionDisableWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -110,12 +110,12 @@ func TestOrganizationSSOConnectionDisableWithOptionalParams(t *testing.T) {
 	err := client.Organizations.SSOConnection.Disable(
 		context.TODO(),
 		"x",
-		keycardapi.OrganizationSSOConnectionDisableParams{
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		keycard.OrganizationSSOConnectionDisableParams{
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -132,7 +132,7 @@ func TestOrganizationSSOConnectionEnableWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -141,28 +141,28 @@ func TestOrganizationSSOConnectionEnableWithOptionalParams(t *testing.T) {
 	_, err := client.Organizations.SSOConnection.Enable(
 		context.TODO(),
 		"x",
-		keycardapi.OrganizationSSOConnectionEnableParams{
+		keycard.OrganizationSSOConnectionEnableParams{
 			ClientID:     "client_id",
 			Identifier:   "x",
-			ClientSecret: keycardapi.String("client_secret"),
-			Protocols: keycardapi.SSOConnectionProtocolParam{
-				Oauth2: keycardapi.SSOConnectionProtocolOauth2Param{
-					AuthorizationEndpoint:         keycardapi.String("https://example.com"),
+			ClientSecret: keycard.String("client_secret"),
+			Protocols: keycard.SSOConnectionProtocolParam{
+				Oauth2: keycard.SSOConnectionProtocolOauth2Param{
+					AuthorizationEndpoint:         keycard.String("https://example.com"),
 					CodeChallengeMethodsSupported: []string{"string"},
-					JwksUri:                       keycardapi.String("https://example.com"),
-					RegistrationEndpoint:          keycardapi.String("https://example.com"),
+					JwksUri:                       keycard.String("https://example.com"),
+					RegistrationEndpoint:          keycard.String("https://example.com"),
 					ScopesSupported:               []string{"string"},
-					TokenEndpoint:                 keycardapi.String("https://example.com"),
+					TokenEndpoint:                 keycard.String("https://example.com"),
 				},
-				Openid: keycardapi.SSOConnectionProtocolOpenidParam{
-					UserinfoEndpoint: keycardapi.String("https://example.com"),
+				Openid: keycard.SSOConnectionProtocolOpenidParam{
+					UserinfoEndpoint: keycard.String("https://example.com"),
 				},
 			},
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -22,7 +22,7 @@ func TestZoneApplicationDependencyGet(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -31,13 +31,13 @@ func TestZoneApplicationDependencyGet(t *testing.T) {
 	_, err := client.Zones.Applications.Dependencies.Get(
 		context.TODO(),
 		"dependencyId",
-		keycardapi.ZoneApplicationDependencyGetParams{
+		keycard.ZoneApplicationDependencyGetParams{
 			ZoneID: "zoneId",
 			ID:     "id",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -54,7 +54,7 @@ func TestZoneApplicationDependencyListWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -63,20 +63,20 @@ func TestZoneApplicationDependencyListWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.Applications.Dependencies.List(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneApplicationDependencyListParams{
+		keycard.ZoneApplicationDependencyListParams{
 			ZoneID: "zoneId",
-			After:  keycardapi.String("x"),
-			Before: keycardapi.String("x"),
-			Cursor: keycardapi.String("cursor"),
-			Expand: keycardapi.ZoneApplicationDependencyListParamsExpandUnion{
-				OfZoneApplicationDependencyListsExpandString: keycardapi.String("total_count"),
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Cursor: keycard.String("cursor"),
+			Expand: keycard.ZoneApplicationDependencyListParamsExpandUnion{
+				OfZoneApplicationDependencyListsExpandString: keycard.String("total_count"),
 			},
-			Limit:         keycardapi.Int(1),
-			WhenAccessing: keycardapi.String("when_accessing"),
+			Limit:         keycard.Int(1),
+			WhenAccessing: keycard.String("when_accessing"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -93,7 +93,7 @@ func TestZoneApplicationDependencyAddWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -102,14 +102,14 @@ func TestZoneApplicationDependencyAddWithOptionalParams(t *testing.T) {
 	err := client.Zones.Applications.Dependencies.Add(
 		context.TODO(),
 		"dependencyId",
-		keycardapi.ZoneApplicationDependencyAddParams{
+		keycard.ZoneApplicationDependencyAddParams{
 			ZoneID:        "zoneId",
 			ID:            "id",
 			WhenAccessing: []string{"string"},
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -126,7 +126,7 @@ func TestZoneApplicationDependencyRemove(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -135,13 +135,13 @@ func TestZoneApplicationDependencyRemove(t *testing.T) {
 	err := client.Zones.Applications.Dependencies.Remove(
 		context.TODO(),
 		"dependencyId",
-		keycardapi.ZoneApplicationDependencyRemoveParams{
+		keycard.ZoneApplicationDependencyRemoveParams{
 			ZoneID: "zoneId",
 			ID:     "id",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

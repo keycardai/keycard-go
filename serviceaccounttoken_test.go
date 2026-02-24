@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -22,20 +22,20 @@ func TestServiceAccountTokenNewWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
 		option.WithPassword("My Password"),
 	)
-	_, err := client.ServiceAccountToken.New(context.TODO(), keycardapi.ServiceAccountTokenNewParams{
+	_, err := client.ServiceAccountToken.New(context.TODO(), keycard.ServiceAccountTokenNewParams{
 		ClientID:         "client_id",
 		ClientSecret:     "client_secret",
-		GrantType:        keycardapi.ServiceAccountTokenNewParamsGrantTypeClientCredentials,
-		XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		GrantType:        keycard.ServiceAccountTokenNewParamsGrantTypeClientCredentials,
+		XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

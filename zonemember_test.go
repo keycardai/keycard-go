@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -22,7 +22,7 @@ func TestZoneMemberGet(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -31,12 +31,12 @@ func TestZoneMemberGet(t *testing.T) {
 	_, err := client.Zones.Members.Get(
 		context.TODO(),
 		"organizationUserId",
-		keycardapi.ZoneMemberGetParams{
+		keycard.ZoneMemberGetParams{
 			ZoneID: "zoneId",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -53,7 +53,7 @@ func TestZoneMemberUpdate(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -62,13 +62,13 @@ func TestZoneMemberUpdate(t *testing.T) {
 	_, err := client.Zones.Members.Update(
 		context.TODO(),
 		"organizationUserId",
-		keycardapi.ZoneMemberUpdateParams{
+		keycard.ZoneMemberUpdateParams{
 			ZoneID: "zoneId",
-			Role:   keycardapi.ZoneRoleZoneManager,
+			Role:   keycard.ZoneRoleZoneManager,
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -85,7 +85,7 @@ func TestZoneMemberListWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -94,18 +94,18 @@ func TestZoneMemberListWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.Members.List(
 		context.TODO(),
 		"zoneId",
-		keycardapi.ZoneMemberListParams{
-			After:  keycardapi.String("after"),
-			Before: keycardapi.String("before"),
-			Expand: keycardapi.ZoneMemberListParamsExpandUnion{
-				OfZoneMemberListsExpandString: keycardapi.String("total_count"),
+		keycard.ZoneMemberListParams{
+			After:  keycard.String("after"),
+			Before: keycard.String("before"),
+			Expand: keycard.ZoneMemberListParamsExpandUnion{
+				OfZoneMemberListsExpandString: keycard.String("total_count"),
 			},
-			Limit: keycardapi.Int(1),
-			Role:  keycardapi.ZoneMemberListParamsRoleZoneManager,
+			Limit: keycard.Int(1),
+			Role:  keycard.ZoneMemberListParamsRoleZoneManager,
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -122,7 +122,7 @@ func TestZoneMemberDelete(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -131,12 +131,12 @@ func TestZoneMemberDelete(t *testing.T) {
 	err := client.Zones.Members.Delete(
 		context.TODO(),
 		"organizationUserId",
-		keycardapi.ZoneMemberDeleteParams{
+		keycard.ZoneMemberDeleteParams{
 			ZoneID: "zoneId",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -153,7 +153,7 @@ func TestZoneMemberAdd(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -162,13 +162,13 @@ func TestZoneMemberAdd(t *testing.T) {
 	_, err := client.Zones.Members.Add(
 		context.TODO(),
 		"zoneId",
-		keycardapi.ZoneMemberAddParams{
+		keycard.ZoneMemberAddParams{
 			OrganizationUserID: "organization_user_id",
-			Role:               keycardapi.ZoneRoleZoneManager,
+			Role:               keycard.ZoneRoleZoneManager,
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

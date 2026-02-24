@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -22,7 +22,7 @@ func TestZoneUserAgentGet(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -31,12 +31,12 @@ func TestZoneUserAgentGet(t *testing.T) {
 	_, err := client.Zones.UserAgents.Get(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneUserAgentGetParams{
+		keycard.ZoneUserAgentGetParams{
 			ZoneID: "zoneId",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -53,7 +53,7 @@ func TestZoneUserAgentListWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -62,17 +62,17 @@ func TestZoneUserAgentListWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.UserAgents.List(
 		context.TODO(),
 		"zoneId",
-		keycardapi.ZoneUserAgentListParams{
-			After:  keycardapi.String("x"),
-			Before: keycardapi.String("x"),
-			Expand: keycardapi.ZoneUserAgentListParamsExpandUnion{
-				OfZoneUserAgentListsExpandString: keycardapi.String("total_count"),
+		keycard.ZoneUserAgentListParams{
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Expand: keycard.ZoneUserAgentListParamsExpandUnion{
+				OfZoneUserAgentListsExpandString: keycard.String("total_count"),
 			},
-			Limit: keycardapi.Int(1),
+			Limit: keycard.Int(1),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
