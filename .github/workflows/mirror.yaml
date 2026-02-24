@@ -1,0 +1,39 @@
+name: Mirror Repository
+
+on:
+  push:
+    branches: ['**']
+    tags: ['**']
+
+permissions:
+  contents: read
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Generate installation token for target org
+        id: token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.GH_REPO_ACCESS_APP_ID }}
+          private-key: ${{ secrets.GH_REPO_ACCESS_PRIVATE_KEY }}
+          owner: keycardai
+          repositories: |
+            keycard-go
+
+      - name: Push to mirror
+        env:
+          MIRROR_TOKEN: ${{ steps.token.outputs.token }}
+        run: |
+          git remote add mirror https://github.com/keycardai/keycard-go.git
+          git config --local "http.https://github.com/keycardai/.extraheader" \
+            "AUTHORIZATION: basic $(printf 'x-access-token:%s' "${MIRROR_TOKEN}" | base64)"
+          git push mirror --all --force
+          git push mirror --tags --force
+          git push mirror --prune
