@@ -1,7 +1,7 @@
 package apiquery
 
 import (
-	"github.com/keycardai/keycard-go/packages/param"
+	"github.com/keycardlabs/keycard-go/packages/param"
 	"net/url"
 	"testing"
 	"time"

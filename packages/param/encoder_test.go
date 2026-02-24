@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/keycardai/keycard-go/packages/param"
+	"github.com/keycardlabs/keycard-go/packages/param"
 )
 
 type Struct struct {

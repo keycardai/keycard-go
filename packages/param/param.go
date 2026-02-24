@@ -2,7 +2,7 @@ package param
 
 import (
 	"encoding/json"
-	"github.com/keycardai/keycard-go/internal/encoding/json/sentinel"
+	"github.com/keycardlabs/keycard-go/internal/encoding/json/sentinel"
 	"reflect"
 )
 

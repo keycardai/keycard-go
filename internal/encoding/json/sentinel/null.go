@@ -1,7 +1,7 @@
 package sentinel
 
 import (
-	"github.com/keycardai/keycard-go/internal/encoding/json/shims"
+	"github.com/keycardlabs/keycard-go/internal/encoding/json/shims"
 	"reflect"
 	"sync"
 )

@@ -11,11 +11,11 @@ import (
 	"slices"
 	"time"
 
-	"github.com/keycardai/keycard-go/internal/apijson"
-	"github.com/keycardai/keycard-go/internal/requestconfig"
-	"github.com/keycardai/keycard-go/option"
-	"github.com/keycardai/keycard-go/packages/param"
-	"github.com/keycardai/keycard-go/packages/respjson"
+	"github.com/keycardlabs/keycard-go/internal/apijson"
+	"github.com/keycardlabs/keycard-go/internal/requestconfig"
+	"github.com/keycardlabs/keycard-go/option"
+	"github.com/keycardlabs/keycard-go/packages/param"
+	"github.com/keycardlabs/keycard-go/packages/respjson"
 )
 
 // InvitationService contains methods and other services that help with interacting
