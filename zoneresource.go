@@ -117,9 +117,9 @@ func (r *ZoneResourceService) Delete(ctx context.Context, id string, body ZoneRe
 }
 
 type ZoneResourceListResponse struct {
-	Items []Resource `json:"items,required"`
+	Items []Resource `json:"items" api:"required"`
 	// Cursor-based pagination metadata
-	Pagination ZoneResourceListResponsePagination `json:"pagination,required"`
+	Pagination ZoneResourceListResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
@@ -138,9 +138,9 @@ func (r *ZoneResourceListResponse) UnmarshalJSON(data []byte) error {
 // Cursor-based pagination metadata
 type ZoneResourceListResponsePagination struct {
 	// An opaque cursor used for paginating through a list of results
-	AfterCursor string `json:"after_cursor,required"`
+	AfterCursor string `json:"after_cursor" api:"required"`
 	// An opaque cursor used for paginating through a list of results
-	BeforeCursor string `json:"before_cursor,required"`
+	BeforeCursor string `json:"before_cursor" api:"required"`
 	// Total number of items matching the query. Only included when
 	// expand[]=total_count is requested.
 	TotalCount int64 `json:"total_count"`
@@ -162,9 +162,9 @@ func (r *ZoneResourceListResponsePagination) UnmarshalJSON(data []byte) error {
 
 type ZoneResourceNewParams struct {
 	// User specified identifier, unique within the zone
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// Human-readable name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Human-readable description
 	Description param.Opt[string] `json:"description,omitzero"`
 	// ID of the application that provides this resource
@@ -187,12 +187,12 @@ func (r *ZoneResourceNewParams) UnmarshalJSON(data []byte) error {
 }
 
 type ZoneResourceGetParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
 
 type ZoneResourceUpdateParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	// ID of the application that provides this resource (set to null to unset)
 	ApplicationID param.Opt[string] `json:"application_id,omitzero"`
 	// ID of the credential provider to associate with the resource (set to null to
@@ -261,6 +261,6 @@ const (
 )
 
 type ZoneResourceDeleteParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }

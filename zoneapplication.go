@@ -159,31 +159,31 @@ func (r *ZoneApplicationService) ListResources(ctx context.Context, id string, p
 // user (delegated access).
 type Application struct {
 	// Unique identifier of the application
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Entity creation timestamp
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Number of resource dependencies
-	DependenciesCount int64 `json:"dependencies_count,required"`
+	DependenciesCount int64 `json:"dependencies_count" api:"required"`
 	// User specified identifier, unique within the zone
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// Human-readable name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Organization that owns this application
-	OrganizationID string `json:"organization_id,required"`
+	OrganizationID string `json:"organization_id" api:"required"`
 	// URL-safe identifier, unique within the zone
-	Slug string `json:"slug,required"`
+	Slug string `json:"slug" api:"required"`
 	// Entity update timestamp
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Zone this application belongs to
-	ZoneID string `json:"zone_id,required"`
+	ZoneID string `json:"zone_id" api:"required"`
 	// Human-readable description
-	Description string `json:"description,nullable"`
+	Description string `json:"description" api:"nullable"`
 	// Entity metadata
 	Metadata Metadata `json:"metadata"`
 	// Protocol-specific configuration
-	Protocols ApplicationProtocols `json:"protocols,nullable"`
+	Protocols ApplicationProtocols `json:"protocols" api:"nullable"`
 	// Traits of the application
-	Traits []ApplicationTrait `json:"traits,nullable"`
+	Traits []ApplicationTrait `json:"traits" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                respjson.Field
@@ -213,7 +213,7 @@ func (r *Application) UnmarshalJSON(data []byte) error {
 // Protocol-specific configuration
 type ApplicationProtocols struct {
 	// OAuth 2.0 protocol configuration
-	Oauth2 ApplicationProtocolsOauth2 `json:"oauth2,nullable"`
+	Oauth2 ApplicationProtocolsOauth2 `json:"oauth2" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Oauth2      respjson.Field
@@ -231,9 +231,9 @@ func (r *ApplicationProtocols) UnmarshalJSON(data []byte) error {
 // OAuth 2.0 protocol configuration
 type ApplicationProtocolsOauth2 struct {
 	// OAuth 2.0 post-logout redirect URIs for this application
-	PostLogoutRedirectUris []string `json:"post_logout_redirect_uris,nullable" format:"uri"`
+	PostLogoutRedirectUris []string `json:"post_logout_redirect_uris" api:"nullable" format:"uri"`
 	// OAuth 2.0 redirect URIs for this application
-	RedirectUris []string `json:"redirect_uris,nullable" format:"uri"`
+	RedirectUris []string `json:"redirect_uris" api:"nullable" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		PostLogoutRedirectUris respjson.Field
@@ -316,11 +316,11 @@ func (r *MetadataUpdateParam) UnmarshalJSON(data []byte) error {
 }
 
 type ZoneApplicationListResponse struct {
-	Items []Application `json:"items,required"`
+	Items []Application `json:"items" api:"required"`
 	// Pagination information
-	PageInfo PageInfoPagination `json:"page_info,required"`
+	PageInfo PageInfoPagination `json:"page_info" api:"required"`
 	// Cursor-based pagination metadata
-	Pagination ZoneApplicationListResponsePagination `json:"pagination,required"`
+	Pagination ZoneApplicationListResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
@@ -340,9 +340,9 @@ func (r *ZoneApplicationListResponse) UnmarshalJSON(data []byte) error {
 // Cursor-based pagination metadata
 type ZoneApplicationListResponsePagination struct {
 	// An opaque cursor used for paginating through a list of results
-	AfterCursor string `json:"after_cursor,required"`
+	AfterCursor string `json:"after_cursor" api:"required"`
 	// An opaque cursor used for paginating through a list of results
-	BeforeCursor string `json:"before_cursor,required"`
+	BeforeCursor string `json:"before_cursor" api:"required"`
 	// Total number of items matching the query. Only included when
 	// expand[]=total_count is requested.
 	TotalCount int64 `json:"total_count"`
@@ -363,11 +363,11 @@ func (r *ZoneApplicationListResponsePagination) UnmarshalJSON(data []byte) error
 }
 
 type ZoneApplicationListCredentialsResponse struct {
-	Items []CredentialUnion `json:"items,required"`
+	Items []CredentialUnion `json:"items" api:"required"`
 	// Pagination information
-	PageInfo PageInfoPagination `json:"page_info,required"`
+	PageInfo PageInfoPagination `json:"page_info" api:"required"`
 	// Cursor-based pagination metadata
-	Pagination ZoneApplicationListCredentialsResponsePagination `json:"pagination,required"`
+	Pagination ZoneApplicationListCredentialsResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
@@ -387,9 +387,9 @@ func (r *ZoneApplicationListCredentialsResponse) UnmarshalJSON(data []byte) erro
 // Cursor-based pagination metadata
 type ZoneApplicationListCredentialsResponsePagination struct {
 	// An opaque cursor used for paginating through a list of results
-	AfterCursor string `json:"after_cursor,required"`
+	AfterCursor string `json:"after_cursor" api:"required"`
 	// An opaque cursor used for paginating through a list of results
-	BeforeCursor string `json:"before_cursor,required"`
+	BeforeCursor string `json:"before_cursor" api:"required"`
 	// Total number of items matching the query. Only included when
 	// expand[]=total_count is requested.
 	TotalCount int64 `json:"total_count"`
@@ -410,11 +410,11 @@ func (r *ZoneApplicationListCredentialsResponsePagination) UnmarshalJSON(data []
 }
 
 type ZoneApplicationListResourcesResponse struct {
-	Items []Resource `json:"items,required"`
+	Items []Resource `json:"items" api:"required"`
 	// Pagination information
-	PageInfo PageInfoPagination `json:"page_info,required"`
+	PageInfo PageInfoPagination `json:"page_info" api:"required"`
 	// Cursor-based pagination metadata
-	Pagination ZoneApplicationListResourcesResponsePagination `json:"pagination,required"`
+	Pagination ZoneApplicationListResourcesResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
@@ -434,9 +434,9 @@ func (r *ZoneApplicationListResourcesResponse) UnmarshalJSON(data []byte) error 
 // Cursor-based pagination metadata
 type ZoneApplicationListResourcesResponsePagination struct {
 	// An opaque cursor used for paginating through a list of results
-	AfterCursor string `json:"after_cursor,required"`
+	AfterCursor string `json:"after_cursor" api:"required"`
 	// An opaque cursor used for paginating through a list of results
-	BeforeCursor string `json:"before_cursor,required"`
+	BeforeCursor string `json:"before_cursor" api:"required"`
 	// Total number of items matching the query. Only included when
 	// expand[]=total_count is requested.
 	TotalCount int64 `json:"total_count"`
@@ -458,9 +458,9 @@ func (r *ZoneApplicationListResourcesResponsePagination) UnmarshalJSON(data []by
 
 type ZoneApplicationNewParams struct {
 	// User specified identifier, unique within the zone
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// Human-readable name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Human-readable description
 	Description param.Opt[string] `json:"description,omitzero"`
 	// Dependencies of the application
@@ -485,7 +485,7 @@ func (r *ZoneApplicationNewParams) UnmarshalJSON(data []byte) error {
 // The property ID is required.
 type ZoneApplicationNewParamsDependency struct {
 	// Resource identifier
-	ID   string            `json:"id,required"`
+	ID   string            `json:"id" api:"required"`
 	Type param.Opt[string] `json:"type,omitzero"`
 	paramObj
 }
@@ -531,12 +531,12 @@ func (r *ZoneApplicationNewParamsProtocolsOauth2) UnmarshalJSON(data []byte) err
 }
 
 type ZoneApplicationGetParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
 
 type ZoneApplicationUpdateParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	// Human-readable description
 	Description param.Opt[string] `json:"description,omitzero"`
 	// User specified identifier, unique within the zone
@@ -640,12 +640,12 @@ const (
 )
 
 type ZoneApplicationDeleteParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
 
 type ZoneApplicationListCredentialsParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	// Cursor for forward pagination
 	After param.Opt[string] `query:"after,omitzero" json:"-"`
 	// Cursor for backward pagination
@@ -684,7 +684,7 @@ const (
 )
 
 type ZoneApplicationListResourcesParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	// Cursor for forward pagination
 	After param.Opt[string] `query:"after,omitzero" json:"-"`
 	// Cursor for backward pagination

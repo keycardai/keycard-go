@@ -109,30 +109,30 @@ func (r *ZoneDelegatedGrantService) Delete(ctx context.Context, id string, body 
 // links the user, resource, and the provider that issued the grant.
 type Grant struct {
 	// Unique identifier of the delegated grant
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Entity creation timestamp
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Date when grant expires
-	ExpiresAt time.Time `json:"expires_at,required" format:"date-time"`
+	ExpiresAt time.Time `json:"expires_at" api:"required" format:"date-time"`
 	// Organization that owns this grant
-	OrganizationID string `json:"organization_id,required"`
+	OrganizationID string `json:"organization_id" api:"required"`
 	// ID of the provider that issued this grant
-	ProviderID string `json:"provider_id,required"`
+	ProviderID string `json:"provider_id" api:"required"`
 	// Indicates whether a refresh token is stored for this grant. Grants with refresh
 	// tokens can be refreshed even after access token expiration.
-	RefreshTokenSet bool `json:"refresh_token_set,required"`
+	RefreshTokenSet bool `json:"refresh_token_set" api:"required"`
 	// ID of resource receiving grant
-	ResourceID string `json:"resource_id,required"`
+	ResourceID string `json:"resource_id" api:"required"`
 	// Granted OAuth scopes
-	Scopes []string `json:"scopes,required"`
+	Scopes []string `json:"scopes" api:"required"`
 	// Any of "active", "expired", "revoked".
-	Status GrantStatus `json:"status,required"`
+	Status GrantStatus `json:"status" api:"required"`
 	// Entity update timestamp
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Reference to the user granting permission
-	UserID string `json:"user_id,required"`
+	UserID string `json:"user_id" api:"required"`
 	// Zone this grant belongs to
-	ZoneID string `json:"zone_id,required"`
+	ZoneID string `json:"zone_id" api:"required"`
 	// Whether the grant is currently active (deprecated - use status instead)
 	//
 	// Deprecated: deprecated
@@ -194,9 +194,9 @@ const (
 )
 
 type ZoneDelegatedGrantListResponse struct {
-	Items []Grant `json:"items,required"`
+	Items []Grant `json:"items" api:"required"`
 	// Cursor-based pagination metadata
-	Pagination ZoneDelegatedGrantListResponsePagination `json:"pagination,required"`
+	Pagination ZoneDelegatedGrantListResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
@@ -215,9 +215,9 @@ func (r *ZoneDelegatedGrantListResponse) UnmarshalJSON(data []byte) error {
 // Cursor-based pagination metadata
 type ZoneDelegatedGrantListResponsePagination struct {
 	// An opaque cursor used for paginating through a list of results
-	AfterCursor string `json:"after_cursor,required"`
+	AfterCursor string `json:"after_cursor" api:"required"`
 	// An opaque cursor used for paginating through a list of results
-	BeforeCursor string `json:"before_cursor,required"`
+	BeforeCursor string `json:"before_cursor" api:"required"`
 	// Total number of items matching the query. Only included when
 	// expand[]=total_count is requested.
 	TotalCount int64 `json:"total_count"`
@@ -238,14 +238,14 @@ func (r *ZoneDelegatedGrantListResponsePagination) UnmarshalJSON(data []byte) er
 }
 
 type ZoneDelegatedGrantGetParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
 
 type ZoneDelegatedGrantUpdateParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	// Any of "revoked".
-	Status ZoneDelegatedGrantUpdateParamsStatus `json:"status,omitzero,required"`
+	Status ZoneDelegatedGrantUpdateParamsStatus `json:"status,omitzero" api:"required"`
 	paramObj
 }
 
@@ -323,6 +323,6 @@ const (
 )
 
 type ZoneDelegatedGrantDeleteParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }

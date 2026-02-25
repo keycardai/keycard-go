@@ -205,9 +205,9 @@ func (r *SessionUnionMetadata) UnmarshalJSON(data []byte) error {
 // User session type-specific fields
 type SessionUserSessionType struct {
 	// Any of "user".
-	SessionType string `json:"session_type,required"`
+	SessionType string `json:"session_type" api:"required"`
 	// User ID
-	UserID string `json:"user_id,required"`
+	UserID string `json:"user_id" api:"required"`
 	// Session ID
 	ID string `json:"id"`
 	// Whether the session is currently active (deprecated - use status instead)
@@ -301,7 +301,7 @@ func (r *SessionUserSessionType) UnmarshalJSON(data []byte) error {
 // Session metadata
 type SessionUserSessionTypeMetadata struct {
 	// Name of the initiating application or user agent
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Name        respjson.Field
@@ -319,9 +319,9 @@ func (r *SessionUserSessionTypeMetadata) UnmarshalJSON(data []byte) error {
 // Application session type-specific fields
 type SessionApplicationSessionType struct {
 	// Application ID that initiated this session
-	ApplicationID string `json:"application_id,required"`
+	ApplicationID string `json:"application_id" api:"required"`
 	// Any of "application".
-	SessionType string `json:"session_type,required"`
+	SessionType string `json:"session_type" api:"required"`
 	// Session ID
 	ID string `json:"id"`
 	// Whether the session is currently active (deprecated - use status instead)
@@ -398,7 +398,7 @@ func (r *SessionApplicationSessionType) UnmarshalJSON(data []byte) error {
 // Session metadata
 type SessionApplicationSessionTypeMetadata struct {
 	// Name of the initiating application or user agent
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Name        respjson.Field
@@ -414,9 +414,9 @@ func (r *SessionApplicationSessionTypeMetadata) UnmarshalJSON(data []byte) error
 }
 
 type ZoneSessionListResponse struct {
-	Items []SessionUnion `json:"items,required"`
+	Items []SessionUnion `json:"items" api:"required"`
 	// Cursor-based pagination metadata
-	Pagination ZoneSessionListResponsePagination `json:"pagination,required"`
+	Pagination ZoneSessionListResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
@@ -435,9 +435,9 @@ func (r *ZoneSessionListResponse) UnmarshalJSON(data []byte) error {
 // Cursor-based pagination metadata
 type ZoneSessionListResponsePagination struct {
 	// An opaque cursor used for paginating through a list of results
-	AfterCursor string `json:"after_cursor,required"`
+	AfterCursor string `json:"after_cursor" api:"required"`
 	// An opaque cursor used for paginating through a list of results
-	BeforeCursor string `json:"before_cursor,required"`
+	BeforeCursor string `json:"before_cursor" api:"required"`
 	// Total number of items matching the query. Only included when
 	// expand[]=total_count is requested.
 	TotalCount int64 `json:"total_count"`
@@ -458,14 +458,14 @@ func (r *ZoneSessionListResponsePagination) UnmarshalJSON(data []byte) error {
 }
 
 type ZoneSessionGetParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
 
 type ZoneSessionUpdateParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	// Any of "revoked".
-	Status ZoneSessionUpdateParamsStatus `json:"status,omitzero,required"`
+	Status ZoneSessionUpdateParamsStatus `json:"status,omitzero" api:"required"`
 	paramObj
 }
 
@@ -549,6 +549,6 @@ const (
 )
 
 type ZoneSessionDeleteParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }

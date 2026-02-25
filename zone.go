@@ -158,9 +158,9 @@ func (r *ZoneService) ListSessionResourceAccess(ctx context.Context, zoneID stri
 // Keycard Cloud encryption key will be used.
 type EncryptionKeyAwsKmsConfig struct {
 	// AWS KMS Key ARN for encrypting the zone's data
-	Arn string `json:"arn,required"`
+	Arn string `json:"arn" api:"required"`
 	// Any of "aws".
-	Type EncryptionKeyAwsKmsConfigType `json:"type,required"`
+	Type EncryptionKeyAwsKmsConfigType `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Arn         respjson.Field
@@ -198,9 +198,9 @@ const (
 // The properties Arn, Type are required.
 type EncryptionKeyAwsKmsConfigParam struct {
 	// AWS KMS Key ARN for encrypting the zone's data
-	Arn string `json:"arn,required"`
+	Arn string `json:"arn" api:"required"`
 	// Any of "aws".
-	Type EncryptionKeyAwsKmsConfigType `json:"type,omitzero,required"`
+	Type EncryptionKeyAwsKmsConfigType `json:"type,omitzero" api:"required"`
 	paramObj
 }
 
@@ -215,13 +215,13 @@ func (r *EncryptionKeyAwsKmsConfigParam) UnmarshalJSON(data []byte) error {
 // Pagination information
 type PageInfoPagination struct {
 	// Whether there are more items after the current page
-	HasNextPage bool `json:"has_next_page,required"`
+	HasNextPage bool `json:"has_next_page" api:"required"`
 	// Whether there are items before the current page
-	HasPreviousPage bool `json:"has_previous_page,required"`
+	HasPreviousPage bool `json:"has_previous_page" api:"required"`
 	// Cursor pointing to the last item in the current page
-	EndCursor string `json:"end_cursor,nullable"`
+	EndCursor string `json:"end_cursor" api:"nullable"`
 	// Cursor pointing to the first item in the current page
-	StartCursor string `json:"start_cursor,nullable"`
+	StartCursor string `json:"start_cursor" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		HasNextPage     respjson.Field
@@ -242,23 +242,23 @@ func (r *PageInfoPagination) UnmarshalJSON(data []byte) error {
 // A zone for organizing resources within an organization
 type Zone struct {
 	// Unique identifier of the zone
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Entity creation timestamp
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Human-readable name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Organization that owns this zone
-	OrganizationID string `json:"organization_id,required"`
+	OrganizationID string `json:"organization_id" api:"required"`
 	// Protocol configuration for a zone
-	Protocols ZoneProtocols `json:"protocols,required"`
+	Protocols ZoneProtocols `json:"protocols" api:"required"`
 	// URL-safe identifier, unique within the zone
-	Slug string `json:"slug,required"`
+	Slug string `json:"slug" api:"required"`
 	// Entity update timestamp
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Application ID configured as the default MCP Gateway for the zone
 	DefaultMcpGatewayApplicationID string `json:"default_mcp_gateway_application_id"`
 	// Human-readable description
-	Description string `json:"description,nullable"`
+	Description string `json:"description" api:"nullable"`
 	// Whether directory open signups are enabled for the zone, only applies when
 	// user_identity_provider_id is not set
 	DirectoryOpenSignupsEnabled bool `json:"directory_open_signups_enabled"`
@@ -306,9 +306,9 @@ func (r *Zone) UnmarshalJSON(data []byte) error {
 // Protocol configuration for a zone
 type ZoneProtocols struct {
 	// OAuth 2.0 protocol configuration for a zone
-	Oauth2 ZoneProtocolsOauth2 `json:"oauth2,required"`
+	Oauth2 ZoneProtocolsOauth2 `json:"oauth2" api:"required"`
 	// OpenID Connect protocol configuration for a zone
-	Openid ZoneProtocolsOpenid `json:"openid,required"`
+	Openid ZoneProtocolsOpenid `json:"openid" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Oauth2      respjson.Field
@@ -327,24 +327,24 @@ func (r *ZoneProtocols) UnmarshalJSON(data []byte) error {
 // OAuth 2.0 protocol configuration for a zone
 type ZoneProtocolsOauth2 struct {
 	// OAuth 2.0 authorization endpoint
-	AuthorizationEndpoint string `json:"authorization_endpoint,required" format:"uri"`
+	AuthorizationEndpoint string `json:"authorization_endpoint" api:"required" format:"uri"`
 	// OAuth 2.0 Authorization Server Metadata endpoint
 	// (.well-known/oauth-authorization-server)
-	AuthorizationServerMetadata string `json:"authorization_server_metadata,required" format:"uri"`
+	AuthorizationServerMetadata string `json:"authorization_server_metadata" api:"required" format:"uri"`
 	// Whether Dynamic Client Registration is enabled
-	DcrEnabled bool `json:"dcr_enabled,required"`
+	DcrEnabled bool `json:"dcr_enabled" api:"required"`
 	// OAuth 2.0 issuer identifier
-	Issuer string `json:"issuer,required" format:"uri"`
+	Issuer string `json:"issuer" api:"required" format:"uri"`
 	// JSON Web Key Set endpoint
-	JwksUri string `json:"jwks_uri,required" format:"uri"`
+	JwksUri string `json:"jwks_uri" api:"required" format:"uri"`
 	// Whether PKCE is required for authorization code flows
-	PkceRequired bool `json:"pkce_required,required"`
+	PkceRequired bool `json:"pkce_required" api:"required"`
 	// OAuth 2.0 redirect URI for this zone
-	RedirectUri string `json:"redirect_uri,required" format:"uri"`
+	RedirectUri string `json:"redirect_uri" api:"required" format:"uri"`
 	// OAuth 2.0 Dynamic Client Registration endpoint
-	RegistrationEndpoint string `json:"registration_endpoint,required" format:"uri"`
+	RegistrationEndpoint string `json:"registration_endpoint" api:"required" format:"uri"`
 	// OAuth 2.0 token endpoint
-	TokenEndpoint string `json:"token_endpoint,required" format:"uri"`
+	TokenEndpoint string `json:"token_endpoint" api:"required" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AuthorizationEndpoint       respjson.Field
@@ -371,9 +371,9 @@ func (r *ZoneProtocolsOauth2) UnmarshalJSON(data []byte) error {
 type ZoneProtocolsOpenid struct {
 	// OpenID Connect Provider Configuration endpoint
 	// (.well-known/openid-configuration)
-	ProviderConfiguration string `json:"provider_configuration,required" format:"uri"`
+	ProviderConfiguration string `json:"provider_configuration" api:"required" format:"uri"`
 	// OpenID Connect UserInfo endpoint
-	UserinfoEndpoint string `json:"userinfo_endpoint,required" format:"uri"`
+	UserinfoEndpoint string `json:"userinfo_endpoint" api:"required" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ProviderConfiguration respjson.Field
@@ -399,11 +399,11 @@ const (
 )
 
 type ZoneListResponse struct {
-	Items []Zone `json:"items,required"`
+	Items []Zone `json:"items" api:"required"`
 	// Pagination information
-	PageInfo PageInfoPagination `json:"page_info,required"`
+	PageInfo PageInfoPagination `json:"page_info" api:"required"`
 	// Cursor-based pagination metadata
-	Pagination ZoneListResponsePagination `json:"pagination,required"`
+	Pagination ZoneListResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
@@ -423,9 +423,9 @@ func (r *ZoneListResponse) UnmarshalJSON(data []byte) error {
 // Cursor-based pagination metadata
 type ZoneListResponsePagination struct {
 	// An opaque cursor used for paginating through a list of results
-	AfterCursor string `json:"after_cursor,required"`
+	AfterCursor string `json:"after_cursor" api:"required"`
 	// An opaque cursor used for paginating through a list of results
-	BeforeCursor string `json:"before_cursor,required"`
+	BeforeCursor string `json:"before_cursor" api:"required"`
 	// Total number of items matching the query. Only included when
 	// expand[]=total_count is requested.
 	TotalCount int64 `json:"total_count"`
@@ -446,9 +446,9 @@ func (r *ZoneListResponsePagination) UnmarshalJSON(data []byte) error {
 }
 
 type ZoneListSessionResourceAccessResponse struct {
-	Items []ZoneListSessionResourceAccessResponseItem `json:"items,required"`
+	Items []ZoneListSessionResourceAccessResponseItem `json:"items" api:"required"`
 	// Cursor-based pagination metadata
-	Pagination ZoneListSessionResourceAccessResponsePagination `json:"pagination,required"`
+	Pagination ZoneListSessionResourceAccessResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
@@ -467,17 +467,17 @@ func (r *ZoneListSessionResourceAccessResponse) UnmarshalJSON(data []byte) error
 // Aggregated record of session-resource access events
 type ZoneListSessionResourceAccessResponseItem struct {
 	// When access first occurred
-	FirstAccessedAt time.Time `json:"first_accessed_at,required" format:"date-time"`
+	FirstAccessedAt time.Time `json:"first_accessed_at" api:"required" format:"date-time"`
 	// When access most recently occurred
-	LastAccessedAt time.Time `json:"last_accessed_at,required" format:"date-time"`
+	LastAccessedAt time.Time `json:"last_accessed_at" api:"required" format:"date-time"`
 	// Organization ID
-	OrganizationID string `json:"organization_id,required"`
+	OrganizationID string `json:"organization_id" api:"required"`
 	// Resource ID
-	ResourceID string `json:"resource_id,required"`
+	ResourceID string `json:"resource_id" api:"required"`
 	// Session ID
-	SessionID string `json:"session_id,required"`
+	SessionID string `json:"session_id" api:"required"`
 	// Total number of access events for this session-resource pair
-	TotalAccessCount int64 `json:"total_access_count,required"`
+	TotalAccessCount int64 `json:"total_access_count" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		FirstAccessedAt  respjson.Field
@@ -500,9 +500,9 @@ func (r *ZoneListSessionResourceAccessResponseItem) UnmarshalJSON(data []byte) e
 // Cursor-based pagination metadata
 type ZoneListSessionResourceAccessResponsePagination struct {
 	// An opaque cursor used for paginating through a list of results
-	AfterCursor string `json:"after_cursor,required"`
+	AfterCursor string `json:"after_cursor" api:"required"`
 	// An opaque cursor used for paginating through a list of results
-	BeforeCursor string `json:"before_cursor,required"`
+	BeforeCursor string `json:"before_cursor" api:"required"`
 	// Total number of items matching the query. Only included when
 	// expand[]=total_count is requested.
 	TotalCount int64 `json:"total_count"`
@@ -524,7 +524,7 @@ func (r *ZoneListSessionResourceAccessResponsePagination) UnmarshalJSON(data []b
 
 type ZoneNewParams struct {
 	// Human-readable name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Human-readable description
 	Description param.Opt[string] `json:"description,omitzero"`
 	// Assign a default MCP Gateway application to the zone
@@ -665,9 +665,9 @@ func (r *ZoneUpdateParams) UnmarshalJSON(data []byte) error {
 // The properties Arn, Type are required.
 type ZoneUpdateParamsEncryptionKey struct {
 	// AWS KMS Key ARN for encrypting the zone's data
-	Arn string `json:"arn,required"`
+	Arn string `json:"arn" api:"required"`
 	// Any of "aws".
-	Type string `json:"type,omitzero,required"`
+	Type string `json:"type,omitzero" api:"required"`
 	paramObj
 }
 
@@ -767,7 +767,7 @@ const (
 )
 
 type ZoneDeleteMcpServerParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
 

@@ -155,13 +155,13 @@ func (r *OrganizationServiceAccountCredentialService) Delete(ctx context.Context
 // Service account credential (without secret)
 type ServiceAccountCredential struct {
 	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// The client ID for authentication
-	ClientID string `json:"client_id,required"`
+	ClientID string `json:"client_id" api:"required"`
 	// The time the entity was created in utc
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// A name for the entity to be displayed in UI
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Optional description of the credential
 	Description string `json:"description"`
 	// When the credential was last used
@@ -194,15 +194,15 @@ func (r *ServiceAccountCredential) UnmarshalJSON(data []byte) error {
 // Service account credential with plaintext secret (only returned on creation)
 type OrganizationServiceAccountCredentialNewResponse struct {
 	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// The client ID for authentication
-	ClientID string `json:"client_id,required"`
+	ClientID string `json:"client_id" api:"required"`
 	// The client secret
-	ClientSecret string `json:"client_secret,required"`
+	ClientSecret string `json:"client_secret" api:"required"`
 	// The time the entity was created in utc
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// A name for the entity to be displayed in UI
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Optional description of the credential
 	Description string `json:"description"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -225,9 +225,9 @@ func (r *OrganizationServiceAccountCredentialNewResponse) UnmarshalJSON(data []b
 }
 
 type OrganizationServiceAccountCredentialListResponse struct {
-	Items []ServiceAccountCredential `json:"items,required"`
+	Items []ServiceAccountCredential `json:"items" api:"required"`
 	// Pagination information using cursor-based pagination
-	PageInfo PageInfoCursor `json:"page_info,required"`
+	PageInfo PageInfoCursor `json:"page_info" api:"required"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -251,9 +251,9 @@ func (r *OrganizationServiceAccountCredentialListResponse) UnmarshalJSON(data []
 
 type OrganizationServiceAccountCredentialNewParams struct {
 	// Organization ID or label identifier
-	OrganizationID string `path:"organization_id,required" json:"-"`
+	OrganizationID string `path:"organization_id" api:"required" json:"-"`
 	// Credential name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Optional description of the credential
 	Description      param.Opt[string] `json:"description,omitzero"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
@@ -270,9 +270,9 @@ func (r *OrganizationServiceAccountCredentialNewParams) UnmarshalJSON(data []byt
 
 type OrganizationServiceAccountCredentialGetParams struct {
 	// Organization ID or label identifier
-	OrganizationID string `path:"organization_id,required" json:"-"`
+	OrganizationID string `path:"organization_id" api:"required" json:"-"`
 	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
-	ServiceAccountID string            `path:"service_account_id,required" json:"-"`
+	ServiceAccountID string            `path:"service_account_id" api:"required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Fields to expand in the response. Currently supports "permissions" to include
 	// the permissions field with the caller's permissions for the resource.
@@ -293,9 +293,9 @@ func (r OrganizationServiceAccountCredentialGetParams) URLQuery() (v url.Values,
 
 type OrganizationServiceAccountCredentialUpdateParams struct {
 	// Organization ID or label identifier
-	OrganizationID string `path:"organization_id,required" json:"-"`
+	OrganizationID string `path:"organization_id" api:"required" json:"-"`
 	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
-	ServiceAccountID string `path:"service_account_id,required" json:"-"`
+	ServiceAccountID string `path:"service_account_id" api:"required" json:"-"`
 	// Optional description of the credential
 	Description param.Opt[string] `json:"description,omitzero"`
 	// Credential name
@@ -314,7 +314,7 @@ func (r *OrganizationServiceAccountCredentialUpdateParams) UnmarshalJSON(data []
 
 type OrganizationServiceAccountCredentialListParams struct {
 	// Organization ID or label identifier
-	OrganizationID string `path:"organization_id,required" json:"-"`
+	OrganizationID string `path:"organization_id" api:"required" json:"-"`
 	// Cursor for forward pagination
 	After param.Opt[string] `query:"after,omitzero" json:"-"`
 	// Cursor for backward pagination
@@ -341,9 +341,9 @@ func (r OrganizationServiceAccountCredentialListParams) URLQuery() (v url.Values
 
 type OrganizationServiceAccountCredentialDeleteParams struct {
 	// Organization ID or label identifier
-	OrganizationID string `path:"organization_id,required" json:"-"`
+	OrganizationID string `path:"organization_id" api:"required" json:"-"`
 	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
-	ServiceAccountID string            `path:"service_account_id,required" json:"-"`
+	ServiceAccountID string            `path:"service_account_id" api:"required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }

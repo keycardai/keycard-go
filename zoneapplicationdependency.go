@@ -125,21 +125,21 @@ func (r *ZoneApplicationDependencyService) Remove(ctx context.Context, dependenc
 // application, before allowing access.
 type Resource struct {
 	// Unique identifier of the resource
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Entity creation timestamp
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// User specified identifier, unique within the zone
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// Human-readable name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Organization that owns this resource
-	OrganizationID string `json:"organization_id,required"`
+	OrganizationID string `json:"organization_id" api:"required"`
 	// URL-safe identifier, unique within the zone
-	Slug string `json:"slug,required"`
+	Slug string `json:"slug" api:"required"`
 	// Entity update timestamp
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Zone this resource belongs to
-	ZoneID string `json:"zone_id,required"`
+	ZoneID string `json:"zone_id" api:"required"`
 	// An Application is a software system with an associated identity that can access
 	// Resources. It may act on its own behalf (machine-to-machine) or on behalf of a
 	// user (delegated access).
@@ -156,11 +156,11 @@ type Resource struct {
 	// ID of the credential provider for this resource
 	CredentialProviderID string `json:"credential_provider_id"`
 	// Human-readable description
-	Description string `json:"description,nullable"`
+	Description string `json:"description" api:"nullable"`
 	// Entity metadata
 	Metadata Metadata `json:"metadata"`
 	// Scopes supported by the resource
-	Scopes []string `json:"scopes,nullable"`
+	Scopes []string `json:"scopes" api:"nullable"`
 	// List of resource IDs that, when accessed, make this dependency available. Only
 	// present when this resource is returned as a dependency.
 	WhenAccessing []string `json:"when_accessing"`
@@ -194,11 +194,11 @@ func (r *Resource) UnmarshalJSON(data []byte) error {
 }
 
 type ZoneApplicationDependencyListResponse struct {
-	Items []Resource `json:"items,required"`
+	Items []Resource `json:"items" api:"required"`
 	// Pagination information
-	PageInfo PageInfoPagination `json:"page_info,required"`
+	PageInfo PageInfoPagination `json:"page_info" api:"required"`
 	// Cursor-based pagination metadata
-	Pagination ZoneApplicationDependencyListResponsePagination `json:"pagination,required"`
+	Pagination ZoneApplicationDependencyListResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
@@ -218,9 +218,9 @@ func (r *ZoneApplicationDependencyListResponse) UnmarshalJSON(data []byte) error
 // Cursor-based pagination metadata
 type ZoneApplicationDependencyListResponsePagination struct {
 	// An opaque cursor used for paginating through a list of results
-	AfterCursor string `json:"after_cursor,required"`
+	AfterCursor string `json:"after_cursor" api:"required"`
 	// An opaque cursor used for paginating through a list of results
-	BeforeCursor string `json:"before_cursor,required"`
+	BeforeCursor string `json:"before_cursor" api:"required"`
 	// Total number of items matching the query. Only included when
 	// expand[]=total_count is requested.
 	TotalCount int64 `json:"total_count"`
@@ -241,13 +241,13 @@ func (r *ZoneApplicationDependencyListResponsePagination) UnmarshalJSON(data []b
 }
 
 type ZoneApplicationDependencyGetParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
-	ID     string `path:"id,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
+	ID     string `path:"id" api:"required" json:"-"`
 	paramObj
 }
 
 type ZoneApplicationDependencyListParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	// Cursor for forward pagination
 	After param.Opt[string] `query:"after,omitzero" json:"-"`
 	// Cursor for backward pagination
@@ -287,8 +287,8 @@ const (
 )
 
 type ZoneApplicationDependencyAddParams struct {
-	ZoneID        string   `path:"zoneId,required" json:"-"`
-	ID            string   `path:"id,required" json:"-"`
+	ZoneID        string   `path:"zoneId" api:"required" json:"-"`
+	ID            string   `path:"id" api:"required" json:"-"`
 	WhenAccessing []string `query:"when_accessing,omitzero" json:"-"`
 	paramObj
 }
@@ -303,7 +303,7 @@ func (r ZoneApplicationDependencyAddParams) URLQuery() (v url.Values, err error)
 }
 
 type ZoneApplicationDependencyRemoveParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
-	ID     string `path:"id,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
+	ID     string `path:"id" api:"required" json:"-"`
 	paramObj
 }

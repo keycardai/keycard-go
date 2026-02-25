@@ -71,23 +71,23 @@ func (r *ZoneUserService) List(ctx context.Context, zoneID string, query ZoneUse
 // An authenticated user entity
 type User struct {
 	// Unique identifier of the user
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Entity creation timestamp
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Email address of the user
-	Email string `json:"email,required" format:"email"`
+	Email string `json:"email" api:"required" format:"email"`
 	// Whether the email address has been verified
-	EmailVerified bool `json:"email_verified,required"`
+	EmailVerified bool `json:"email_verified" api:"required"`
 	// Issuer identifier of the identity provider
-	Issuer string `json:"issuer,required"`
+	Issuer string `json:"issuer" api:"required"`
 	// Organization that owns this user
-	OrganizationID string `json:"organization_id,required"`
+	OrganizationID string `json:"organization_id" api:"required"`
 	// Subject identifier from the identity provider
-	Subject string `json:"subject,required"`
+	Subject string `json:"subject" api:"required"`
 	// Entity update timestamp
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Zone this user belongs to
-	ZoneID string `json:"zone_id,required"`
+	ZoneID string `json:"zone_id" api:"required"`
 	// Date when the user was last authenticated
 	AuthenticatedAt string `json:"authenticated_at"`
 	// Reference to the identity provider. This field is undefined when the source
@@ -118,9 +118,9 @@ func (r *User) UnmarshalJSON(data []byte) error {
 }
 
 type ZoneUserListResponse struct {
-	Items []User `json:"items,required"`
+	Items []User `json:"items" api:"required"`
 	// Cursor-based pagination metadata
-	Pagination ZoneUserListResponsePagination `json:"pagination,required"`
+	Pagination ZoneUserListResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
@@ -139,9 +139,9 @@ func (r *ZoneUserListResponse) UnmarshalJSON(data []byte) error {
 // Cursor-based pagination metadata
 type ZoneUserListResponsePagination struct {
 	// An opaque cursor used for paginating through a list of results
-	AfterCursor string `json:"after_cursor,required"`
+	AfterCursor string `json:"after_cursor" api:"required"`
 	// An opaque cursor used for paginating through a list of results
-	BeforeCursor string `json:"before_cursor,required"`
+	BeforeCursor string `json:"before_cursor" api:"required"`
 	// Total number of items matching the query. Only included when
 	// expand[]=total_count is requested.
 	TotalCount int64 `json:"total_count"`
@@ -162,7 +162,7 @@ func (r *ZoneUserListResponsePagination) UnmarshalJSON(data []byte) error {
 }
 
 type ZoneUserGetParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
 

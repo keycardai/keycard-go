@@ -47,13 +47,13 @@ func (r *ServiceAccountTokenService) New(ctx context.Context, params ServiceAcco
 
 type ServiceAccountTokenNewParams struct {
 	// Service account client ID
-	ClientID string `json:"client_id,required"`
+	ClientID string `json:"client_id" api:"required"`
 	// Service account client secret
-	ClientSecret string `json:"client_secret,required"`
+	ClientSecret string `json:"client_secret" api:"required"`
 	// OAuth 2.0 grant type (must be "client_credentials")
 	//
 	// Any of "client_credentials".
-	GrantType        ServiceAccountTokenNewParamsGrantType `json:"grant_type,omitzero,required"`
+	GrantType        ServiceAccountTokenNewParamsGrantType `json:"grant_type,omitzero" api:"required"`
 	XClientRequestID param.Opt[string]                     `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }

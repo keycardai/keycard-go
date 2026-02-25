@@ -120,19 +120,19 @@ func (r *ZoneApplicationCredentialService) Delete(ctx context.Context, id string
 // Common fields shared by all application credential types
 type BaseFields struct {
 	// Unique identifier of the credential
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// ID of the application this credential belongs to
-	ApplicationID string `json:"application_id,required"`
+	ApplicationID string `json:"application_id" api:"required"`
 	// Entity creation timestamp
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Organization that owns this credential
-	OrganizationID string `json:"organization_id,required"`
+	OrganizationID string `json:"organization_id" api:"required"`
 	// URL-safe identifier, unique within the zone
-	Slug string `json:"slug,required"`
+	Slug string `json:"slug" api:"required"`
 	// Entity update timestamp
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Zone this credential belongs to
-	ZoneID string `json:"zone_id,required"`
+	ZoneID string `json:"zone_id" api:"required"`
 	// An Application is a software system with an associated identity that can access
 	// Resources. It may act on its own behalf (machine-to-machine) or on behalf of a
 	// user (delegated access).
@@ -248,9 +248,9 @@ func (r *CredentialUnion) UnmarshalJSON(data []byte) error {
 // Password-based application credential
 type Password struct {
 	// Username for password credential, also used as OAuth 2.0 client ID
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// Any of "password".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// Password for credential (only returned on creation, store securely), also used
 	// as OAuth 2.0 client secret
 	Password string `json:"password"`
@@ -274,9 +274,9 @@ func (r *Password) UnmarshalJSON(data []byte) error {
 // Public credential (no secret storage)
 type Public struct {
 	// Identifier for public credential, also used as OAuth 2.0 client ID
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// Any of "public".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Identifier  respjson.Field
@@ -296,11 +296,11 @@ func (r *Public) UnmarshalJSON(data []byte) error {
 // Public key-based application credential
 type PublicKey struct {
 	// Client ID for public key credential, also used as OAuth 2.0 client ID
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// JWKS URI to retrieve public keys from
-	JwksUri string `json:"jwks_uri,required" format:"uri"`
+	JwksUri string `json:"jwks_uri" api:"required" format:"uri"`
 	// Any of "public-key".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Identifier  respjson.Field
@@ -322,11 +322,11 @@ func (r *PublicKey) UnmarshalJSON(data []byte) error {
 type Token struct {
 	// Identifier for this credential. For token type, this equals the subject value,
 	// or '\*' when subject is not specified.
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// ID of the provider issuing tokens verified by this credential
-	ProviderID string `json:"provider_id,required"`
+	ProviderID string `json:"provider_id" api:"required"`
 	// Any of "token".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// A Provider is a system that supplies access to Resources and allows actors
 	// (Users or Applications) to authenticate.
 	//
@@ -334,7 +334,7 @@ type Token struct {
 	Provider Provider `json:"provider"`
 	// Subject identifier for the token. When null or omitted, any token from the
 	// provider is accepted without checking application-specific claims.
-	Subject string `json:"subject,nullable"`
+	Subject string `json:"subject" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Identifier  respjson.Field
@@ -357,9 +357,9 @@ func (r *Token) UnmarshalJSON(data []byte) error {
 // URL-based application credential
 type URL struct {
 	// URL of the credential (must be a valid URL)
-	Identifier string `json:"identifier,required" format:"uri"`
+	Identifier string `json:"identifier" api:"required" format:"uri"`
 	// Any of "url".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Identifier  respjson.Field
@@ -462,11 +462,11 @@ func (r *ZoneApplicationCredentialNewResponseUnion) UnmarshalJSON(data []byte) e
 }
 
 type ZoneApplicationCredentialListResponse struct {
-	Items []CredentialUnion `json:"items,required"`
+	Items []CredentialUnion `json:"items" api:"required"`
 	// Pagination information
-	PageInfo PageInfoPagination `json:"page_info,required"`
+	PageInfo PageInfoPagination `json:"page_info" api:"required"`
 	// Cursor-based pagination metadata
-	Pagination ZoneApplicationCredentialListResponsePagination `json:"pagination,required"`
+	Pagination ZoneApplicationCredentialListResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
@@ -486,9 +486,9 @@ func (r *ZoneApplicationCredentialListResponse) UnmarshalJSON(data []byte) error
 // Cursor-based pagination metadata
 type ZoneApplicationCredentialListResponsePagination struct {
 	// An opaque cursor used for paginating through a list of results
-	AfterCursor string `json:"after_cursor,required"`
+	AfterCursor string `json:"after_cursor" api:"required"`
 	// An opaque cursor used for paginating through a list of results
-	BeforeCursor string `json:"before_cursor,required"`
+	BeforeCursor string `json:"before_cursor" api:"required"`
 	// Total number of items matching the query. Only included when
 	// expand[]=total_count is requested.
 	TotalCount int64 `json:"total_count"`
@@ -549,11 +549,11 @@ func (r *ZoneApplicationCredentialNewParams) UnmarshalJSON(data []byte) error {
 // The properties ApplicationID, ProviderID, Type are required.
 type ZoneApplicationCredentialNewParamsBodyApplicationCredentialCreateToken struct {
 	// ID of the application this credential belongs to
-	ApplicationID string `json:"application_id,required"`
+	ApplicationID string `json:"application_id" api:"required"`
 	// ID of the provider issuing tokens this credential verifies
-	ProviderID string `json:"provider_id,required"`
+	ProviderID string `json:"provider_id" api:"required"`
 	// Any of "token".
-	Type string `json:"type,omitzero,required"`
+	Type string `json:"type,omitzero" api:"required"`
 	// Subject identifier for the token. When omitted, any token from the provider is
 	// accepted without checking application-specific claims.
 	Subject param.Opt[string] `json:"subject,omitzero"`
@@ -579,9 +579,9 @@ func init() {
 // The properties ApplicationID, Type are required.
 type ZoneApplicationCredentialNewParamsBodyApplicationCredentialCreatePassword struct {
 	// ID of the application this credential belongs to
-	ApplicationID string `json:"application_id,required"`
+	ApplicationID string `json:"application_id" api:"required"`
 	// Any of "password".
-	Type string `json:"type,omitzero,required"`
+	Type string `json:"type,omitzero" api:"required"`
 	// Username for password credential, also used as OAuth 2.0 client ID
 	// (auto-generated if not provided)
 	Identifier param.Opt[string] `json:"identifier,omitzero"`
@@ -607,11 +607,11 @@ func init() {
 // The properties ApplicationID, JwksUri, Type are required.
 type ZoneApplicationCredentialNewParamsBodyApplicationCredentialCreatePublicKey struct {
 	// ID of the application this credential belongs to
-	ApplicationID string `json:"application_id,required"`
+	ApplicationID string `json:"application_id" api:"required"`
 	// JWKS URI to retrieve public keys from
-	JwksUri string `json:"jwks_uri,required" format:"uri"`
+	JwksUri string `json:"jwks_uri" api:"required" format:"uri"`
 	// Any of "public-key".
-	Type string `json:"type,omitzero,required"`
+	Type string `json:"type,omitzero" api:"required"`
 	// Client ID for public key credential, also used as OAuth 2.0 client ID
 	// (auto-generated if not provided)
 	Identifier param.Opt[string] `json:"identifier,omitzero"`
@@ -637,11 +637,11 @@ func init() {
 // The properties ApplicationID, Identifier, Type are required.
 type ZoneApplicationCredentialNewParamsBodyApplicationCredentialCreateURL struct {
 	// ID of the application this credential belongs to
-	ApplicationID string `json:"application_id,required"`
+	ApplicationID string `json:"application_id" api:"required"`
 	// URL of the credential (must be a valid URL)
-	Identifier string `json:"identifier,required" format:"uri"`
+	Identifier string `json:"identifier" api:"required" format:"uri"`
 	// Any of "url".
-	Type string `json:"type,omitzero,required"`
+	Type string `json:"type,omitzero" api:"required"`
 	paramObj
 }
 
@@ -664,9 +664,9 @@ func init() {
 // The properties ApplicationID, Type are required.
 type ZoneApplicationCredentialNewParamsBodyApplicationCredentialCreatePublic struct {
 	// ID of the application this credential belongs to
-	ApplicationID string `json:"application_id,required"`
+	ApplicationID string `json:"application_id" api:"required"`
 	// Any of "public".
-	Type string `json:"type,omitzero,required"`
+	Type string `json:"type,omitzero" api:"required"`
 	// Identifier for public credential, also used as OAuth 2.0 client ID
 	// (auto-generated if not provided)
 	Identifier param.Opt[string] `json:"identifier,omitzero"`
@@ -688,12 +688,12 @@ func init() {
 }
 
 type ZoneApplicationCredentialGetParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
 
 type ZoneApplicationCredentialUpdateParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 
 	//
 	// Request body variants
@@ -882,6 +882,6 @@ const (
 )
 
 type ZoneApplicationCredentialDeleteParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
