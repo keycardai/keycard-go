@@ -259,11 +259,6 @@ type Zone struct {
 	DefaultMcpGatewayApplicationID string `json:"default_mcp_gateway_application_id"`
 	// Human-readable description
 	Description string `json:"description" api:"nullable"`
-	// Whether directory open signups are enabled for the zone, only applies when
-	// user_identity_provider_id is not set
-	//
-	// Deprecated: deprecated
-	DirectoryOpenSignupsEnabled bool `json:"directory_open_signups_enabled"`
 	// AWS KMS configuration for zone encryption. When not specified, the default
 	// Keycard Cloud encryption key will be used.
 	EncryptionKey EncryptionKeyAwsKmsConfig `json:"encryption_key"`
@@ -292,7 +287,6 @@ type Zone struct {
 		UpdatedAt                      respjson.Field
 		DefaultMcpGatewayApplicationID respjson.Field
 		Description                    respjson.Field
-		DirectoryOpenSignupsEnabled    respjson.Field
 		EncryptionKey                  respjson.Field
 		LoginFlow                      respjson.Field
 		Permissions                    respjson.Field
@@ -535,9 +529,6 @@ type ZoneNewParams struct {
 	Description param.Opt[string] `json:"description,omitzero"`
 	// Assign a default MCP Gateway application to the zone
 	DefaultMcpGatewayApplication param.Opt[bool] `json:"default_mcp_gateway_application,omitzero"`
-	// Whether directory open signups are enabled for the zone, only applies when
-	// user_identity_provider_id is not set. Defaults to false.
-	DirectoryOpenSignupsEnabled param.Opt[bool] `json:"directory_open_signups_enabled,omitzero"`
 	// Whether the zone requires an invitation for email/password registration, only
 	// applies when user_identity_provider_id is not set. Defaults to true.
 	RequiresInvitation param.Opt[bool] `json:"requires_invitation,omitzero"`
@@ -641,9 +632,6 @@ type ZoneUpdateParams struct {
 	Description param.Opt[string] `json:"description,omitzero"`
 	// Provider ID to configure for user login (set to null to unset)
 	UserIdentityProviderID param.Opt[string] `json:"user_identity_provider_id,omitzero"`
-	// Whether directory open signups are enabled for the zone, only applies when
-	// user_identity_provider_id is not set
-	DirectoryOpenSignupsEnabled param.Opt[bool] `json:"directory_open_signups_enabled,omitzero"`
 	// Human-readable name
 	Name param.Opt[string] `json:"name,omitzero"`
 	// Whether the zone requires an invitation for email/password registration, only

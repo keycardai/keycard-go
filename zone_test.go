@@ -32,7 +32,6 @@ func TestZoneNewWithOptionalParams(t *testing.T) {
 		Name:                         "x",
 		DefaultMcpGatewayApplication: keycard.Bool(true),
 		Description:                  keycard.String("description"),
-		DirectoryOpenSignupsEnabled:  keycard.Bool(true),
 		EncryptionKey: keycard.EncryptionKeyAwsKmsConfigParam{
 			Arn:  "x",
 			Type: keycard.EncryptionKeyAwsKmsConfigTypeAws,
@@ -109,7 +108,6 @@ func TestZoneUpdateWithOptionalParams(t *testing.T) {
 		keycard.ZoneUpdateParams{
 			DefaultMcpGatewayApplicationID: keycard.String("default_mcp_gateway_application_id"),
 			Description:                    keycard.String("description"),
-			DirectoryOpenSignupsEnabled:    keycard.Bool(true),
 			EncryptionKey: keycard.ZoneUpdateParamsEncryptionKey{
 				Arn:  "x",
 				Type: "aws",
