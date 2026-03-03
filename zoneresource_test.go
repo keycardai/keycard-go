@@ -35,6 +35,7 @@ func TestZoneResourceNewWithOptionalParams(t *testing.T) {
 			Identifier:           "x",
 			Name:                 "x",
 			ApplicationID:        keycard.String("application_id"),
+			ApplicationType:      keycard.ZoneResourceNewParamsApplicationTypeNative,
 			CredentialProviderID: keycard.String("credential_provider_id"),
 			Description:          keycard.String("description"),
 			Metadata: keycard.MetadataParam{
@@ -104,6 +105,7 @@ func TestZoneResourceUpdateWithOptionalParams(t *testing.T) {
 		keycard.ZoneResourceUpdateParams{
 			ZoneID:               "zoneId",
 			ApplicationID:        keycard.String("application_id"),
+			ApplicationType:      keycard.ZoneResourceUpdateParamsApplicationTypeNative,
 			CredentialProviderID: keycard.String("credential_provider_id"),
 			Description:          keycard.String("description"),
 			Identifier:           keycard.String("x"),

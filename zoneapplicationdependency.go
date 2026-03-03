@@ -126,6 +126,12 @@ func (r *ZoneApplicationDependencyService) Remove(ctx context.Context, dependenc
 type Resource struct {
 	// Unique identifier of the resource
 	ID string `json:"id" api:"required"`
+	// The expected type of client for this credential. Native clients must use
+	// localhost URLs for redirect_uris or URIs with custom schemes. Web clients must
+	// use https URLs and must not use localhost as the hostname.
+	//
+	// Any of "native", "web".
+	ApplicationType ResourceApplicationType `json:"application_type" api:"required"`
 	// Entity creation timestamp
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// User specified identifier, unique within the zone
@@ -167,6 +173,7 @@ type Resource struct {
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                   respjson.Field
+		ApplicationType      respjson.Field
 		CreatedAt            respjson.Field
 		Identifier           respjson.Field
 		Name                 respjson.Field
@@ -192,6 +199,16 @@ func (r Resource) RawJSON() string { return r.JSON.raw }
 func (r *Resource) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// The expected type of client for this credential. Native clients must use
+// localhost URLs for redirect_uris or URIs with custom schemes. Web clients must
+// use https URLs and must not use localhost as the hostname.
+type ResourceApplicationType string
+
+const (
+	ResourceApplicationTypeNative ResourceApplicationType = "native"
+	ResourceApplicationTypeWeb    ResourceApplicationType = "web"
+)
 
 type ZoneApplicationDependencyListResponse struct {
 	Items []Resource `json:"items" api:"required"`

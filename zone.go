@@ -139,9 +139,10 @@ func (r *ZoneService) DeleteMcpServer(ctx context.Context, downstreamID string, 
 	return
 }
 
-// Returns aggregated access records per entry session-resource pair, including
-// access from descendant sessions. At least one of user_id, session_id, or
-// resource_id must be provided.
+// Returns aggregated access records per session-resource pair. By default
+// (rollup_children=true), includes access from descendant sessions. Set
+// rollup_children=false to return only direct session access. At least one of
+// user_id, session_id, or resource_id must be provided.
 func (r *ZoneService) ListSessionResourceAccess(ctx context.Context, zoneID string, query ZoneListSessionResourceAccessParams, opts ...option.RequestOption) (res *ZoneListSessionResourceAccessResponse, err error) {
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -780,6 +781,10 @@ type ZoneListSessionResourceAccessParams struct {
 	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Filter by resource ID
 	ResourceID param.Opt[string] `query:"resource_id,omitzero" json:"-"`
+	// Include resource access from descendant sessions. When true (default),
+	// aggregates access from the session and all its descendants. When false, returns
+	// only direct access for the session.
+	RollupChildren param.Opt[bool] `query:"rollup_children,omitzero" json:"-"`
 	// Filter by session ID
 	SessionID param.Opt[string] `query:"session_id,omitzero" json:"-"`
 	// Filter by user ID

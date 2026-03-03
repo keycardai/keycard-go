@@ -247,10 +247,11 @@ func TestZoneListSessionResourceAccessWithOptionalParams(t *testing.T) {
 			Expand: keycard.ZoneListSessionResourceAccessParamsExpandUnion{
 				OfZoneListSessionResourceAccesssExpandString: keycard.String("total_count"),
 			},
-			Limit:      keycard.Int(1),
-			ResourceID: keycard.String("resource_id"),
-			SessionID:  keycard.String("session_id"),
-			UserID:     keycard.String("user_id"),
+			Limit:          keycard.Int(1),
+			ResourceID:     keycard.String("resource_id"),
+			RollupChildren: keycard.Bool(true),
+			SessionID:      keycard.String("session_id"),
+			UserID:         keycard.String("user_id"),
 		},
 	)
 	if err != nil {

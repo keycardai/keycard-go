@@ -171,6 +171,12 @@ type ZoneResourceNewParams struct {
 	ApplicationID param.Opt[string] `json:"application_id,omitzero"`
 	// ID of the credential provider to associate with the resource
 	CredentialProviderID param.Opt[string] `json:"credential_provider_id,omitzero"`
+	// The expected type of client for this credential. Native clients must use
+	// localhost URLs for redirect_uris or URIs with custom schemes. Web clients must
+	// use https URLs and must not use localhost as the hostname.
+	//
+	// Any of "native", "web".
+	ApplicationType ZoneResourceNewParamsApplicationType `json:"application_type,omitzero"`
 	// Entity metadata
 	Metadata MetadataParam `json:"metadata,omitzero"`
 	// Scopes supported by the resource
@@ -185,6 +191,16 @@ func (r ZoneResourceNewParams) MarshalJSON() (data []byte, err error) {
 func (r *ZoneResourceNewParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// The expected type of client for this credential. Native clients must use
+// localhost URLs for redirect_uris or URIs with custom schemes. Web clients must
+// use https URLs and must not use localhost as the hostname.
+type ZoneResourceNewParamsApplicationType string
+
+const (
+	ZoneResourceNewParamsApplicationTypeNative ZoneResourceNewParamsApplicationType = "native"
+	ZoneResourceNewParamsApplicationTypeWeb    ZoneResourceNewParamsApplicationType = "web"
+)
 
 type ZoneResourceGetParams struct {
 	ZoneID string `path:"zoneId" api:"required" json:"-"`
@@ -208,6 +224,12 @@ type ZoneResourceUpdateParams struct {
 	Metadata MetadataUpdateParam `json:"metadata,omitzero"`
 	// Scopes supported by the resource (set to null to unset)
 	Scopes []string `json:"scopes,omitzero"`
+	// The expected type of client for this credential. Native clients must use
+	// localhost URLs for redirect_uris or URIs with custom schemes. Web clients must
+	// use https URLs and must not use localhost as the hostname.
+	//
+	// Any of "native", "web".
+	ApplicationType ZoneResourceUpdateParamsApplicationType `json:"application_type,omitzero"`
 	paramObj
 }
 
@@ -218,6 +240,16 @@ func (r ZoneResourceUpdateParams) MarshalJSON() (data []byte, err error) {
 func (r *ZoneResourceUpdateParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// The expected type of client for this credential. Native clients must use
+// localhost URLs for redirect_uris or URIs with custom schemes. Web clients must
+// use https URLs and must not use localhost as the hostname.
+type ZoneResourceUpdateParamsApplicationType string
+
+const (
+	ZoneResourceUpdateParamsApplicationTypeNative ZoneResourceUpdateParamsApplicationType = "native"
+	ZoneResourceUpdateParamsApplicationTypeWeb    ZoneResourceUpdateParamsApplicationType = "web"
+)
 
 type ZoneResourceListParams struct {
 	// Cursor for forward pagination
