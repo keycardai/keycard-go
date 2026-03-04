@@ -73,9 +73,10 @@ func (r *ZoneSessionService) Update(ctx context.Context, id string, params ZoneS
 	return
 }
 
-// Returns entry sessions in the specified zone. Entry sessions are app user
-// sessions with an initiator that are roots or direct children of a root user
-// session. Can be filtered by session type, status, and user.
+// Returns sessions in the specified zone. By default, returns entry sessions (app
+// user sessions with an initiator that are roots or direct children of a root user
+// session). Use include_nested=true to include nested sessions. Can be filtered by
+// session type, status, and user.
 func (r *ZoneSessionService) List(ctx context.Context, zoneID string, query ZoneSessionListParams, opts ...option.RequestOption) (res *ZoneSessionListResponse, err error) {
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -495,6 +496,12 @@ type ZoneSessionListParams struct {
 	// Any of "true".
 	Active ZoneSessionListParamsActive      `query:"active,omitzero" json:"-"`
 	Expand ZoneSessionListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Include nested sessions. When false (default), only returns entry sessions
+	// (direct children of root user sessions). When true, returns all sessions with an
+	// initiator, including nested sessions.
+	//
+	// Any of "true".
+	IncludeNested ZoneSessionListParamsIncludeNested `query:"include_nested,omitzero" json:"-"`
 	// Any of "user", "application".
 	SessionType ZoneSessionListParamsSessionType `query:"session_type,omitzero" json:"-"`
 	// Any of "active", "expired", "revoked".
@@ -531,6 +538,15 @@ type ZoneSessionListParamsExpandString string
 
 const (
 	ZoneSessionListParamsExpandStringTotalCount ZoneSessionListParamsExpandString = "total_count"
+)
+
+// Include nested sessions. When false (default), only returns entry sessions
+// (direct children of root user sessions). When true, returns all sessions with an
+// initiator, including nested sessions.
+type ZoneSessionListParamsIncludeNested string
+
+const (
+	ZoneSessionListParamsIncludeNestedTrue ZoneSessionListParamsIncludeNested = "true"
 )
 
 type ZoneSessionListParamsSessionType string
