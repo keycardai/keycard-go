@@ -40,7 +40,10 @@ func TestZoneProviderNewWithOptionalParams(t *testing.T) {
 			Metadata:     map[string]any{},
 			Protocols: keycard.ZoneProviderNewParamsProtocols{
 				Oauth2: keycard.ZoneProviderNewParamsProtocolsOauth2{
-					AuthorizationEndpoint:           keycard.String("https://example.com"),
+					AuthorizationEndpoint: keycard.String("https://example.com"),
+					AuthorizationParameters: map[string]string{
+						"foo": "string",
+					},
 					AuthorizationResourceEnabled:    keycard.Bool(true),
 					AuthorizationResourceParameter:  keycard.String("authorization_resource_parameter"),
 					CodeChallengeMethodsSupported:   []string{"string"},
@@ -127,7 +130,10 @@ func TestZoneProviderUpdateWithOptionalParams(t *testing.T) {
 			Name:         keycard.String("x"),
 			Protocols: keycard.ZoneProviderUpdateParamsProtocols{
 				Oauth2: keycard.ZoneProviderUpdateParamsProtocolsOauth2{
-					AuthorizationEndpoint:           keycard.String("https://example.com"),
+					AuthorizationEndpoint: keycard.String("https://example.com"),
+					AuthorizationParameters: map[string]string{
+						"foo": "string",
+					},
 					AuthorizationResourceEnabled:    keycard.Bool(true),
 					AuthorizationResourceParameter:  keycard.String("authorization_resource_parameter"),
 					CodeChallengeMethodsSupported:   []string{"string"},

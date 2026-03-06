@@ -130,6 +130,10 @@ type Provider struct {
 	Name string `json:"name" api:"required"`
 	// Organization that owns this provider
 	OrganizationID string `json:"organization_id" api:"required"`
+	// Who owns this provider. Platform-owned providers cannot be modified via API.
+	//
+	// Any of "platform", "customer".
+	OwnerType ProviderOwnerType `json:"owner_type" api:"required"`
 	// URL-safe identifier, unique within the zone
 	Slug string `json:"slug" api:"required"`
 	// Entity update timestamp
@@ -155,6 +159,7 @@ type Provider struct {
 		Identifier      respjson.Field
 		Name            respjson.Field
 		OrganizationID  respjson.Field
+		OwnerType       respjson.Field
 		Slug            respjson.Field
 		UpdatedAt       respjson.Field
 		ZoneID          respjson.Field
@@ -174,6 +179,14 @@ func (r Provider) RawJSON() string { return r.JSON.raw }
 func (r *Provider) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Who owns this provider. Platform-owned providers cannot be modified via API.
+type ProviderOwnerType string
+
+const (
+	ProviderOwnerTypePlatform ProviderOwnerType = "platform"
+	ProviderOwnerTypeCustomer ProviderOwnerType = "customer"
+)
 
 // Protocol-specific configuration
 type ProviderProtocols struct {
@@ -201,6 +214,9 @@ type ProviderProtocolsOauth2 struct {
 	// OIDC issuer URL used for discovery and token validation.
 	Issuer                string `json:"issuer" api:"required" format:"uri"`
 	AuthorizationEndpoint string `json:"authorization_endpoint" api:"nullable" format:"uri"`
+	// Custom query parameters appended to authorization redirect URLs. Use for
+	// non-standard providers (e.g. Google prompt=consent, access_type=offline).
+	AuthorizationParameters map[string]string `json:"authorization_parameters" api:"nullable"`
 	// Whether to include the resource parameter in authorization requests.
 	AuthorizationResourceEnabled bool `json:"authorization_resource_enabled" api:"nullable"`
 	// The resource parameter value to include in authorization requests. Defaults to
@@ -224,6 +240,7 @@ type ProviderProtocolsOauth2 struct {
 	JSON struct {
 		Issuer                          respjson.Field
 		AuthorizationEndpoint           respjson.Field
+		AuthorizationParameters         respjson.Field
 		AuthorizationResourceEnabled    respjson.Field
 		AuthorizationResourceParameter  respjson.Field
 		CodeChallengeMethodsSupported   respjson.Field
@@ -383,8 +400,11 @@ type ZoneProviderNewParamsProtocolsOauth2 struct {
 	// Dot-separated path to the access token in the token response body. Defaults to
 	// "access_token". Slack v2 uses "authed_user.access_token".
 	TokenResponseAccessTokenPointer param.Opt[string] `json:"token_response_access_token_pointer,omitzero"`
-	CodeChallengeMethodsSupported   []string          `json:"code_challenge_methods_supported,omitzero"`
-	ScopesSupported                 []string          `json:"scopes_supported,omitzero"`
+	// Custom query parameters appended to authorization redirect URLs. Use for
+	// non-standard providers (e.g. Google prompt=consent, access_type=offline).
+	AuthorizationParameters       map[string]string `json:"authorization_parameters,omitzero"`
+	CodeChallengeMethodsSupported []string          `json:"code_challenge_methods_supported,omitzero"`
+	ScopesSupported               []string          `json:"scopes_supported,omitzero"`
 	paramObj
 }
 
@@ -482,7 +502,10 @@ type ZoneProviderUpdateParamsProtocolsOauth2 struct {
 	// "access_token". Set to null to unset.
 	TokenResponseAccessTokenPointer param.Opt[string] `json:"token_response_access_token_pointer,omitzero"`
 	// OIDC issuer URL for discovery and token validation. Cannot be set to null.
-	Issuer                        param.Opt[string] `json:"issuer,omitzero" format:"uri"`
+	Issuer param.Opt[string] `json:"issuer,omitzero" format:"uri"`
+	// Custom query parameters appended to authorization redirect URLs. Set to null to
+	// unset.
+	AuthorizationParameters       map[string]string `json:"authorization_parameters,omitzero"`
 	CodeChallengeMethodsSupported []string          `json:"code_challenge_methods_supported,omitzero"`
 	ScopesSupported               []string          `json:"scopes_supported,omitzero"`
 	paramObj

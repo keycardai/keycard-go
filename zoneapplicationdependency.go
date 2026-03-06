@@ -140,6 +140,10 @@ type Resource struct {
 	Name string `json:"name" api:"required"`
 	// Organization that owns this resource
 	OrganizationID string `json:"organization_id" api:"required"`
+	// Who owns this resource. Platform-owned resources cannot be modified via API.
+	//
+	// Any of "platform", "customer".
+	OwnerType ResourceOwnerType `json:"owner_type" api:"required"`
 	// URL-safe identifier, unique within the zone
 	Slug string `json:"slug" api:"required"`
 	// Entity update timestamp
@@ -178,6 +182,7 @@ type Resource struct {
 		Identifier           respjson.Field
 		Name                 respjson.Field
 		OrganizationID       respjson.Field
+		OwnerType            respjson.Field
 		Slug                 respjson.Field
 		UpdatedAt            respjson.Field
 		ZoneID               respjson.Field
@@ -208,6 +213,14 @@ type ResourceApplicationType string
 const (
 	ResourceApplicationTypeNative ResourceApplicationType = "native"
 	ResourceApplicationTypeWeb    ResourceApplicationType = "web"
+)
+
+// Who owns this resource. Platform-owned resources cannot be modified via API.
+type ResourceOwnerType string
+
+const (
+	ResourceOwnerTypePlatform ResourceOwnerType = "platform"
+	ResourceOwnerTypeCustomer ResourceOwnerType = "customer"
 )
 
 type ZoneApplicationDependencyListResponse struct {
