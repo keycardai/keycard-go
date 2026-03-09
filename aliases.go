@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"github.com/keycardlabs/keycard-go/internal/apierror"

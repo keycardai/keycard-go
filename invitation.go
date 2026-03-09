@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -40,7 +40,7 @@ func NewInvitationService(opts ...option.RequestOption) (r InvitationService) {
 // View invitation details by token without consuming the token
 func (r *InvitationService) Get(ctx context.Context, token string, query InvitationGetParams, opts ...option.RequestOption) (res *InvitationGetResponse, err error) {
 	if !param.IsOmitted(query.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", query.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", query.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -56,7 +56,7 @@ func (r *InvitationService) Get(ctx context.Context, token string, query Invitat
 // Accept and consume an invitation token to join the organization
 func (r *InvitationService) Accept(ctx context.Context, token string, body InvitationAcceptParams, opts ...option.RequestOption) (res *InvitationAcceptResponse, err error) {
 	if !param.IsOmitted(body.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", body.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", body.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -72,21 +72,21 @@ func (r *InvitationService) Accept(ctx context.Context, token string, body Invit
 // Public invitation details viewable by token
 type InvitationGetResponse struct {
 	// Name of the user who sent the invitation
-	CreatedByName string `json:"created_by_name,required"`
+	CreatedByName string `json:"created_by_name" api:"required"`
 	// Email address for the invitation
-	Email string `json:"email,required" format:"email"`
+	Email string `json:"email" api:"required" format:"email"`
 	// When the invitation expires
-	ExpiresAt time.Time `json:"expires_at,required" format:"date-time"`
+	ExpiresAt time.Time `json:"expires_at" api:"required" format:"date-time"`
 	// Name of the organization being invited to
-	OrganizationName string `json:"organization_name,required"`
+	OrganizationName string `json:"organization_name" api:"required"`
 	// Role that will be assigned when invitation is accepted
 	//
 	// Any of "org_admin", "org_member", "org_viewer".
-	Role OrganizationRole `json:"role,required"`
+	Role OrganizationRole `json:"role" api:"required"`
 	// Status of an invitation
 	//
 	// Any of "pending", "accepted", "expired", "revoked".
-	Status InvitationStatus `json:"status,required"`
+	Status InvitationStatus `json:"status" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		CreatedByName    respjson.Field
@@ -109,11 +109,11 @@ func (r *InvitationGetResponse) UnmarshalJSON(data []byte) error {
 // Result of accepting an invitation
 type InvitationAcceptResponse struct {
 	// ID of the organization joined
-	OrganizationID string `json:"organization_id,required"`
+	OrganizationID string `json:"organization_id" api:"required"`
 	// Name of the organization joined
-	OrganizationName string `json:"organization_name,required"`
+	OrganizationName string `json:"organization_name" api:"required"`
 	// Whether the invitation was successfully accepted
-	Success bool `json:"success,required"`
+	Success bool `json:"success" api:"required"`
 	// ID of the user who accepted the invitation
 	UserID string `json:"user_id"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].

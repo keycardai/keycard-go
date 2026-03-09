@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -42,7 +42,7 @@ func NewOrganizationSSOConnectionService(opts ...option.RequestOption) (r Organi
 // Get SSO connection configuration for organization
 func (r *OrganizationSSOConnectionService) Get(ctx context.Context, organizationID string, params OrganizationSSOConnectionGetParams, opts ...option.RequestOption) (res *SSOConnection, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -58,7 +58,7 @@ func (r *OrganizationSSOConnectionService) Get(ctx context.Context, organization
 // Update SSO connection configuration
 func (r *OrganizationSSOConnectionService) Update(ctx context.Context, organizationID string, params OrganizationSSOConnectionUpdateParams, opts ...option.RequestOption) (res *SSOConnection, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -74,7 +74,7 @@ func (r *OrganizationSSOConnectionService) Update(ctx context.Context, organizat
 // Disable SSO for organization
 func (r *OrganizationSSOConnectionService) Disable(ctx context.Context, organizationID string, body OrganizationSSOConnectionDisableParams, opts ...option.RequestOption) (err error) {
 	if !param.IsOmitted(body.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", body.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", body.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -91,7 +91,7 @@ func (r *OrganizationSSOConnectionService) Disable(ctx context.Context, organiza
 // Enable SSO for organization
 func (r *OrganizationSSOConnectionService) Enable(ctx context.Context, organizationID string, params OrganizationSSOConnectionEnableParams, opts ...option.RequestOption) (res *SSOConnection, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -107,24 +107,24 @@ func (r *OrganizationSSOConnectionService) Enable(ctx context.Context, organizat
 // SSO connection configuration for an organization
 type SSOConnection struct {
 	// Unique identifier for the SSO connection
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// OAuth 2.0 client ID
-	ClientID string `json:"client_id,required"`
+	ClientID string `json:"client_id" api:"required"`
 	// Whether a client secret is configured
-	ClientSecretSet bool `json:"client_secret_set,required"`
+	ClientSecretSet bool `json:"client_secret_set" api:"required"`
 	// The time the entity was created in utc
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// SSO provider identifier (e.g., issuer URL)
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// The time the entity was mostly recently updated in utc
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
 	// names to boolean values indicating if the permission is granted.
 	Permissions map[string]map[string]bool `json:"permissions"`
 	// Protocol configuration for SSO connection
-	Protocols SSOConnectionProtocol `json:"protocols,nullable"`
+	Protocols SSOConnectionProtocol `json:"protocols" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID              respjson.Field
@@ -149,9 +149,9 @@ func (r *SSOConnection) UnmarshalJSON(data []byte) error {
 // Protocol configuration for SSO connection
 type SSOConnectionProtocol struct {
 	// OAuth 2.0 protocol configuration for SSO connection
-	Oauth2 SSOConnectionProtocolOauth2 `json:"oauth2,nullable"`
+	Oauth2 SSOConnectionProtocolOauth2 `json:"oauth2" api:"nullable"`
 	// OpenID Connect protocol configuration for SSO connection
-	Openid SSOConnectionProtocolOpenid `json:"openid,nullable"`
+	Openid SSOConnectionProtocolOpenid `json:"openid" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Oauth2      respjson.Field
@@ -179,17 +179,17 @@ func (r SSOConnectionProtocol) ToParam() SSOConnectionProtocolParam {
 // OAuth 2.0 protocol configuration for SSO connection
 type SSOConnectionProtocolOauth2 struct {
 	// OAuth 2.0 authorization endpoint
-	AuthorizationEndpoint string `json:"authorization_endpoint,nullable" format:"uri"`
+	AuthorizationEndpoint string `json:"authorization_endpoint" api:"nullable" format:"uri"`
 	// Supported PKCE code challenge methods
-	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported,nullable"`
+	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported" api:"nullable"`
 	// JSON Web Key Set endpoint
-	JwksUri string `json:"jwks_uri,nullable" format:"uri"`
+	JwksUri string `json:"jwks_uri" api:"nullable" format:"uri"`
 	// OAuth 2.0 registration endpoint
-	RegistrationEndpoint string `json:"registration_endpoint,nullable" format:"uri"`
+	RegistrationEndpoint string `json:"registration_endpoint" api:"nullable" format:"uri"`
 	// Supported OAuth 2.0 scopes
-	ScopesSupported []string `json:"scopes_supported,nullable"`
+	ScopesSupported []string `json:"scopes_supported" api:"nullable"`
 	// OAuth 2.0 token endpoint
-	TokenEndpoint string `json:"token_endpoint,nullable" format:"uri"`
+	TokenEndpoint string `json:"token_endpoint" api:"nullable" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AuthorizationEndpoint         respjson.Field
@@ -212,7 +212,7 @@ func (r *SSOConnectionProtocolOauth2) UnmarshalJSON(data []byte) error {
 // OpenID Connect protocol configuration for SSO connection
 type SSOConnectionProtocolOpenid struct {
 	// OpenID Connect UserInfo endpoint
-	UserinfoEndpoint string `json:"userinfo_endpoint,nullable" format:"uri"`
+	UserinfoEndpoint string `json:"userinfo_endpoint" api:"nullable" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		UserinfoEndpoint respjson.Field
@@ -331,9 +331,9 @@ type OrganizationSSOConnectionDisableParams struct {
 
 type OrganizationSSOConnectionEnableParams struct {
 	// OAuth 2.0 client ID
-	ClientID string `json:"client_id,required"`
+	ClientID string `json:"client_id" api:"required"`
 	// SSO provider identifier (e.g., issuer URL)
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// OAuth 2.0 client secret (optional, will be encrypted if provided)
 	ClientSecret     param.Opt[string] `json:"client_secret,omitzero"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`

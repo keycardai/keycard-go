@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 )
 
 func TestOrganizationInvitationNewWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -22,7 +22,7 @@ func TestOrganizationInvitationNewWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -31,14 +31,14 @@ func TestOrganizationInvitationNewWithOptionalParams(t *testing.T) {
 	_, err := client.Organizations.Invitations.New(
 		context.TODO(),
 		"x",
-		keycardapi.OrganizationInvitationNewParams{
+		keycard.OrganizationInvitationNewParams{
 			Email:            "dev@stainless.com",
-			Role:             keycardapi.OrganizationRoleOrgAdmin,
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Role:             keycard.OrganizationRoleOrgAdmin,
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -47,7 +47,7 @@ func TestOrganizationInvitationNewWithOptionalParams(t *testing.T) {
 }
 
 func TestOrganizationInvitationListWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -55,7 +55,7 @@ func TestOrganizationInvitationListWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -64,16 +64,16 @@ func TestOrganizationInvitationListWithOptionalParams(t *testing.T) {
 	_, err := client.Organizations.Invitations.List(
 		context.TODO(),
 		"x",
-		keycardapi.OrganizationInvitationListParams{
-			After:            keycardapi.String("x"),
-			Before:           keycardapi.String("x"),
+		keycard.OrganizationInvitationListParams{
+			After:            keycard.String("x"),
+			Before:           keycard.String("x"),
 			Expand:           []string{"permissions"},
-			Limit:            keycardapi.Int(1),
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Limit:            keycard.Int(1),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -82,7 +82,7 @@ func TestOrganizationInvitationListWithOptionalParams(t *testing.T) {
 }
 
 func TestOrganizationInvitationDeleteWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -90,7 +90,7 @@ func TestOrganizationInvitationDeleteWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -99,13 +99,13 @@ func TestOrganizationInvitationDeleteWithOptionalParams(t *testing.T) {
 	err := client.Organizations.Invitations.Delete(
 		context.TODO(),
 		"ab3def8hij2klm9opq5rst7uvw",
-		keycardapi.OrganizationInvitationDeleteParams{
+		keycard.OrganizationInvitationDeleteParams{
 			OrganizationID:   "x",
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

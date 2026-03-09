@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -41,7 +41,7 @@ func NewZoneSecretService(opts ...option.RequestOption) (r ZoneSecretService) {
 
 func (r *ZoneSecretService) New(ctx context.Context, zoneID string, params ZoneSecretNewParams, opts ...option.RequestOption) (res *Secret, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithVaultAPIBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -56,7 +56,7 @@ func (r *ZoneSecretService) New(ctx context.Context, zoneID string, params ZoneS
 
 func (r *ZoneSecretService) Get(ctx context.Context, id string, params ZoneSecretGetParams, opts ...option.RequestOption) (res *ZoneSecretGetResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithVaultAPIBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -75,7 +75,7 @@ func (r *ZoneSecretService) Get(ctx context.Context, id string, params ZoneSecre
 
 func (r *ZoneSecretService) Update(ctx context.Context, id string, params ZoneSecretUpdateParams, opts ...option.RequestOption) (res *Secret, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithVaultAPIBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -94,7 +94,7 @@ func (r *ZoneSecretService) Update(ctx context.Context, id string, params ZoneSe
 
 func (r *ZoneSecretService) List(ctx context.Context, zoneID string, params ZoneSecretListParams, opts ...option.RequestOption) (res *[]Secret, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithVaultAPIBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -109,7 +109,7 @@ func (r *ZoneSecretService) List(ctx context.Context, zoneID string, params Zone
 
 func (r *ZoneSecretService) Delete(ctx context.Context, id string, params ZoneSecretDeleteParams, opts ...option.RequestOption) (err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithVaultAPIBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -129,18 +129,18 @@ func (r *ZoneSecretService) Delete(ctx context.Context, id string, params ZoneSe
 
 type Secret struct {
 	// A globally unique opaque identifier
-	ID        string    `json:"id,required"`
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	ID        string    `json:"id" api:"required"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// A globally unique opaque identifier
-	EntityID string `json:"entity_id,required"`
+	EntityID string `json:"entity_id" api:"required"`
 	// A name for the entity to be displayed in UI
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Any of "token", "password".
-	Type      SecretType `json:"type,required"`
-	UpdatedAt time.Time  `json:"updated_at,required" format:"date-time"`
-	Version   int64      `json:"version,required"`
+	Type      SecretType `json:"type" api:"required"`
+	UpdatedAt time.Time  `json:"updated_at" api:"required" format:"date-time"`
+	Version   int64      `json:"version" api:"required"`
 	// A globally unique opaque identifier
-	ZoneID string `json:"zone_id,required"`
+	ZoneID string `json:"zone_id" api:"required"`
 	// A description of the entity
 	Description string `json:"description"`
 	// A JSON object containing arbitrary metadata. Metadata will not be encrypted.
@@ -176,10 +176,10 @@ const (
 )
 
 type SecretPasswordFields struct {
-	Password string `json:"password,required"`
+	Password string `json:"password" api:"required"`
 	// Any of "password".
-	Type     SecretPasswordFieldsType `json:"type,required"`
-	Username string                   `json:"username,required"`
+	Type     SecretPasswordFieldsType `json:"type" api:"required"`
+	Username string                   `json:"username" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Password    respjson.Field
@@ -213,10 +213,10 @@ const (
 
 // The properties Password, Type, Username are required.
 type SecretPasswordFieldsParam struct {
-	Password string `json:"password,required"`
+	Password string `json:"password" api:"required"`
 	// Any of "password".
-	Type     SecretPasswordFieldsType `json:"type,omitzero,required"`
-	Username string                   `json:"username,required"`
+	Type     SecretPasswordFieldsType `json:"type,omitzero" api:"required"`
+	Username string                   `json:"username" api:"required"`
 	paramObj
 }
 
@@ -229,9 +229,9 @@ func (r *SecretPasswordFieldsParam) UnmarshalJSON(data []byte) error {
 }
 
 type SecretTokenFields struct {
-	Token string `json:"token,required"`
+	Token string `json:"token" api:"required"`
 	// Any of "token".
-	Type SecretTokenFieldsType `json:"type,required"`
+	Type SecretTokenFieldsType `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Token       respjson.Field
@@ -264,9 +264,9 @@ const (
 
 // The properties Token, Type are required.
 type SecretTokenFieldsParam struct {
-	Token string `json:"token,required"`
+	Token string `json:"token" api:"required"`
 	// Any of "token".
-	Type SecretTokenFieldsType `json:"type,omitzero,required"`
+	Type SecretTokenFieldsType `json:"type,omitzero" api:"required"`
 	paramObj
 }
 
@@ -280,17 +280,17 @@ func (r *SecretTokenFieldsParam) UnmarshalJSON(data []byte) error {
 
 type ZoneSecretGetResponse struct {
 	// A globally unique opaque identifier
-	ID        string                         `json:"id,required"`
-	CreatedAt time.Time                      `json:"created_at,required" format:"date-time"`
-	Data      ZoneSecretGetResponseDataUnion `json:"data,required"`
+	ID        string                         `json:"id" api:"required"`
+	CreatedAt time.Time                      `json:"created_at" api:"required" format:"date-time"`
+	Data      ZoneSecretGetResponseDataUnion `json:"data" api:"required"`
 	// A globally unique opaque identifier
-	EntityID string `json:"entity_id,required"`
+	EntityID string `json:"entity_id" api:"required"`
 	// A name for the entity to be displayed in UI
-	Name      string    `json:"name,required"`
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
-	Version   int64     `json:"version,required"`
+	Name      string    `json:"name" api:"required"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
+	Version   int64     `json:"version" api:"required"`
 	// A globally unique opaque identifier
-	ZoneID string `json:"zone_id,required"`
+	ZoneID string `json:"zone_id" api:"required"`
 	// A description of the entity
 	Description string `json:"description"`
 	// A JSON object containing arbitrary metadata. Metadata will not be encrypted.
@@ -355,8 +355,8 @@ func (SecretPasswordFields) implZoneSecretGetResponseDataUnion() {}
 // Use the following switch statement to find the correct variant
 //
 //	switch variant := ZoneSecretGetResponseDataUnion.AsAny().(type) {
-//	case keycardapi.SecretTokenFields:
-//	case keycardapi.SecretPasswordFields:
+//	case keycard.SecretTokenFields:
+//	case keycard.SecretPasswordFields:
 //	default:
 //	  fmt.Errorf("no variant present")
 //	}
@@ -388,11 +388,11 @@ func (r *ZoneSecretGetResponseDataUnion) UnmarshalJSON(data []byte) error {
 }
 
 type ZoneSecretNewParams struct {
-	Data ZoneSecretNewParamsDataUnion `json:"data,omitzero,required"`
+	Data ZoneSecretNewParamsDataUnion `json:"data,omitzero" api:"required"`
 	// A globally unique opaque identifier
-	EntityID string `json:"entity_id,required"`
+	EntityID string `json:"entity_id" api:"required"`
 	// A name for the entity to be displayed in UI
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// A description of the entity
 	Description param.Opt[string] `json:"description,omitzero"`
 	// Optional zone ID. This field is provided for API compatibility but is ignored
@@ -439,14 +439,14 @@ func init() {
 
 type ZoneSecretGetParams struct {
 	// A globally unique opaque identifier
-	ZoneID           string            `path:"zone_id,required" json:"-"`
+	ZoneID           string            `path:"zone_id" api:"required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 
 type ZoneSecretUpdateParams struct {
 	// A globally unique opaque identifier
-	ZoneID string `path:"zone_id,required" json:"-"`
+	ZoneID string `path:"zone_id" api:"required" json:"-"`
 	// A description of the entity
 	Description param.Opt[string] `json:"description,omitzero"`
 	// A name for the entity to be displayed in UI
@@ -519,7 +519,7 @@ const (
 
 type ZoneSecretDeleteParams struct {
 	// A globally unique opaque identifier
-	ZoneID           string            `path:"zone_id,required" json:"-"`
+	ZoneID           string            `path:"zone_id" api:"required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }

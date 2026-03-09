@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -43,7 +43,7 @@ func NewOrganizationServiceAccountService(opts ...option.RequestOption) (r Organ
 // Create a new service account for an organization
 func (r *OrganizationServiceAccountService) New(ctx context.Context, organizationID string, params OrganizationServiceAccountNewParams, opts ...option.RequestOption) (res *ServiceAccount, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -59,7 +59,7 @@ func (r *OrganizationServiceAccountService) New(ctx context.Context, organizatio
 // Get a specific service account
 func (r *OrganizationServiceAccountService) Get(ctx context.Context, serviceAccountID string, params OrganizationServiceAccountGetParams, opts ...option.RequestOption) (res *ServiceAccount, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -79,7 +79,7 @@ func (r *OrganizationServiceAccountService) Get(ctx context.Context, serviceAcco
 // Update a service account
 func (r *OrganizationServiceAccountService) Update(ctx context.Context, serviceAccountID string, params OrganizationServiceAccountUpdateParams, opts ...option.RequestOption) (res *ServiceAccount, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -99,7 +99,7 @@ func (r *OrganizationServiceAccountService) Update(ctx context.Context, serviceA
 // List service accounts for an organization
 func (r *OrganizationServiceAccountService) List(ctx context.Context, organizationID string, params OrganizationServiceAccountListParams, opts ...option.RequestOption) (res *OrganizationServiceAccountListResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -115,7 +115,7 @@ func (r *OrganizationServiceAccountService) List(ctx context.Context, organizati
 // Delete a service account
 func (r *OrganizationServiceAccountService) Delete(ctx context.Context, serviceAccountID string, params OrganizationServiceAccountDeleteParams, opts ...option.RequestOption) (err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -135,13 +135,13 @@ func (r *OrganizationServiceAccountService) Delete(ctx context.Context, serviceA
 
 type ServiceAccount struct {
 	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// The time the entity was created in utc
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// A name for the entity to be displayed in UI
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// The time the entity was mostly recently updated in utc
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Optional description of the service account
 	Description string `json:"description"`
 	// Permissions granted to the authenticated principal for this resource. Only
@@ -169,9 +169,9 @@ func (r *ServiceAccount) UnmarshalJSON(data []byte) error {
 }
 
 type OrganizationServiceAccountListResponse struct {
-	Items []ServiceAccount `json:"items,required"`
+	Items []ServiceAccount `json:"items" api:"required"`
 	// Pagination information using cursor-based pagination
-	PageInfo PageInfoCursor `json:"page_info,required"`
+	PageInfo PageInfoCursor `json:"page_info" api:"required"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -195,7 +195,7 @@ func (r *OrganizationServiceAccountListResponse) UnmarshalJSON(data []byte) erro
 
 type OrganizationServiceAccountNewParams struct {
 	// Service account name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Optional description of the service account
 	Description      param.Opt[string] `json:"description,omitzero"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
@@ -212,7 +212,7 @@ func (r *OrganizationServiceAccountNewParams) UnmarshalJSON(data []byte) error {
 
 type OrganizationServiceAccountGetParams struct {
 	// Organization ID or label identifier
-	OrganizationID   string            `path:"organization_id,required" json:"-"`
+	OrganizationID   string            `path:"organization_id" api:"required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Fields to expand in the response. Currently supports "permissions" to include
 	// the permissions field with the caller's permissions for the resource.
@@ -233,7 +233,7 @@ func (r OrganizationServiceAccountGetParams) URLQuery() (v url.Values, err error
 
 type OrganizationServiceAccountUpdateParams struct {
 	// Organization ID or label identifier
-	OrganizationID string `path:"organization_id,required" json:"-"`
+	OrganizationID string `path:"organization_id" api:"required" json:"-"`
 	// Optional description of the service account
 	Description param.Opt[string] `json:"description,omitzero"`
 	// Service account name
@@ -277,7 +277,7 @@ func (r OrganizationServiceAccountListParams) URLQuery() (v url.Values, err erro
 
 type OrganizationServiceAccountDeleteParams struct {
 	// Organization ID or label identifier
-	OrganizationID   string            `path:"organization_id,required" json:"-"`
+	OrganizationID   string            `path:"organization_id" api:"required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }

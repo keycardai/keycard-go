@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 )
 
 func TestZoneNewWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -22,31 +22,31 @@ func TestZoneNewWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
 		option.WithPassword("My Password"),
 	)
-	_, err := client.Zones.New(context.TODO(), keycardapi.ZoneNewParams{
+	_, err := client.Zones.New(context.TODO(), keycard.ZoneNewParams{
 		Name:                         "x",
-		DefaultMcpGatewayApplication: keycardapi.Bool(true),
-		Description:                  keycardapi.String("description"),
-		DirectoryOpenSignupsEnabled:  keycardapi.Bool(true),
-		EncryptionKey: keycardapi.EncryptionKeyAwsKmsConfigParam{
+		DefaultMcpGatewayApplication: keycard.Bool(true),
+		Description:                  keycard.String("description"),
+		EncryptionKey: keycard.EncryptionKeyAwsKmsConfigParam{
 			Arn:  "x",
-			Type: keycardapi.EncryptionKeyAwsKmsConfigTypeAws,
+			Type: keycard.EncryptionKeyAwsKmsConfigTypeAws,
 		},
-		LoginFlow: keycardapi.ZoneNewParamsLoginFlowDefault,
-		Protocols: keycardapi.ZoneNewParamsProtocols{
-			Oauth2: keycardapi.ZoneNewParamsProtocolsOauth2{
-				DcrEnabled:   keycardapi.Bool(true),
-				PkceRequired: keycardapi.Bool(true),
+		LoginFlow: keycard.ZoneNewParamsLoginFlowDefault,
+		Protocols: keycard.ZoneNewParamsProtocols{
+			Oauth2: keycard.ZoneNewParamsProtocolsOauth2{
+				DcrEnabled:   keycard.Bool(true),
+				PkceRequired: keycard.Bool(true),
 			},
 		},
+		RequiresInvitation: keycard.Bool(true),
 	})
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -55,7 +55,7 @@ func TestZoneNewWithOptionalParams(t *testing.T) {
 }
 
 func TestZoneGetWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -63,7 +63,7 @@ func TestZoneGetWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -72,14 +72,14 @@ func TestZoneGetWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.Get(
 		context.TODO(),
 		"zoneId",
-		keycardapi.ZoneGetParams{
-			Expand: keycardapi.ZoneGetParamsExpandUnion{
-				OfZoneGetsExpandString: keycardapi.String("permissions"),
+		keycard.ZoneGetParams{
+			Expand: keycard.ZoneGetParamsExpandUnion{
+				OfZoneGetsExpandString: keycard.String("permissions"),
 			},
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -88,7 +88,7 @@ func TestZoneGetWithOptionalParams(t *testing.T) {
 }
 
 func TestZoneUpdateWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -96,7 +96,7 @@ func TestZoneUpdateWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -105,27 +105,27 @@ func TestZoneUpdateWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.Update(
 		context.TODO(),
 		"zoneId",
-		keycardapi.ZoneUpdateParams{
-			DefaultMcpGatewayApplicationID: keycardapi.String("default_mcp_gateway_application_id"),
-			Description:                    keycardapi.String("description"),
-			DirectoryOpenSignupsEnabled:    keycardapi.Bool(true),
-			EncryptionKey: keycardapi.ZoneUpdateParamsEncryptionKey{
+		keycard.ZoneUpdateParams{
+			DefaultMcpGatewayApplicationID: keycard.String("default_mcp_gateway_application_id"),
+			Description:                    keycard.String("description"),
+			EncryptionKey: keycard.ZoneUpdateParamsEncryptionKey{
 				Arn:  "x",
 				Type: "aws",
 			},
-			LoginFlow: keycardapi.ZoneUpdateParamsLoginFlowDefault,
-			Name:      keycardapi.String("x"),
-			Protocols: keycardapi.ZoneUpdateParamsProtocols{
-				Oauth2: keycardapi.ZoneUpdateParamsProtocolsOauth2{
-					DcrEnabled:   keycardapi.Bool(true),
-					PkceRequired: keycardapi.Bool(true),
+			LoginFlow: keycard.ZoneUpdateParamsLoginFlowDefault,
+			Name:      keycard.String("x"),
+			Protocols: keycard.ZoneUpdateParamsProtocols{
+				Oauth2: keycard.ZoneUpdateParamsProtocolsOauth2{
+					DcrEnabled:   keycard.Bool(true),
+					PkceRequired: keycard.Bool(true),
 				},
 			},
-			UserIdentityProviderID: keycardapi.String("user_identity_provider_id"),
+			RequiresInvitation:     keycard.Bool(true),
+			UserIdentityProviderID: keycard.String("user_identity_provider_id"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -134,7 +134,7 @@ func TestZoneUpdateWithOptionalParams(t *testing.T) {
 }
 
 func TestZoneListWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -142,19 +142,24 @@ func TestZoneListWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
 		option.WithPassword("My Password"),
 	)
-	_, err := client.Zones.List(context.TODO(), keycardapi.ZoneListParams{
-		Cursor: keycardapi.String("cursor"),
-		Limit:  keycardapi.Int(1),
-		Slug:   keycardapi.String("slug"),
+	_, err := client.Zones.List(context.TODO(), keycard.ZoneListParams{
+		After:  keycard.String("x"),
+		Before: keycard.String("x"),
+		Cursor: keycard.String("cursor"),
+		Expand: keycard.ZoneListParamsExpandUnion{
+			OfZoneListsExpandString: keycard.String("total_count"),
+		},
+		Limit: keycard.Int(1),
+		Slug:  keycard.String("slug"),
 	})
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -163,7 +168,7 @@ func TestZoneListWithOptionalParams(t *testing.T) {
 }
 
 func TestZoneDelete(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -171,7 +176,7 @@ func TestZoneDelete(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -179,7 +184,7 @@ func TestZoneDelete(t *testing.T) {
 	)
 	err := client.Zones.Delete(context.TODO(), "zoneId")
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -188,7 +193,7 @@ func TestZoneDelete(t *testing.T) {
 }
 
 func TestZoneDeleteMcpServer(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -196,7 +201,7 @@ func TestZoneDeleteMcpServer(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -205,12 +210,12 @@ func TestZoneDeleteMcpServer(t *testing.T) {
 	err := client.Zones.DeleteMcpServer(
 		context.TODO(),
 		"downstreamId",
-		keycardapi.ZoneDeleteMcpServerParams{
+		keycard.ZoneDeleteMcpServerParams{
 			ZoneID: "zoneId",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -219,7 +224,7 @@ func TestZoneDeleteMcpServer(t *testing.T) {
 }
 
 func TestZoneListSessionResourceAccessWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -227,7 +232,7 @@ func TestZoneListSessionResourceAccessWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -236,14 +241,21 @@ func TestZoneListSessionResourceAccessWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.ListSessionResourceAccess(
 		context.TODO(),
 		"zoneId",
-		keycardapi.ZoneListSessionResourceAccessParams{
-			ResourceID: keycardapi.String("resource_id"),
-			SessionID:  keycardapi.String("session_id"),
-			UserID:     keycardapi.String("user_id"),
+		keycard.ZoneListSessionResourceAccessParams{
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Expand: keycard.ZoneListSessionResourceAccessParamsExpandUnion{
+				OfZoneListSessionResourceAccesssExpandString: keycard.String("total_count"),
+			},
+			Limit:          keycard.Int(1),
+			ResourceID:     keycard.String("resource_id"),
+			RollupChildren: keycard.Bool(true),
+			SessionID:      keycard.String("session_id"),
+			UserID:         keycard.String("user_id"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

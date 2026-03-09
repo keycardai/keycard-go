@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 )
 
 func TestOrganizationServiceAccountNewWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -22,7 +22,7 @@ func TestOrganizationServiceAccountNewWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -31,14 +31,14 @@ func TestOrganizationServiceAccountNewWithOptionalParams(t *testing.T) {
 	_, err := client.Organizations.ServiceAccounts.New(
 		context.TODO(),
 		"x",
-		keycardapi.OrganizationServiceAccountNewParams{
+		keycard.OrganizationServiceAccountNewParams{
 			Name:             "name",
-			Description:      keycardapi.String("description"),
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Description:      keycard.String("description"),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -47,7 +47,7 @@ func TestOrganizationServiceAccountNewWithOptionalParams(t *testing.T) {
 }
 
 func TestOrganizationServiceAccountGetWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -55,7 +55,7 @@ func TestOrganizationServiceAccountGetWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -64,14 +64,14 @@ func TestOrganizationServiceAccountGetWithOptionalParams(t *testing.T) {
 	_, err := client.Organizations.ServiceAccounts.Get(
 		context.TODO(),
 		"ab3def8hij2klm9opq5rst7uvw",
-		keycardapi.OrganizationServiceAccountGetParams{
+		keycard.OrganizationServiceAccountGetParams{
 			OrganizationID:   "x",
 			Expand:           []string{"permissions"},
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -80,7 +80,7 @@ func TestOrganizationServiceAccountGetWithOptionalParams(t *testing.T) {
 }
 
 func TestOrganizationServiceAccountUpdateWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -88,7 +88,7 @@ func TestOrganizationServiceAccountUpdateWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -97,15 +97,15 @@ func TestOrganizationServiceAccountUpdateWithOptionalParams(t *testing.T) {
 	_, err := client.Organizations.ServiceAccounts.Update(
 		context.TODO(),
 		"ab3def8hij2klm9opq5rst7uvw",
-		keycardapi.OrganizationServiceAccountUpdateParams{
+		keycard.OrganizationServiceAccountUpdateParams{
 			OrganizationID:   "x",
-			Description:      keycardapi.String("description"),
-			Name:             keycardapi.String("name"),
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Description:      keycard.String("description"),
+			Name:             keycard.String("name"),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -114,7 +114,7 @@ func TestOrganizationServiceAccountUpdateWithOptionalParams(t *testing.T) {
 }
 
 func TestOrganizationServiceAccountListWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -122,7 +122,7 @@ func TestOrganizationServiceAccountListWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -131,16 +131,16 @@ func TestOrganizationServiceAccountListWithOptionalParams(t *testing.T) {
 	_, err := client.Organizations.ServiceAccounts.List(
 		context.TODO(),
 		"x",
-		keycardapi.OrganizationServiceAccountListParams{
-			After:            keycardapi.String("x"),
-			Before:           keycardapi.String("x"),
+		keycard.OrganizationServiceAccountListParams{
+			After:            keycard.String("x"),
+			Before:           keycard.String("x"),
 			Expand:           []string{"permissions"},
-			Limit:            keycardapi.Int(1),
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			Limit:            keycard.Int(1),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -149,7 +149,7 @@ func TestOrganizationServiceAccountListWithOptionalParams(t *testing.T) {
 }
 
 func TestOrganizationServiceAccountDeleteWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -157,7 +157,7 @@ func TestOrganizationServiceAccountDeleteWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -166,13 +166,13 @@ func TestOrganizationServiceAccountDeleteWithOptionalParams(t *testing.T) {
 	err := client.Organizations.ServiceAccounts.Delete(
 		context.TODO(),
 		"ab3def8hij2klm9opq5rst7uvw",
-		keycardapi.OrganizationServiceAccountDeleteParams{
+		keycard.OrganizationServiceAccountDeleteParams{
 			OrganizationID:   "x",
-			XClientRequestID: keycardapi.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

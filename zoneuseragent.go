@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -12,8 +12,10 @@ import (
 	"time"
 
 	"github.com/keycardlabs/keycard-go/internal/apijson"
+	"github.com/keycardlabs/keycard-go/internal/apiquery"
 	"github.com/keycardlabs/keycard-go/internal/requestconfig"
 	"github.com/keycardlabs/keycard-go/option"
+	"github.com/keycardlabs/keycard-go/packages/param"
 	"github.com/keycardlabs/keycard-go/packages/respjson"
 )
 
@@ -56,7 +58,7 @@ func (r *ZoneUserAgentService) Get(ctx context.Context, id string, query ZoneUse
 // Returns a list of user agents in the specified zone. User agents represent
 // client software (browsers, desktop apps, CLI tools) registered via OAuth 2.0
 // Dynamic Client Registration.
-func (r *ZoneUserAgentService) List(ctx context.Context, zoneID string, opts ...option.RequestOption) (res *ZoneUserAgentListResponse, err error) {
+func (r *ZoneUserAgentService) List(ctx context.Context, zoneID string, query ZoneUserAgentListParams, opts ...option.RequestOption) (res *ZoneUserAgentListResponse, err error) {
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
@@ -64,7 +66,7 @@ func (r *ZoneUserAgentService) List(ctx context.Context, zoneID string, opts ...
 		return
 	}
 	path := fmt.Sprintf("zones/%s/user-agents", url.PathEscape(zoneID))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
 }
 
@@ -72,21 +74,21 @@ func (r *ZoneUserAgentService) List(ctx context.Context, zoneID string, opts ...
 // initiate user sessions via OAuth 2.0 Dynamic Client Registration.
 type UserAgent struct {
 	// Unique identifier of the user agent
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Entity creation timestamp
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// User agent identifier (serves as OAuth client_id). Format: ua:{sha256_hash}
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// Human-readable name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Organization that owns this user agent
-	OrganizationID string `json:"organization_id,required"`
+	OrganizationID string `json:"organization_id" api:"required"`
 	// URL-safe identifier, unique within the zone
-	Slug string `json:"slug,required"`
+	Slug string `json:"slug" api:"required"`
 	// Entity update timestamp
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Zone this user agent belongs to
-	ZoneID string `json:"zone_id,required"`
+	ZoneID string `json:"zone_id" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID             respjson.Field
@@ -109,10 +111,13 @@ func (r *UserAgent) UnmarshalJSON(data []byte) error {
 }
 
 type ZoneUserAgentListResponse struct {
-	Items []UserAgent `json:"items,required"`
+	Items []UserAgent `json:"items" api:"required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneUserAgentListResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -124,7 +129,69 @@ func (r *ZoneUserAgentListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Cursor-based pagination metadata
+type ZoneUserAgentListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor" api:"required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor" api:"required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneUserAgentListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneUserAgentListResponsePagination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type ZoneUserAgentGetParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
+
+type ZoneUserAgentListParams struct {
+	// Cursor for forward pagination
+	After param.Opt[string] `query:"after,omitzero" json:"-"`
+	// Cursor for backward pagination
+	Before param.Opt[string] `query:"before,omitzero" json:"-"`
+	// Maximum number of items to return
+	Limit  param.Opt[int64]                   `query:"limit,omitzero" json:"-"`
+	Expand ZoneUserAgentListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [ZoneUserAgentListParams]'s query parameters as
+// `url.Values`.
+func (r ZoneUserAgentListParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneUserAgentListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneUserAgentListsExpandString)
+	OfZoneUserAgentListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneUserAgentListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneUserAgentListParamsExpandString string
+
+const (
+	ZoneUserAgentListParamsExpandStringTotalCount ZoneUserAgentListParamsExpandString = "total_count"
+)

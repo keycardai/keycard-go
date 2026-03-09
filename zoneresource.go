@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -117,10 +117,13 @@ func (r *ZoneResourceService) Delete(ctx context.Context, id string, body ZoneRe
 }
 
 type ZoneResourceListResponse struct {
-	Items []Resource `json:"items,required"`
+	Items []Resource `json:"items" api:"required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneResourceListResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -132,17 +135,48 @@ func (r *ZoneResourceListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Cursor-based pagination metadata
+type ZoneResourceListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor" api:"required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor" api:"required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneResourceListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneResourceListResponsePagination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type ZoneResourceNewParams struct {
 	// User specified identifier, unique within the zone
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// Human-readable name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Human-readable description
 	Description param.Opt[string] `json:"description,omitzero"`
 	// ID of the application that provides this resource
 	ApplicationID param.Opt[string] `json:"application_id,omitzero"`
 	// ID of the credential provider to associate with the resource
 	CredentialProviderID param.Opt[string] `json:"credential_provider_id,omitzero"`
+	// The expected type of client for this credential. Native clients must use
+	// localhost URLs for redirect_uris or URIs with custom schemes. Web clients must
+	// use https URLs and must not use localhost as the hostname.
+	//
+	// Any of "native", "web".
+	ApplicationType ZoneResourceNewParamsApplicationType `json:"application_type,omitzero"`
 	// Entity metadata
 	Metadata MetadataParam `json:"metadata,omitzero"`
 	// Scopes supported by the resource
@@ -158,13 +192,23 @@ func (r *ZoneResourceNewParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// The expected type of client for this credential. Native clients must use
+// localhost URLs for redirect_uris or URIs with custom schemes. Web clients must
+// use https URLs and must not use localhost as the hostname.
+type ZoneResourceNewParamsApplicationType string
+
+const (
+	ZoneResourceNewParamsApplicationTypeNative ZoneResourceNewParamsApplicationType = "native"
+	ZoneResourceNewParamsApplicationTypeWeb    ZoneResourceNewParamsApplicationType = "web"
+)
+
 type ZoneResourceGetParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
 
 type ZoneResourceUpdateParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	// ID of the application that provides this resource (set to null to unset)
 	ApplicationID param.Opt[string] `json:"application_id,omitzero"`
 	// ID of the credential provider to associate with the resource (set to null to
@@ -180,6 +224,12 @@ type ZoneResourceUpdateParams struct {
 	Metadata MetadataUpdateParam `json:"metadata,omitzero"`
 	// Scopes supported by the resource (set to null to unset)
 	Scopes []string `json:"scopes,omitzero"`
+	// The expected type of client for this credential. Native clients must use
+	// localhost URLs for redirect_uris or URIs with custom schemes. Web clients must
+	// use https URLs and must not use localhost as the hostname.
+	//
+	// Any of "native", "web".
+	ApplicationType ZoneResourceUpdateParamsApplicationType `json:"application_type,omitzero"`
 	paramObj
 }
 
@@ -191,12 +241,29 @@ func (r *ZoneResourceUpdateParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// The expected type of client for this credential. Native clients must use
+// localhost URLs for redirect_uris or URIs with custom schemes. Web clients must
+// use https URLs and must not use localhost as the hostname.
+type ZoneResourceUpdateParamsApplicationType string
+
+const (
+	ZoneResourceUpdateParamsApplicationTypeNative ZoneResourceUpdateParamsApplicationType = "native"
+	ZoneResourceUpdateParamsApplicationTypeWeb    ZoneResourceUpdateParamsApplicationType = "web"
+)
+
 type ZoneResourceListParams struct {
+	// Cursor for forward pagination
+	After param.Opt[string] `query:"after,omitzero" json:"-"`
+	// Cursor for backward pagination
+	Before param.Opt[string] `query:"before,omitzero" json:"-"`
 	// Filter resources by credential provider ID
 	CredentialProviderID param.Opt[string] `query:"credentialProviderId,omitzero" json:"-"`
 	// Filter resources by identifier
 	Identifier param.Opt[string] `query:"identifier,omitzero" json:"-"`
-	Slug       param.Opt[string] `query:"slug,omitzero" json:"-"`
+	// Maximum number of items to return
+	Limit  param.Opt[int64]                  `query:"limit,omitzero" json:"-"`
+	Slug   param.Opt[string]                 `query:"slug,omitzero" json:"-"`
+	Expand ZoneResourceListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	paramObj
 }
 
@@ -208,7 +275,24 @@ func (r ZoneResourceListParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneResourceListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneResourceListsExpandString)
+	OfZoneResourceListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneResourceListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneResourceListParamsExpandString string
+
+const (
+	ZoneResourceListParamsExpandStringTotalCount ZoneResourceListParamsExpandString = "total_count"
+)
+
 type ZoneResourceDeleteParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }

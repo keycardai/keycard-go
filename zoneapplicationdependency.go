@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -125,21 +125,31 @@ func (r *ZoneApplicationDependencyService) Remove(ctx context.Context, dependenc
 // application, before allowing access.
 type Resource struct {
 	// Unique identifier of the resource
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
+	// The expected type of client for this credential. Native clients must use
+	// localhost URLs for redirect_uris or URIs with custom schemes. Web clients must
+	// use https URLs and must not use localhost as the hostname.
+	//
+	// Any of "native", "web".
+	ApplicationType ResourceApplicationType `json:"application_type" api:"required"`
 	// Entity creation timestamp
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// User specified identifier, unique within the zone
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// Human-readable name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Organization that owns this resource
-	OrganizationID string `json:"organization_id,required"`
+	OrganizationID string `json:"organization_id" api:"required"`
+	// Who owns this resource. Platform-owned resources cannot be modified via API.
+	//
+	// Any of "platform", "customer".
+	OwnerType ResourceOwnerType `json:"owner_type" api:"required"`
 	// URL-safe identifier, unique within the zone
-	Slug string `json:"slug,required"`
+	Slug string `json:"slug" api:"required"`
 	// Entity update timestamp
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Zone this resource belongs to
-	ZoneID string `json:"zone_id,required"`
+	ZoneID string `json:"zone_id" api:"required"`
 	// An Application is a software system with an associated identity that can access
 	// Resources. It may act on its own behalf (machine-to-machine) or on behalf of a
 	// user (delegated access).
@@ -156,21 +166,23 @@ type Resource struct {
 	// ID of the credential provider for this resource
 	CredentialProviderID string `json:"credential_provider_id"`
 	// Human-readable description
-	Description string `json:"description,nullable"`
+	Description string `json:"description" api:"nullable"`
 	// Entity metadata
 	Metadata Metadata `json:"metadata"`
 	// Scopes supported by the resource
-	Scopes []string `json:"scopes,nullable"`
+	Scopes []string `json:"scopes" api:"nullable"`
 	// List of resource IDs that, when accessed, make this dependency available. Only
 	// present when this resource is returned as a dependency.
 	WhenAccessing []string `json:"when_accessing"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                   respjson.Field
+		ApplicationType      respjson.Field
 		CreatedAt            respjson.Field
 		Identifier           respjson.Field
 		Name                 respjson.Field
 		OrganizationID       respjson.Field
+		OwnerType            respjson.Field
 		Slug                 respjson.Field
 		UpdatedAt            respjson.Field
 		ZoneID               respjson.Field
@@ -193,14 +205,35 @@ func (r *Resource) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// The expected type of client for this credential. Native clients must use
+// localhost URLs for redirect_uris or URIs with custom schemes. Web clients must
+// use https URLs and must not use localhost as the hostname.
+type ResourceApplicationType string
+
+const (
+	ResourceApplicationTypeNative ResourceApplicationType = "native"
+	ResourceApplicationTypeWeb    ResourceApplicationType = "web"
+)
+
+// Who owns this resource. Platform-owned resources cannot be modified via API.
+type ResourceOwnerType string
+
+const (
+	ResourceOwnerTypePlatform ResourceOwnerType = "platform"
+	ResourceOwnerTypeCustomer ResourceOwnerType = "customer"
+)
+
 type ZoneApplicationDependencyListResponse struct {
-	Items []Resource `json:"items,required"`
+	Items []Resource `json:"items" api:"required"`
 	// Pagination information
-	PageInfo PageInfoPagination `json:"page_info,required"`
+	PageInfo PageInfoPagination `json:"page_info" api:"required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneApplicationDependencyListResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
 		PageInfo    respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -212,17 +245,48 @@ func (r *ZoneApplicationDependencyListResponse) UnmarshalJSON(data []byte) error
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Cursor-based pagination metadata
+type ZoneApplicationDependencyListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor" api:"required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor" api:"required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneApplicationDependencyListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneApplicationDependencyListResponsePagination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type ZoneApplicationDependencyGetParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
-	ID     string `path:"id,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
+	ID     string `path:"id" api:"required" json:"-"`
 	paramObj
 }
 
 type ZoneApplicationDependencyListParams struct {
-	ZoneID        string            `path:"zoneId,required" json:"-"`
-	Cursor        param.Opt[string] `query:"cursor,omitzero" json:"-"`
-	Limit         param.Opt[int64]  `query:"limit,omitzero" json:"-"`
-	WhenAccessing param.Opt[string] `query:"when_accessing,omitzero" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
+	// Cursor for forward pagination
+	After param.Opt[string] `query:"after,omitzero" json:"-"`
+	// Cursor for backward pagination
+	Before param.Opt[string] `query:"before,omitzero" json:"-"`
+	Cursor param.Opt[string] `query:"cursor,omitzero" json:"-"`
+	// Maximum number of items to return
+	Limit         param.Opt[int64]                               `query:"limit,omitzero" json:"-"`
+	WhenAccessing param.Opt[string]                              `query:"when_accessing,omitzero" json:"-"`
+	Expand        ZoneApplicationDependencyListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	paramObj
 }
 
@@ -235,9 +299,26 @@ func (r ZoneApplicationDependencyListParams) URLQuery() (v url.Values, err error
 	})
 }
 
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneApplicationDependencyListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneApplicationDependencyListsExpandString)
+	OfZoneApplicationDependencyListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneApplicationDependencyListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneApplicationDependencyListParamsExpandString string
+
+const (
+	ZoneApplicationDependencyListParamsExpandStringTotalCount ZoneApplicationDependencyListParamsExpandString = "total_count"
+)
+
 type ZoneApplicationDependencyAddParams struct {
-	ZoneID        string   `path:"zoneId,required" json:"-"`
-	ID            string   `path:"id,required" json:"-"`
+	ZoneID        string   `path:"zoneId" api:"required" json:"-"`
+	ID            string   `path:"id" api:"required" json:"-"`
 	WhenAccessing []string `query:"when_accessing,omitzero" json:"-"`
 	paramObj
 }
@@ -252,7 +333,7 @@ func (r ZoneApplicationDependencyAddParams) URLQuery() (v url.Values, err error)
 }
 
 type ZoneApplicationDependencyRemoveParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
-	ID     string `path:"id,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
+	ID     string `path:"id" api:"required" json:"-"`
 	paramObj
 }

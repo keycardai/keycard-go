@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 )
 
 func TestZoneUserAgentGet(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -22,7 +22,7 @@ func TestZoneUserAgentGet(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -31,12 +31,12 @@ func TestZoneUserAgentGet(t *testing.T) {
 	_, err := client.Zones.UserAgents.Get(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneUserAgentGetParams{
+		keycard.ZoneUserAgentGetParams{
 			ZoneID: "zoneId",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -44,8 +44,8 @@ func TestZoneUserAgentGet(t *testing.T) {
 	}
 }
 
-func TestZoneUserAgentList(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+func TestZoneUserAgentListWithOptionalParams(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -53,15 +53,26 @@ func TestZoneUserAgentList(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
 		option.WithPassword("My Password"),
 	)
-	_, err := client.Zones.UserAgents.List(context.TODO(), "zoneId")
+	_, err := client.Zones.UserAgents.List(
+		context.TODO(),
+		"zoneId",
+		keycard.ZoneUserAgentListParams{
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Expand: keycard.ZoneUserAgentListParamsExpandUnion{
+				OfZoneUserAgentListsExpandString: keycard.String("total_count"),
+			},
+			Limit: keycard.Int(1),
+		},
+	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -121,31 +121,35 @@ func (r *ZoneProviderService) Delete(ctx context.Context, id string, body ZonePr
 // (Users or Applications) to authenticate.
 type Provider struct {
 	// Unique identifier of the provider
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Entity creation timestamp
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// User specified identifier, unique within the zone
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// Human-readable name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Organization that owns this provider
-	OrganizationID string `json:"organization_id,required"`
+	OrganizationID string `json:"organization_id" api:"required"`
+	// Who owns this provider. Platform-owned providers cannot be modified via API.
+	//
+	// Any of "platform", "customer".
+	OwnerType ProviderOwnerType `json:"owner_type" api:"required"`
 	// URL-safe identifier, unique within the zone
-	Slug string `json:"slug,required"`
+	Slug string `json:"slug" api:"required"`
 	// Entity update timestamp
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Zone this provider belongs to
-	ZoneID string `json:"zone_id,required"`
+	ZoneID string `json:"zone_id" api:"required"`
 	// OAuth 2.0 client identifier
-	ClientID string `json:"client_id,nullable"`
+	ClientID string `json:"client_id" api:"nullable"`
 	// Indicates whether a client secret is configured
 	ClientSecretSet bool `json:"client_secret_set"`
 	// Human-readable description
-	Description string `json:"description,nullable"`
+	Description string `json:"description" api:"nullable"`
 	// Provider metadata
-	Metadata any `json:"metadata,nullable"`
+	Metadata any `json:"metadata" api:"nullable"`
 	// Protocol-specific configuration
-	Protocols ProviderProtocols `json:"protocols,nullable"`
+	Protocols ProviderProtocols `json:"protocols" api:"nullable"`
 	// Any of "external", "keycard-vault", "keycard-sts".
 	Type ProviderType `json:"type"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -155,6 +159,7 @@ type Provider struct {
 		Identifier      respjson.Field
 		Name            respjson.Field
 		OrganizationID  respjson.Field
+		OwnerType       respjson.Field
 		Slug            respjson.Field
 		UpdatedAt       respjson.Field
 		ZoneID          respjson.Field
@@ -175,12 +180,20 @@ func (r *Provider) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Who owns this provider. Platform-owned providers cannot be modified via API.
+type ProviderOwnerType string
+
+const (
+	ProviderOwnerTypePlatform ProviderOwnerType = "platform"
+	ProviderOwnerTypeCustomer ProviderOwnerType = "customer"
+)
+
 // Protocol-specific configuration
 type ProviderProtocols struct {
 	// OAuth 2.0 protocol configuration
-	Oauth2 ProviderProtocolsOauth2 `json:"oauth2,nullable"`
+	Oauth2 ProviderProtocolsOauth2 `json:"oauth2" api:"nullable"`
 	// OpenID Connect protocol configuration
-	Openid ProviderProtocolsOpenid `json:"openid,nullable"`
+	Openid ProviderProtocolsOpenid `json:"openid" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Oauth2      respjson.Field
@@ -198,29 +211,36 @@ func (r *ProviderProtocols) UnmarshalJSON(data []byte) error {
 
 // OAuth 2.0 protocol configuration
 type ProviderProtocolsOauth2 struct {
-	AuthorizationEndpoint string `json:"authorization_endpoint,nullable" format:"uri"`
+	// OIDC issuer URL used for discovery and token validation.
+	Issuer                string `json:"issuer" api:"required" format:"uri"`
+	AuthorizationEndpoint string `json:"authorization_endpoint" api:"nullable" format:"uri"`
+	// Custom query parameters appended to authorization redirect URLs. Use for
+	// non-standard providers (e.g. Google prompt=consent, access_type=offline).
+	AuthorizationParameters map[string]string `json:"authorization_parameters" api:"nullable"`
 	// Whether to include the resource parameter in authorization requests.
-	AuthorizationResourceEnabled bool `json:"authorization_resource_enabled,nullable"`
+	AuthorizationResourceEnabled bool `json:"authorization_resource_enabled" api:"nullable"`
 	// The resource parameter value to include in authorization requests. Defaults to
 	// "resource" when authorization_resource_enabled is true.
-	AuthorizationResourceParameter string   `json:"authorization_resource_parameter,nullable"`
-	CodeChallengeMethodsSupported  []string `json:"code_challenge_methods_supported,nullable"`
-	JwksUri                        string   `json:"jwks_uri,nullable" format:"uri"`
-	RegistrationEndpoint           string   `json:"registration_endpoint,nullable" format:"uri"`
+	AuthorizationResourceParameter string   `json:"authorization_resource_parameter" api:"nullable"`
+	CodeChallengeMethodsSupported  []string `json:"code_challenge_methods_supported" api:"nullable"`
+	JwksUri                        string   `json:"jwks_uri" api:"nullable" format:"uri"`
+	RegistrationEndpoint           string   `json:"registration_endpoint" api:"nullable" format:"uri"`
 	// The query parameter name for scopes in authorization requests. Defaults to
 	// "scope". Slack v2 uses "user_scope".
-	ScopeParameter string `json:"scope_parameter,nullable"`
+	ScopeParameter string `json:"scope_parameter" api:"nullable"`
 	// The separator character for scope values. Defaults to " " (space). Slack v2 uses
 	// ",".
-	ScopeSeparator  string   `json:"scope_separator,nullable"`
-	ScopesSupported []string `json:"scopes_supported,nullable"`
-	TokenEndpoint   string   `json:"token_endpoint,nullable" format:"uri"`
+	ScopeSeparator  string   `json:"scope_separator" api:"nullable"`
+	ScopesSupported []string `json:"scopes_supported" api:"nullable"`
+	TokenEndpoint   string   `json:"token_endpoint" api:"nullable" format:"uri"`
 	// Dot-separated path to the access token in the token response body. Defaults to
 	// "access_token". Slack v2 uses "authed_user.access_token".
-	TokenResponseAccessTokenPointer string `json:"token_response_access_token_pointer,nullable"`
+	TokenResponseAccessTokenPointer string `json:"token_response_access_token_pointer" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		Issuer                          respjson.Field
 		AuthorizationEndpoint           respjson.Field
+		AuthorizationParameters         respjson.Field
 		AuthorizationResourceEnabled    respjson.Field
 		AuthorizationResourceParameter  respjson.Field
 		CodeChallengeMethodsSupported   respjson.Field
@@ -244,7 +264,7 @@ func (r *ProviderProtocolsOauth2) UnmarshalJSON(data []byte) error {
 
 // OpenID Connect protocol configuration
 type ProviderProtocolsOpenid struct {
-	UserinfoEndpoint string `json:"userinfo_endpoint,nullable" format:"uri"`
+	UserinfoEndpoint string `json:"userinfo_endpoint" api:"nullable" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		UserinfoEndpoint respjson.Field
@@ -268,13 +288,16 @@ const (
 )
 
 type ZoneProviderListResponse struct {
-	Items []Provider `json:"items,required"`
+	Items []Provider `json:"items" api:"required"`
 	// Pagination information
-	PageInfo PageInfoPagination `json:"page_info,required"`
+	PageInfo PageInfoPagination `json:"page_info" api:"required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneProviderListResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
 		PageInfo    respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -286,11 +309,36 @@ func (r *ZoneProviderListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Cursor-based pagination metadata
+type ZoneProviderListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor" api:"required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor" api:"required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneProviderListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneProviderListResponsePagination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type ZoneProviderNewParams struct {
 	// User specified identifier, unique within the zone
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// Human-readable name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Human-readable description
 	Description param.Opt[string] `json:"description,omitzero"`
 	// OAuth 2.0 client identifier
@@ -337,8 +385,11 @@ type ZoneProviderNewParamsProtocolsOauth2 struct {
 	// The resource parameter value to include in authorization requests. Defaults to
 	// "resource" when authorization_resource_enabled is true.
 	AuthorizationResourceParameter param.Opt[string] `json:"authorization_resource_parameter,omitzero"`
-	JwksUri                        param.Opt[string] `json:"jwks_uri,omitzero" format:"uri"`
-	RegistrationEndpoint           param.Opt[string] `json:"registration_endpoint,omitzero" format:"uri"`
+	// OIDC issuer URL for discovery and token validation. When omitted, the provider
+	// identifier is used as the issuer. New clients should always set this explicitly.
+	Issuer               param.Opt[string] `json:"issuer,omitzero" format:"uri"`
+	JwksUri              param.Opt[string] `json:"jwks_uri,omitzero" format:"uri"`
+	RegistrationEndpoint param.Opt[string] `json:"registration_endpoint,omitzero" format:"uri"`
 	// The query parameter name for scopes in authorization requests. Defaults to
 	// "scope". Slack v2 uses "user_scope".
 	ScopeParameter param.Opt[string] `json:"scope_parameter,omitzero"`
@@ -349,8 +400,11 @@ type ZoneProviderNewParamsProtocolsOauth2 struct {
 	// Dot-separated path to the access token in the token response body. Defaults to
 	// "access_token". Slack v2 uses "authed_user.access_token".
 	TokenResponseAccessTokenPointer param.Opt[string] `json:"token_response_access_token_pointer,omitzero"`
-	CodeChallengeMethodsSupported   []string          `json:"code_challenge_methods_supported,omitzero"`
-	ScopesSupported                 []string          `json:"scopes_supported,omitzero"`
+	// Custom query parameters appended to authorization redirect URLs. Use for
+	// non-standard providers (e.g. Google prompt=consent, access_type=offline).
+	AuthorizationParameters       map[string]string `json:"authorization_parameters,omitzero"`
+	CodeChallengeMethodsSupported []string          `json:"code_challenge_methods_supported,omitzero"`
+	ScopesSupported               []string          `json:"scopes_supported,omitzero"`
 	paramObj
 }
 
@@ -377,12 +431,12 @@ func (r *ZoneProviderNewParamsProtocolsOpenid) UnmarshalJSON(data []byte) error 
 }
 
 type ZoneProviderGetParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
 
 type ZoneProviderUpdateParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	// OAuth 2.0 client identifier. Set to null to remove.
 	ClientID param.Opt[string] `json:"client_id,omitzero"`
 	// OAuth 2.0 client secret (will be encrypted and stored securely). Set to null to
@@ -447,8 +501,13 @@ type ZoneProviderUpdateParamsProtocolsOauth2 struct {
 	// Dot-separated path to the access token in the token response body. Defaults to
 	// "access_token". Set to null to unset.
 	TokenResponseAccessTokenPointer param.Opt[string] `json:"token_response_access_token_pointer,omitzero"`
-	CodeChallengeMethodsSupported   []string          `json:"code_challenge_methods_supported,omitzero"`
-	ScopesSupported                 []string          `json:"scopes_supported,omitzero"`
+	// OIDC issuer URL for discovery and token validation. Cannot be set to null.
+	Issuer param.Opt[string] `json:"issuer,omitzero" format:"uri"`
+	// Custom query parameters appended to authorization redirect URLs. Set to null to
+	// unset.
+	AuthorizationParameters       map[string]string `json:"authorization_parameters,omitzero"`
+	CodeChallengeMethodsSupported []string          `json:"code_challenge_methods_supported,omitzero"`
+	ScopesSupported               []string          `json:"scopes_supported,omitzero"`
 	paramObj
 }
 
@@ -475,10 +534,16 @@ func (r *ZoneProviderUpdateParamsProtocolsOpenid) UnmarshalJSON(data []byte) err
 }
 
 type ZoneProviderListParams struct {
+	// Cursor for forward pagination
+	After param.Opt[string] `query:"after,omitzero" json:"-"`
+	// Cursor for backward pagination
+	Before     param.Opt[string] `query:"before,omitzero" json:"-"`
 	Cursor     param.Opt[string] `query:"cursor,omitzero" json:"-"`
 	Identifier param.Opt[string] `query:"identifier,omitzero" json:"-"`
-	Limit      param.Opt[int64]  `query:"limit,omitzero" json:"-"`
-	Slug       param.Opt[string] `query:"slug,omitzero" json:"-"`
+	// Maximum number of items to return
+	Limit  param.Opt[int64]                  `query:"limit,omitzero" json:"-"`
+	Slug   param.Opt[string]                 `query:"slug,omitzero" json:"-"`
+	Expand ZoneProviderListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Any of "external", "keycard-vault", "keycard-sts".
 	Type ZoneProviderListParamsType `query:"type,omitzero" json:"-"`
 	paramObj
@@ -492,6 +557,23 @@ func (r ZoneProviderListParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneProviderListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneProviderListsExpandString)
+	OfZoneProviderListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneProviderListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneProviderListParamsExpandString string
+
+const (
+	ZoneProviderListParamsExpandStringTotalCount ZoneProviderListParamsExpandString = "total_count"
+)
+
 type ZoneProviderListParamsType string
 
 const (
@@ -501,6 +583,6 @@ const (
 )
 
 type ZoneProviderDeleteParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }

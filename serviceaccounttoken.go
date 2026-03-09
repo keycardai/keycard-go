@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -36,7 +36,7 @@ func NewServiceAccountTokenService(opts ...option.RequestOption) (r ServiceAccou
 // Exchange service account credentials for organization-scoped M2M token
 func (r *ServiceAccountTokenService) New(ctx context.Context, params ServiceAccountTokenNewParams, opts ...option.RequestOption) (res *TokenResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -47,13 +47,13 @@ func (r *ServiceAccountTokenService) New(ctx context.Context, params ServiceAcco
 
 type ServiceAccountTokenNewParams struct {
 	// Service account client ID
-	ClientID string `json:"client_id,required"`
+	ClientID string `json:"client_id" api:"required"`
 	// Service account client secret
-	ClientSecret string `json:"client_secret,required"`
+	ClientSecret string `json:"client_secret" api:"required"`
 	// OAuth 2.0 grant type (must be "client_credentials")
 	//
 	// Any of "client_credentials".
-	GrantType        ServiceAccountTokenNewParamsGrantType `json:"grant_type,omitzero,required"`
+	GrantType        ServiceAccountTokenNewParamsGrantType `json:"grant_type,omitzero" api:"required"`
 	XClientRequestID param.Opt[string]                     `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }

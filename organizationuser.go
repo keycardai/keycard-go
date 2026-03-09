@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -41,7 +41,7 @@ func NewOrganizationUserService(opts ...option.RequestOption) (r OrganizationUse
 // Get a specific user in an organization
 func (r *OrganizationUserService) Get(ctx context.Context, userID string, params OrganizationUserGetParams, opts ...option.RequestOption) (res *OrganizationUser, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -61,7 +61,7 @@ func (r *OrganizationUserService) Get(ctx context.Context, userID string, params
 // Update user status in an organization
 func (r *OrganizationUserService) Update(ctx context.Context, userID string, params OrganizationUserUpdateParams, opts ...option.RequestOption) (res *OrganizationUser, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -81,7 +81,7 @@ func (r *OrganizationUserService) Update(ctx context.Context, userID string, par
 // List users in an organization
 func (r *OrganizationUserService) List(ctx context.Context, organizationID string, params OrganizationUserListParams, opts ...option.RequestOption) (res *OrganizationUserListResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -97,7 +97,7 @@ func (r *OrganizationUserService) List(ctx context.Context, organizationID strin
 // Remove a user from an organization
 func (r *OrganizationUserService) Delete(ctx context.Context, userID string, params OrganizationUserDeleteParams, opts ...option.RequestOption) (err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -134,21 +134,21 @@ const (
 
 type OrganizationUser struct {
 	// The keycard account ID
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// The time the entity was created in utc
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// User's role in the organization
 	//
 	// Any of "org_admin", "org_member", "org_viewer".
-	Role OrganizationRole `json:"role,required"`
+	Role OrganizationRole `json:"role" api:"required"`
 	// Identity provider issuer
-	Source string `json:"source,required" format:"uri"`
+	Source string `json:"source" api:"required" format:"uri"`
 	// Status of organization membership
 	//
 	// Any of "active", "disabled".
-	Status OrganizationStatus `json:"status,required"`
+	Status OrganizationStatus `json:"status" api:"required"`
 	// The time the entity was mostly recently updated in utc
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// User email address
 	Email string `json:"email" format:"email"`
 	// Permissions granted to the authenticated principal for this resource. Only
@@ -178,9 +178,9 @@ func (r *OrganizationUser) UnmarshalJSON(data []byte) error {
 }
 
 type OrganizationUserListResponse struct {
-	Items []OrganizationUser `json:"items,required"`
+	Items []OrganizationUser `json:"items" api:"required"`
 	// Pagination information using cursor-based pagination
-	PageInfo PageInfoCursor `json:"page_info,required"`
+	PageInfo PageInfoCursor `json:"page_info" api:"required"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -204,7 +204,7 @@ func (r *OrganizationUserListResponse) UnmarshalJSON(data []byte) error {
 
 type OrganizationUserGetParams struct {
 	// Organization ID or label identifier
-	OrganizationID   string            `path:"organization_id,required" json:"-"`
+	OrganizationID   string            `path:"organization_id" api:"required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Fields to expand in the response. Currently supports "permissions" to include
 	// the permissions field with the caller's permissions for the resource.
@@ -225,7 +225,7 @@ func (r OrganizationUserGetParams) URLQuery() (v url.Values, err error) {
 
 type OrganizationUserUpdateParams struct {
 	// Organization ID or label identifier
-	OrganizationID   string            `path:"organization_id,required" json:"-"`
+	OrganizationID   string            `path:"organization_id" api:"required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// New role for the user in the organization
 	//
@@ -277,7 +277,7 @@ func (r OrganizationUserListParams) URLQuery() (v url.Values, err error) {
 
 type OrganizationUserDeleteParams struct {
 	// Organization ID or label identifier
-	OrganizationID   string            `path:"organization_id,required" json:"-"`
+	OrganizationID   string            `path:"organization_id" api:"required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }

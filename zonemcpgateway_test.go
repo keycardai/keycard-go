@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 )
 
 func TestZoneMcpGatewayNewMcpServerWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -22,7 +22,7 @@ func TestZoneMcpGatewayNewMcpServerWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -31,23 +31,23 @@ func TestZoneMcpGatewayNewMcpServerWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.McpGateways.NewMcpServer(
 		context.TODO(),
 		"applicationId",
-		keycardapi.ZoneMcpGatewayNewMcpServerParams{
+		keycard.ZoneMcpGatewayNewMcpServerParams{
 			ZoneID: "zoneId",
-			Downstream: keycardapi.ZoneMcpGatewayNewMcpServerParamsDownstream{
-				Slug: keycardapi.String("slug"),
+			Downstream: keycard.ZoneMcpGatewayNewMcpServerParamsDownstream{
+				Slug: keycard.String("slug"),
 			},
-			Upstream: keycardapi.ZoneMcpGatewayNewMcpServerParamsUpstream{
+			Upstream: keycard.ZoneMcpGatewayNewMcpServerParamsUpstream{
 				Identifier: "x",
 				Name:       "x",
 			},
-			UpstreamProvider: keycardapi.ZoneMcpGatewayNewMcpServerParamsUpstreamProvider{
+			UpstreamProvider: keycard.ZoneMcpGatewayNewMcpServerParamsUpstreamProvider{
 				Identifier: "x",
 				Name:       "x",
 			},
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

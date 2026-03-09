@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -48,7 +48,7 @@ func NewOrganizationService(opts ...option.RequestOption) (r OrganizationService
 
 func (r *OrganizationService) New(ctx context.Context, params OrganizationNewParams, opts ...option.RequestOption) (res *Organization, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -60,7 +60,7 @@ func (r *OrganizationService) New(ctx context.Context, params OrganizationNewPar
 // Get organization by ID or label
 func (r *OrganizationService) Get(ctx context.Context, organizationID string, params OrganizationGetParams, opts ...option.RequestOption) (res *Organization, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -76,7 +76,7 @@ func (r *OrganizationService) Get(ctx context.Context, organizationID string, pa
 // Update organization details
 func (r *OrganizationService) Update(ctx context.Context, organizationID string, params OrganizationUpdateParams, opts ...option.RequestOption) (res *Organization, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -92,7 +92,7 @@ func (r *OrganizationService) Update(ctx context.Context, organizationID string,
 // List organizations for the current user
 func (r *OrganizationService) List(ctx context.Context, params OrganizationListParams, opts ...option.RequestOption) (res *OrganizationListResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -104,7 +104,7 @@ func (r *OrganizationService) List(ctx context.Context, params OrganizationListP
 // Exchange user token for organization-scoped M2M token
 func (r *OrganizationService) ExchangeToken(ctx context.Context, organizationID string, body OrganizationExchangeTokenParams, opts ...option.RequestOption) (res *TokenResponse, err error) {
 	if !param.IsOmitted(body.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", body.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", body.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -120,7 +120,7 @@ func (r *OrganizationService) ExchangeToken(ctx context.Context, organizationID 
 // List unified view of users and invitations in an organization
 func (r *OrganizationService) ListIdentities(ctx context.Context, organizationID string, params OrganizationListIdentitiesParams, opts ...option.RequestOption) (res *OrganizationListIdentitiesResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -144,7 +144,7 @@ func (r *OrganizationService) ListIdentities(ctx context.Context, organizationID
 // - `scope`: Whether the role applies at organization or zone level
 func (r *OrganizationService) ListRoles(ctx context.Context, organizationID string, params OrganizationListRolesParams, opts ...option.RequestOption) (res *OrganizationListRolesResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -159,17 +159,17 @@ func (r *OrganizationService) ListRoles(ctx context.Context, organizationID stri
 
 type Organization struct {
 	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// The time the entity was created in utc
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// A domain name segment for the entity, often derived from the name.
-	Label string `json:"label,required"`
+	Label string `json:"label" api:"required"`
 	// A name for the entity to be displayed in UI
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Whether SSO is enabled for this organization
-	SSOEnabled bool `json:"sso_enabled,required"`
+	SSOEnabled bool `json:"sso_enabled" api:"required"`
 	// The time the entity was mostly recently updated in utc
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -198,9 +198,9 @@ func (r *Organization) UnmarshalJSON(data []byte) error {
 // Pagination information using cursor-based pagination
 type PageInfoCursor struct {
 	// Whether there are more items after the current page
-	HasNextPage bool `json:"has_next_page,required"`
+	HasNextPage bool `json:"has_next_page" api:"required"`
 	// Whether there are more items before the current page
-	HasPrevPage bool `json:"has_prev_page,required"`
+	HasPrevPage bool `json:"has_prev_page" api:"required"`
 	// Cursor pointing to the last item in the current page
 	EndCursor string `json:"end_cursor"`
 	// Cursor pointing to the first item in the current page
@@ -236,9 +236,9 @@ const (
 // OAuth2-style token response for M2M tokens
 type TokenResponse struct {
 	// The M2M access token
-	AccessToken string `json:"access_token,required"`
+	AccessToken string `json:"access_token" api:"required"`
 	// Token type (always "Bearer")
-	TokenType string `json:"token_type,required"`
+	TokenType string `json:"token_type" api:"required"`
 	// Token expiration time in seconds
 	ExpiresIn int64 `json:"expires_in"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -258,9 +258,9 @@ func (r *TokenResponse) UnmarshalJSON(data []byte) error {
 }
 
 type OrganizationListResponse struct {
-	Items []Organization `json:"items,required"`
+	Items []Organization `json:"items" api:"required"`
 	// Pagination information using cursor-based pagination
-	PageInfo PageInfoCursor `json:"page_info,required"`
+	PageInfo PageInfoCursor `json:"page_info" api:"required"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -284,9 +284,9 @@ func (r *OrganizationListResponse) UnmarshalJSON(data []byte) error {
 
 // List of identities (users and invitations) in an organization
 type OrganizationListIdentitiesResponse struct {
-	Items []OrganizationListIdentitiesResponseItem `json:"items,required"`
+	Items []OrganizationListIdentitiesResponseItem `json:"items" api:"required"`
 	// Pagination information using cursor-based pagination
-	PageInfo PageInfoCursor `json:"page_info,required"`
+	PageInfo PageInfoCursor `json:"page_info" api:"required"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -311,28 +311,28 @@ func (r *OrganizationListIdentitiesResponse) UnmarshalJSON(data []byte) error {
 // Unified view of users and invitations in an organization
 type OrganizationListIdentitiesResponseItem struct {
 	// The identity ID (user or invitation)
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// The time the entity was created in utc
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Email address of the identity
-	Email string `json:"email,required" format:"email"`
+	Email string `json:"email" api:"required" format:"email"`
 	// Role in the organization
 	//
 	// Any of "org_admin", "org_member", "org_viewer".
-	Role OrganizationRole `json:"role,required"`
+	Role OrganizationRole `json:"role" api:"required"`
 	// Identity provider issuer
-	Source string `json:"source,required" format:"uri"`
+	Source string `json:"source" api:"required" format:"uri"`
 	// Status of the identity (OrganizationStatus for users, InvitationStatus for
 	// invitations)
 	//
 	// Any of "active", "disabled", "pending", "accepted", "expired", "revoked".
-	Status OrganizationListIdentitiesResponseItemStatus `json:"status,required"`
+	Status OrganizationListIdentitiesResponseItemStatus `json:"status" api:"required"`
 	// Type of identity (user or invitation)
 	//
 	// Any of "user", "invitation".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// The time the entity was mostly recently updated in utc
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -376,7 +376,7 @@ const (
 // List of available roles
 type OrganizationListRolesResponse struct {
 	// List of roles
-	Items []OrganizationListRolesResponseItem `json:"items,required"`
+	Items []OrganizationListRolesResponseItem `json:"items" api:"required"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -400,15 +400,15 @@ func (r *OrganizationListRolesResponse) UnmarshalJSON(data []byte) error {
 // A role definition that can be assigned to users
 type OrganizationListRolesResponseItem struct {
 	// Detailed description of the role and its permissions
-	Description string `json:"description,required"`
+	Description string `json:"description" api:"required"`
 	// Human-readable display name for the role
-	Label string `json:"label,required"`
+	Label string `json:"label" api:"required"`
 	// Internal identifier for the role (e.g., org_admin, zone_manager)
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// The scope at which this role can be assigned (organization or zone)
 	//
 	// Any of "organization", "zone".
-	Scope RoleScope `json:"scope,required"`
+	Scope RoleScope `json:"scope" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Description respjson.Field

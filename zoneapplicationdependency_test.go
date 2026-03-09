@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 )
 
 func TestZoneApplicationDependencyGet(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -22,7 +22,7 @@ func TestZoneApplicationDependencyGet(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -31,13 +31,13 @@ func TestZoneApplicationDependencyGet(t *testing.T) {
 	_, err := client.Zones.Applications.Dependencies.Get(
 		context.TODO(),
 		"dependencyId",
-		keycardapi.ZoneApplicationDependencyGetParams{
+		keycard.ZoneApplicationDependencyGetParams{
 			ZoneID: "zoneId",
 			ID:     "id",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -46,7 +46,7 @@ func TestZoneApplicationDependencyGet(t *testing.T) {
 }
 
 func TestZoneApplicationDependencyListWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -54,7 +54,7 @@ func TestZoneApplicationDependencyListWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -63,15 +63,20 @@ func TestZoneApplicationDependencyListWithOptionalParams(t *testing.T) {
 	_, err := client.Zones.Applications.Dependencies.List(
 		context.TODO(),
 		"id",
-		keycardapi.ZoneApplicationDependencyListParams{
-			ZoneID:        "zoneId",
-			Cursor:        keycardapi.String("cursor"),
-			Limit:         keycardapi.Int(1),
-			WhenAccessing: keycardapi.String("when_accessing"),
+		keycard.ZoneApplicationDependencyListParams{
+			ZoneID: "zoneId",
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Cursor: keycard.String("cursor"),
+			Expand: keycard.ZoneApplicationDependencyListParamsExpandUnion{
+				OfZoneApplicationDependencyListsExpandString: keycard.String("total_count"),
+			},
+			Limit:         keycard.Int(1),
+			WhenAccessing: keycard.String("when_accessing"),
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -80,7 +85,7 @@ func TestZoneApplicationDependencyListWithOptionalParams(t *testing.T) {
 }
 
 func TestZoneApplicationDependencyAddWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -88,7 +93,7 @@ func TestZoneApplicationDependencyAddWithOptionalParams(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -97,14 +102,14 @@ func TestZoneApplicationDependencyAddWithOptionalParams(t *testing.T) {
 	err := client.Zones.Applications.Dependencies.Add(
 		context.TODO(),
 		"dependencyId",
-		keycardapi.ZoneApplicationDependencyAddParams{
+		keycard.ZoneApplicationDependencyAddParams{
 			ZoneID:        "zoneId",
 			ID:            "id",
 			WhenAccessing: []string{"string"},
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}
@@ -113,7 +118,7 @@ func TestZoneApplicationDependencyAddWithOptionalParams(t *testing.T) {
 }
 
 func TestZoneApplicationDependencyRemove(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -121,7 +126,7 @@ func TestZoneApplicationDependencyRemove(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
@@ -130,13 +135,13 @@ func TestZoneApplicationDependencyRemove(t *testing.T) {
 	err := client.Zones.Applications.Dependencies.Remove(
 		context.TODO(),
 		"dependencyId",
-		keycardapi.ZoneApplicationDependencyRemoveParams{
+		keycard.ZoneApplicationDependencyRemoveParams{
 			ZoneID: "zoneId",
 			ID:     "id",
 		},
 	)
 	if err != nil {
-		var apierr *keycardapi.Error
+		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
 			t.Log(string(apierr.DumpRequest(true)))
 		}

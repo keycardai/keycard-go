@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -41,7 +41,7 @@ func NewOrganizationInvitationService(opts ...option.RequestOption) (r Organizat
 // Create an invitation to join an organization
 func (r *OrganizationInvitationService) New(ctx context.Context, organizationID string, params OrganizationInvitationNewParams, opts ...option.RequestOption) (res *Invitation, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -57,7 +57,7 @@ func (r *OrganizationInvitationService) New(ctx context.Context, organizationID 
 // List invitations for an organization
 func (r *OrganizationInvitationService) List(ctx context.Context, organizationID string, params OrganizationInvitationListParams, opts ...option.RequestOption) (res *OrganizationInvitationListResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -73,7 +73,7 @@ func (r *OrganizationInvitationService) List(ctx context.Context, organizationID
 // Delete an invitation
 func (r *OrganizationInvitationService) Delete(ctx context.Context, invitationID string, params OrganizationInvitationDeleteParams, opts ...option.RequestOption) (err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%s", params.XClientRequestID.Value)))
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -93,27 +93,27 @@ func (r *OrganizationInvitationService) Delete(ctx context.Context, invitationID
 
 type Invitation struct {
 	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// The time the entity was created in utc
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// ID of the user who created the invitation
-	CreatedBy string `json:"created_by,required"`
+	CreatedBy string `json:"created_by" api:"required"`
 	// Email address for the invitation
-	Email string `json:"email,required" format:"email"`
+	Email string `json:"email" api:"required" format:"email"`
 	// When the invitation expires
-	ExpiresAt time.Time `json:"expires_at,required" format:"date-time"`
+	ExpiresAt time.Time `json:"expires_at" api:"required" format:"date-time"`
 	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
-	OrganizationID string `json:"organization_id,required"`
+	OrganizationID string `json:"organization_id" api:"required"`
 	// Role that will be assigned when invitation is accepted
 	//
 	// Any of "org_admin", "org_member", "org_viewer".
-	Role OrganizationRole `json:"role,required"`
+	Role OrganizationRole `json:"role" api:"required"`
 	// Status of an invitation
 	//
 	// Any of "pending", "accepted", "expired", "revoked".
-	Status InvitationStatus `json:"status,required"`
+	Status InvitationStatus `json:"status" api:"required"`
 	// The time the entity was mostly recently updated in utc
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -153,9 +153,9 @@ const (
 )
 
 type OrganizationInvitationListResponse struct {
-	Items []Invitation `json:"items,required"`
+	Items []Invitation `json:"items" api:"required"`
 	// Pagination information using cursor-based pagination
-	PageInfo PageInfoCursor `json:"page_info,required"`
+	PageInfo PageInfoCursor `json:"page_info" api:"required"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -179,11 +179,11 @@ func (r *OrganizationInvitationListResponse) UnmarshalJSON(data []byte) error {
 
 type OrganizationInvitationNewParams struct {
 	// Email address to invite
-	Email string `json:"email,required" format:"email"`
+	Email string `json:"email" api:"required" format:"email"`
 	// Role to assign when invitation is accepted
 	//
 	// Any of "org_admin", "org_member", "org_viewer".
-	Role             OrganizationRole  `json:"role,omitzero,required"`
+	Role             OrganizationRole  `json:"role,omitzero" api:"required"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
@@ -223,7 +223,7 @@ func (r OrganizationInvitationListParams) URLQuery() (v url.Values, err error) {
 
 type OrganizationInvitationDeleteParams struct {
 	// Organization ID or label identifier
-	OrganizationID   string            `path:"organization_id,required" json:"-"`
+	OrganizationID   string            `path:"organization_id" api:"required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }

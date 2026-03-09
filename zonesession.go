@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -73,9 +73,10 @@ func (r *ZoneSessionService) Update(ctx context.Context, id string, params ZoneS
 	return
 }
 
-// Returns entry sessions in the specified zone. Entry sessions are app user
-// sessions with an initiator that are roots or direct children of a root user
-// session. Can be filtered by session type, status, and user.
+// Returns sessions in the specified zone. By default, returns entry sessions (app
+// user sessions with an initiator that are roots or direct children of a root user
+// session). Use include_nested=true to include nested sessions. Can be filtered by
+// session type, status, and user.
 func (r *ZoneSessionService) List(ctx context.Context, zoneID string, query ZoneSessionListParams, opts ...option.RequestOption) (res *ZoneSessionListResponse, err error) {
 	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
@@ -205,9 +206,9 @@ func (r *SessionUnionMetadata) UnmarshalJSON(data []byte) error {
 // User session type-specific fields
 type SessionUserSessionType struct {
 	// Any of "user".
-	SessionType string `json:"session_type,required"`
+	SessionType string `json:"session_type" api:"required"`
 	// User ID
-	UserID string `json:"user_id,required"`
+	UserID string `json:"user_id" api:"required"`
 	// Session ID
 	ID string `json:"id"`
 	// Whether the session is currently active (deprecated - use status instead)
@@ -301,7 +302,7 @@ func (r *SessionUserSessionType) UnmarshalJSON(data []byte) error {
 // Session metadata
 type SessionUserSessionTypeMetadata struct {
 	// Name of the initiating application or user agent
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Name        respjson.Field
@@ -319,9 +320,9 @@ func (r *SessionUserSessionTypeMetadata) UnmarshalJSON(data []byte) error {
 // Application session type-specific fields
 type SessionApplicationSessionType struct {
 	// Application ID that initiated this session
-	ApplicationID string `json:"application_id,required"`
+	ApplicationID string `json:"application_id" api:"required"`
 	// Any of "application".
-	SessionType string `json:"session_type,required"`
+	SessionType string `json:"session_type" api:"required"`
 	// Session ID
 	ID string `json:"id"`
 	// Whether the session is currently active (deprecated - use status instead)
@@ -398,7 +399,7 @@ func (r *SessionApplicationSessionType) UnmarshalJSON(data []byte) error {
 // Session metadata
 type SessionApplicationSessionTypeMetadata struct {
 	// Name of the initiating application or user agent
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Name        respjson.Field
@@ -414,10 +415,13 @@ func (r *SessionApplicationSessionTypeMetadata) UnmarshalJSON(data []byte) error
 }
 
 type ZoneSessionListResponse struct {
-	Items []SessionUnion `json:"items,required"`
+	Items []SessionUnion `json:"items" api:"required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneSessionListResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -429,15 +433,40 @@ func (r *ZoneSessionListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Cursor-based pagination metadata
+type ZoneSessionListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor" api:"required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor" api:"required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneSessionListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneSessionListResponsePagination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type ZoneSessionGetParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
 
 type ZoneSessionUpdateParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	// Any of "revoked".
-	Status ZoneSessionUpdateParamsStatus `json:"status,omitzero,required"`
+	Status ZoneSessionUpdateParamsStatus `json:"status,omitzero" api:"required"`
 	paramObj
 }
 
@@ -456,10 +485,23 @@ const (
 )
 
 type ZoneSessionListParams struct {
+	// Cursor for forward pagination
+	After param.Opt[string] `query:"after,omitzero" json:"-"`
+	// Cursor for backward pagination
+	Before param.Opt[string] `query:"before,omitzero" json:"-"`
+	// Maximum number of items to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Filter by user ID
 	UserID param.Opt[string] `query:"user_id,omitzero" json:"-"`
 	// Any of "true".
-	Active ZoneSessionListParamsActive `query:"active,omitzero" json:"-"`
+	Active ZoneSessionListParamsActive      `query:"active,omitzero" json:"-"`
+	Expand ZoneSessionListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Include nested sessions. When false (default), only returns entry sessions
+	// (direct children of root user sessions). When true, returns all sessions with an
+	// initiator, including nested sessions.
+	//
+	// Any of "true".
+	IncludeNested ZoneSessionListParamsIncludeNested `query:"include_nested,omitzero" json:"-"`
 	// Any of "user", "application".
 	SessionType ZoneSessionListParamsSessionType `query:"session_type,omitzero" json:"-"`
 	// Any of "active", "expired", "revoked".
@@ -481,6 +523,32 @@ const (
 	ZoneSessionListParamsActiveTrue ZoneSessionListParamsActive = "true"
 )
 
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneSessionListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneSessionListsExpandString)
+	OfZoneSessionListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneSessionListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneSessionListParamsExpandString string
+
+const (
+	ZoneSessionListParamsExpandStringTotalCount ZoneSessionListParamsExpandString = "total_count"
+)
+
+// Include nested sessions. When false (default), only returns entry sessions
+// (direct children of root user sessions). When true, returns all sessions with an
+// initiator, including nested sessions.
+type ZoneSessionListParamsIncludeNested string
+
+const (
+	ZoneSessionListParamsIncludeNestedTrue ZoneSessionListParamsIncludeNested = "true"
+)
+
 type ZoneSessionListParamsSessionType string
 
 const (
@@ -497,6 +565,6 @@ const (
 )
 
 type ZoneSessionDeleteParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }

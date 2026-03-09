@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi_test
+package keycard_test
 
 import (
 	"context"
@@ -20,14 +20,14 @@ func TestUsage(t *testing.T) {
 	if !testutil.CheckTestServer(t, baseURL) {
 		return
 	}
-	client := keycardapi.NewClient(
+	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 		option.WithUsername("My Username"),
 		option.WithPassword("My Password"),
 	)
-	t.Skip("Prism tests are disabled")
-	zones, err := client.Zones.List(context.TODO(), keycardapi.ZoneListParams{})
+	t.Skip("Mock server tests are disabled")
+	zones, err := client.Zones.List(context.TODO(), keycard.ZoneListParams{})
 	if err != nil {
 		t.Fatalf("err should be nil: %s", err.Error())
 	}

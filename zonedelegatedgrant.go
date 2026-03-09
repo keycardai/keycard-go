@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -109,30 +109,30 @@ func (r *ZoneDelegatedGrantService) Delete(ctx context.Context, id string, body 
 // links the user, resource, and the provider that issued the grant.
 type Grant struct {
 	// Unique identifier of the delegated grant
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Entity creation timestamp
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Date when grant expires
-	ExpiresAt time.Time `json:"expires_at,required" format:"date-time"`
+	ExpiresAt time.Time `json:"expires_at" api:"required" format:"date-time"`
 	// Organization that owns this grant
-	OrganizationID string `json:"organization_id,required"`
+	OrganizationID string `json:"organization_id" api:"required"`
 	// ID of the provider that issued this grant
-	ProviderID string `json:"provider_id,required"`
+	ProviderID string `json:"provider_id" api:"required"`
 	// Indicates whether a refresh token is stored for this grant. Grants with refresh
 	// tokens can be refreshed even after access token expiration.
-	RefreshTokenSet bool `json:"refresh_token_set,required"`
+	RefreshTokenSet bool `json:"refresh_token_set" api:"required"`
 	// ID of resource receiving grant
-	ResourceID string `json:"resource_id,required"`
+	ResourceID string `json:"resource_id" api:"required"`
 	// Granted OAuth scopes
-	Scopes []string `json:"scopes,required"`
+	Scopes []string `json:"scopes" api:"required"`
 	// Any of "active", "expired", "revoked".
-	Status GrantStatus `json:"status,required"`
+	Status GrantStatus `json:"status" api:"required"`
 	// Entity update timestamp
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Reference to the user granting permission
-	UserID string `json:"user_id,required"`
+	UserID string `json:"user_id" api:"required"`
 	// Zone this grant belongs to
-	ZoneID string `json:"zone_id,required"`
+	ZoneID string `json:"zone_id" api:"required"`
 	// Whether the grant is currently active (deprecated - use status instead)
 	//
 	// Deprecated: deprecated
@@ -194,10 +194,13 @@ const (
 )
 
 type ZoneDelegatedGrantListResponse struct {
-	Items []Grant `json:"items,required"`
+	Items []Grant `json:"items" api:"required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneDelegatedGrantListResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -209,15 +212,40 @@ func (r *ZoneDelegatedGrantListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Cursor-based pagination metadata
+type ZoneDelegatedGrantListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor" api:"required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor" api:"required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneDelegatedGrantListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneDelegatedGrantListResponsePagination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type ZoneDelegatedGrantGetParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
 
 type ZoneDelegatedGrantUpdateParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	// Any of "revoked".
-	Status ZoneDelegatedGrantUpdateParamsStatus `json:"status,omitzero,required"`
+	Status ZoneDelegatedGrantUpdateParamsStatus `json:"status,omitzero" api:"required"`
 	paramObj
 }
 
@@ -236,12 +264,19 @@ const (
 )
 
 type ZoneDelegatedGrantListParams struct {
+	// Cursor for forward pagination
+	After param.Opt[string] `query:"after,omitzero" json:"-"`
+	// Cursor for backward pagination
+	Before param.Opt[string] `query:"before,omitzero" json:"-"`
+	// Maximum number of items to return
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Filter by resource ID
 	ResourceID param.Opt[string] `query:"resource_id,omitzero" json:"-"`
 	// Filter by user ID
 	UserID param.Opt[string] `query:"user_id,omitzero" json:"-"`
 	// Any of "true".
-	Active ZoneDelegatedGrantListParamsActive `query:"active,omitzero" json:"-"`
+	Active ZoneDelegatedGrantListParamsActive      `query:"active,omitzero" json:"-"`
+	Expand ZoneDelegatedGrantListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Any of "active", "expired", "revoked".
 	Status ZoneDelegatedGrantListParamsStatus `query:"status,omitzero" json:"-"`
 	paramObj
@@ -262,6 +297,23 @@ const (
 	ZoneDelegatedGrantListParamsActiveTrue ZoneDelegatedGrantListParamsActive = "true"
 )
 
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneDelegatedGrantListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneDelegatedGrantListsExpandString)
+	OfZoneDelegatedGrantListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneDelegatedGrantListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneDelegatedGrantListParamsExpandString string
+
+const (
+	ZoneDelegatedGrantListParamsExpandStringTotalCount ZoneDelegatedGrantListParamsExpandString = "total_count"
+)
+
 type ZoneDelegatedGrantListParamsStatus string
 
 const (
@@ -271,6 +323,6 @@ const (
 )
 
 type ZoneDelegatedGrantDeleteParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }

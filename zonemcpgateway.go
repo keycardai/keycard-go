@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -59,14 +59,14 @@ type ZoneMcpGatewayNewMcpServerResponse struct {
 	// A Resource is a system that exposes protected information or functionality. It
 	// requires authentication of the requesting actor, which may be a user or
 	// application, before allowing access.
-	DownstreamResource Resource `json:"downstream_resource,required"`
+	DownstreamResource Resource `json:"downstream_resource" api:"required"`
 	// A Provider is a system that supplies access to Resources and allows actors
 	// (Users or Applications) to authenticate.
-	UpstreamProvider Provider `json:"upstream_provider,required"`
+	UpstreamProvider Provider `json:"upstream_provider" api:"required"`
 	// A Resource is a system that exposes protected information or functionality. It
 	// requires authentication of the requesting actor, which may be a user or
 	// application, before allowing access.
-	UpstreamResource Resource `json:"upstream_resource,required"`
+	UpstreamResource Resource `json:"upstream_resource" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		DownstreamResource respjson.Field
@@ -84,13 +84,13 @@ func (r *ZoneMcpGatewayNewMcpServerResponse) UnmarshalJSON(data []byte) error {
 }
 
 type ZoneMcpGatewayNewMcpServerParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	// Downstream MCP server config
-	Downstream ZoneMcpGatewayNewMcpServerParamsDownstream `json:"downstream,omitzero,required"`
+	Downstream ZoneMcpGatewayNewMcpServerParamsDownstream `json:"downstream,omitzero" api:"required"`
 	// Upstream MCP server config
-	Upstream ZoneMcpGatewayNewMcpServerParamsUpstream `json:"upstream,omitzero,required"`
+	Upstream ZoneMcpGatewayNewMcpServerParamsUpstream `json:"upstream,omitzero" api:"required"`
 	// Credential provider for the upstream connection
-	UpstreamProvider ZoneMcpGatewayNewMcpServerParamsUpstreamProvider `json:"upstream_provider,omitzero,required"`
+	UpstreamProvider ZoneMcpGatewayNewMcpServerParamsUpstreamProvider `json:"upstream_provider,omitzero" api:"required"`
 	paramObj
 }
 
@@ -122,9 +122,9 @@ func (r *ZoneMcpGatewayNewMcpServerParamsDownstream) UnmarshalJSON(data []byte) 
 // The properties Identifier, Name are required.
 type ZoneMcpGatewayNewMcpServerParamsUpstream struct {
 	// User specified identifier, unique within the zone
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// Human-readable name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	paramObj
 }
 
@@ -141,9 +141,9 @@ func (r *ZoneMcpGatewayNewMcpServerParamsUpstream) UnmarshalJSON(data []byte) er
 // The properties Identifier, Name are required.
 type ZoneMcpGatewayNewMcpServerParamsUpstreamProvider struct {
 	// User specified identifier, unique within the zone
-	Identifier string `json:"identifier,required"`
+	Identifier string `json:"identifier" api:"required"`
 	// Human-readable name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	paramObj
 }
 

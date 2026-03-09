@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-package keycardapi
+package keycard
 
 import (
 	"context"
@@ -122,24 +122,24 @@ func (r *ZoneMemberService) Add(ctx context.Context, zoneID string, body ZoneMem
 // Represents an organization user's membership in a zone with an assigned role
 type ZoneMember struct {
 	// Unique identifier of the zone member
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// HAL-format hypermedia links for zone member resources
-	Links ZoneMember_Links `json:"_links,required"`
+	Links ZoneMember_Links `json:"_links" api:"required"`
 	// Entity creation timestamp
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Organization ID that owns the zone
-	OrganizationID string `json:"organization_id,required"`
+	OrganizationID string `json:"organization_id" api:"required"`
 	// Organization user ID of the zone member
-	OrganizationUserID string `json:"organization_user_id,required"`
+	OrganizationUserID string `json:"organization_user_id" api:"required"`
 	// Zone role type. zone_manager has full management access, zone_viewer has
 	// read-only access.
 	//
 	// Any of "zone_manager", "zone_viewer".
-	Role ZoneRole `json:"role,required"`
+	Role ZoneRole `json:"role" api:"required"`
 	// Entity update timestamp
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Zone ID the organization user is a member of
-	ZoneID string `json:"zone_id,required"`
+	ZoneID string `json:"zone_id" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                 respjson.Field
@@ -163,8 +163,8 @@ func (r *ZoneMember) UnmarshalJSON(data []byte) error {
 
 // HAL-format hypermedia links for zone member resources
 type ZoneMember_Links struct {
-	OrganizationUser ZoneMember_LinksOrganizationUser `json:"organization_user,required"`
-	Self             ZoneMember_LinksSelf             `json:"self,required"`
+	OrganizationUser ZoneMember_LinksOrganizationUser `json:"organization_user" api:"required"`
+	Self             ZoneMember_LinksSelf             `json:"self" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		OrganizationUser respjson.Field
@@ -182,7 +182,7 @@ func (r *ZoneMember_Links) UnmarshalJSON(data []byte) error {
 
 type ZoneMember_LinksOrganizationUser struct {
 	// Link to the user resource
-	Href string `json:"href,required" format:"uri-reference"`
+	Href string `json:"href" api:"required" format:"uri-reference"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Href        respjson.Field
@@ -199,7 +199,7 @@ func (r *ZoneMember_LinksOrganizationUser) UnmarshalJSON(data []byte) error {
 
 type ZoneMember_LinksSelf struct {
 	// Link to this zone member resource
-	Href string `json:"href,required" format:"uri-reference"`
+	Href string `json:"href" api:"required" format:"uri-reference"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Href        respjson.Field
@@ -224,13 +224,16 @@ const (
 )
 
 type ZoneMemberListResponse struct {
-	Items []ZoneMember `json:"items,required"`
+	Items []ZoneMember `json:"items" api:"required"`
 	// Pagination information
-	PageInfo PageInfoPagination `json:"page_info,required"`
+	PageInfo PageInfoPagination `json:"page_info" api:"required"`
+	// Cursor-based pagination metadata
+	Pagination ZoneMemberListResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
 		PageInfo    respjson.Field
+		Pagination  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -242,18 +245,43 @@ func (r *ZoneMemberListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Cursor-based pagination metadata
+type ZoneMemberListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor" api:"required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor" api:"required"`
+	// Total number of items matching the query. Only included when
+	// expand[]=total_count is requested.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneMemberListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *ZoneMemberListResponsePagination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type ZoneMemberGetParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
 
 type ZoneMemberUpdateParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	// Zone role type. zone_manager has full management access, zone_viewer has
 	// read-only access.
 	//
 	// Any of "zone_manager", "zone_viewer".
-	Role ZoneRole `json:"role,omitzero,required"`
+	Role ZoneRole `json:"role,omitzero" api:"required"`
 	paramObj
 }
 
@@ -271,7 +299,8 @@ type ZoneMemberListParams struct {
 	// Cursor for backward pagination
 	Before param.Opt[string] `query:"before,omitzero" json:"-"`
 	// Maximum number of members to return
-	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
+	Limit  param.Opt[int64]                `query:"limit,omitzero" json:"-"`
+	Expand ZoneMemberListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Filter members by role
 	//
 	// Any of "zone_manager", "zone_viewer".
@@ -287,6 +316,23 @@ func (r ZoneMemberListParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneMemberListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneMemberListsExpandString)
+	OfZoneMemberListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneMemberListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneMemberListParamsExpandString string
+
+const (
+	ZoneMemberListParamsExpandStringTotalCount ZoneMemberListParamsExpandString = "total_count"
+)
+
 // Filter members by role
 type ZoneMemberListParamsRole string
 
@@ -296,18 +342,18 @@ const (
 )
 
 type ZoneMemberDeleteParams struct {
-	ZoneID string `path:"zoneId,required" json:"-"`
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
 
 type ZoneMemberAddParams struct {
 	// Organization user ID to add to the zone
-	OrganizationUserID string `json:"organization_user_id,required"`
+	OrganizationUserID string `json:"organization_user_id" api:"required"`
 	// Zone role type. zone_manager has full management access, zone_viewer has
 	// read-only access.
 	//
 	// Any of "zone_manager", "zone_viewer".
-	Role ZoneRole `json:"role,omitzero,required"`
+	Role ZoneRole `json:"role,omitzero" api:"required"`
 	paramObj
 }
 

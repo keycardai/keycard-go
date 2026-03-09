@@ -1,14 +1,29 @@
 # Changelog
 
-## 0.2.0 (2026-02-13)
+## 0.2.0 (2026-03-07)
 
 Full Changelog: [v0.1.0...v0.2.0](https://github.com/keycardlabs/keycard-go/compare/v0.1.0...v0.2.0)
 
 ### Features
 
-* PREVIEW: sync svc-iam.yaml from svc-iam/larry/slack-v2-oauth-provider-config ([2c9e361](https://github.com/keycardlabs/keycard-go/commit/2c9e361e55277bc741ea635c01ff015af192e736))
-* PREVIEW: sync svc-iam.yaml from svc-iam/seriousben/fix-session-resource-access-aggregation ([331a81b](https://github.com/keycardlabs/keycard-go/commit/331a81b484059bc5b37f41e18bb8aa86ac34cbc6))
-* PREVIEW: sync svc-org-management.yaml from svc-org-management/sean/COR-145-role-required ([b447d9a](https://github.com/keycardlabs/keycard-go/commit/b447d9a3b9eb529fb4c356ec849366722d0cb094))
+* Add application_type property to url credential ([2cc792d](https://github.com/keycardlabs/keycard-go/commit/2cc792d7977e1d93f1f76596bcc9b30d59379bb2))
+* add is_system_managed property to resources and applications ([6c016c2](https://github.com/keycardlabs/keycard-go/commit/6c016c27cc23c410a916cee827dedecd896c695e))
+* filter, search, sort for invitations (COR-577) ([fcbe7f3](https://github.com/keycardlabs/keycard-go/commit/fcbe7f3bf4dc79aedb1b9c929b628dd7d7093f03))
+* internal endpoint to re-send verification email ([364d718](https://github.com/keycardlabs/keycard-go/commit/364d71847dc7eeebcb9cb1d53697c693772fdccf))
+* switch zone setting for email/password support (COR-543) ([c3113c0](https://github.com/keycardlabs/keycard-go/commit/c3113c0356e2c6197507f08283a3b4db737a848a))
+
+
+### Bug Fixes
+
+* fix request delays for retrying to be more respectful of high requested delays ([1a67996](https://github.com/keycardlabs/keycard-go/commit/1a67996350c34debf13cf0e8efb465fb563d0f07))
+
+
+### Chores
+
+* **ci:** skip uploading artifacts on stainless-internal branches ([261b573](https://github.com/keycardlabs/keycard-go/commit/261b573fd74b4e6f79e5d1501006bfcb5b2edc58))
+* **internal:** codegen related update ([a952d28](https://github.com/keycardlabs/keycard-go/commit/a952d28ab82ac826806f8adf4b2b4246b6c6efee))
+* **internal:** move custom custom `json` tags to `api` ([1d87561](https://github.com/keycardlabs/keycard-go/commit/1d87561f4612e73104d1b15b27081a314d4becef))
+* sync repo ([fbb71a8](https://github.com/keycardlabs/keycard-go/commit/fbb71a80a3230fc70594844365f91f5eeb78ecb1))
 
 ## 0.1.0 (2026-02-13)
 
