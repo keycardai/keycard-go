@@ -47,11 +47,11 @@ func (r *ZoneSecretService) New(ctx context.Context, zoneID string, params ZoneS
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zone_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s/secrets", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 func (r *ZoneSecretService) Get(ctx context.Context, id string, params ZoneSecretGetParams, opts ...option.RequestOption) (res *ZoneSecretGetResponse, err error) {
@@ -62,15 +62,15 @@ func (r *ZoneSecretService) Get(ctx context.Context, id string, params ZoneSecre
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zone_id parameter")
-		return
+		return nil, err
 	}
 	if id == "" {
 		err = errors.New("missing required id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s/secrets/%s", url.PathEscape(params.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 func (r *ZoneSecretService) Update(ctx context.Context, id string, params ZoneSecretUpdateParams, opts ...option.RequestOption) (res *Secret, err error) {
@@ -81,15 +81,15 @@ func (r *ZoneSecretService) Update(ctx context.Context, id string, params ZoneSe
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zone_id parameter")
-		return
+		return nil, err
 	}
 	if id == "" {
 		err = errors.New("missing required id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s/secrets/%s", url.PathEscape(params.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 func (r *ZoneSecretService) List(ctx context.Context, zoneID string, params ZoneSecretListParams, opts ...option.RequestOption) (res *[]Secret, err error) {
@@ -100,11 +100,11 @@ func (r *ZoneSecretService) List(ctx context.Context, zoneID string, params Zone
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zone_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s/secrets", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 func (r *ZoneSecretService) Delete(ctx context.Context, id string, params ZoneSecretDeleteParams, opts ...option.RequestOption) (err error) {
@@ -116,15 +116,15 @@ func (r *ZoneSecretService) Delete(ctx context.Context, id string, params ZoneSe
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zone_id parameter")
-		return
+		return err
 	}
 	if id == "" {
 		err = errors.New("missing required id parameter")
-		return
+		return err
 	}
 	path := fmt.Sprintf("zones/%s/secrets/%s", url.PathEscape(params.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return
+	return err
 }
 
 type Secret struct {

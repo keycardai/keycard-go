@@ -44,19 +44,19 @@ func (r *ZoneApplicationDependencyService) Get(ctx context.Context, dependencyID
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
-		return
+		return nil, err
 	}
 	if query.ID == "" {
 		err = errors.New("missing required id parameter")
-		return
+		return nil, err
 	}
 	if dependencyID == "" {
 		err = errors.New("missing required dependencyId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s/applications/%s/dependencies/%s", url.PathEscape(query.ZoneID), url.PathEscape(query.ID), url.PathEscape(dependencyID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Returns resource dependencies for an application
@@ -65,15 +65,15 @@ func (r *ZoneApplicationDependencyService) List(ctx context.Context, id string, 
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
-		return
+		return nil, err
 	}
 	if id == "" {
 		err = errors.New("missing required id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s/applications/%s/dependencies", url.PathEscape(params.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Adds a resource dependency to an application
@@ -83,19 +83,19 @@ func (r *ZoneApplicationDependencyService) Add(ctx context.Context, dependencyID
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
-		return
+		return err
 	}
 	if params.ID == "" {
 		err = errors.New("missing required id parameter")
-		return
+		return err
 	}
 	if dependencyID == "" {
 		err = errors.New("missing required dependencyId parameter")
-		return
+		return err
 	}
 	path := fmt.Sprintf("zones/%s/applications/%s/dependencies/%s", url.PathEscape(params.ZoneID), url.PathEscape(params.ID), url.PathEscape(dependencyID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, params, nil, opts...)
-	return
+	return err
 }
 
 // Removes a resource dependency from an application
@@ -105,19 +105,19 @@ func (r *ZoneApplicationDependencyService) Remove(ctx context.Context, dependenc
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
-		return
+		return err
 	}
 	if body.ID == "" {
 		err = errors.New("missing required id parameter")
-		return
+		return err
 	}
 	if dependencyID == "" {
 		err = errors.New("missing required dependencyId parameter")
-		return
+		return err
 	}
 	path := fmt.Sprintf("zones/%s/applications/%s/dependencies/%s", url.PathEscape(body.ZoneID), url.PathEscape(body.ID), url.PathEscape(dependencyID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return
+	return err
 }
 
 // A Resource is a system that exposes protected information or functionality. It

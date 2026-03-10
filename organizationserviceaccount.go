@@ -49,11 +49,11 @@ func (r *OrganizationServiceAccountService) New(ctx context.Context, organizatio
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/service-accounts", url.PathEscape(organizationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Get a specific service account
@@ -65,15 +65,15 @@ func (r *OrganizationServiceAccountService) Get(ctx context.Context, serviceAcco
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	if serviceAccountID == "" {
 		err = errors.New("missing required service_account_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/service-accounts/%s", url.PathEscape(params.OrganizationID), url.PathEscape(serviceAccountID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Update a service account
@@ -85,15 +85,15 @@ func (r *OrganizationServiceAccountService) Update(ctx context.Context, serviceA
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	if serviceAccountID == "" {
 		err = errors.New("missing required service_account_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/service-accounts/%s", url.PathEscape(params.OrganizationID), url.PathEscape(serviceAccountID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // List service accounts for an organization
@@ -105,11 +105,11 @@ func (r *OrganizationServiceAccountService) List(ctx context.Context, organizati
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/service-accounts", url.PathEscape(organizationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Delete a service account
@@ -122,15 +122,15 @@ func (r *OrganizationServiceAccountService) Delete(ctx context.Context, serviceA
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return err
 	}
 	if serviceAccountID == "" {
 		err = errors.New("missing required service_account_id parameter")
-		return
+		return err
 	}
 	path := fmt.Sprintf("organizations/%s/service-accounts/%s", url.PathEscape(params.OrganizationID), url.PathEscape(serviceAccountID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return
+	return err
 }
 
 type ServiceAccount struct {

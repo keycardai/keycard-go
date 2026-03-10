@@ -42,7 +42,7 @@ func (r *ServiceAccountTokenService) New(ctx context.Context, params ServiceAcco
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	path := "service-account-token"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 type ServiceAccountTokenNewParams struct {

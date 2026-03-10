@@ -44,15 +44,15 @@ func (r *ZoneUserService) Get(ctx context.Context, id string, query ZoneUserGetP
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
-		return
+		return nil, err
 	}
 	if id == "" {
 		err = errors.New("missing required id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s/users/%s", url.PathEscape(query.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Returns a list of users in the specified zone. Can be filtered by email address.
@@ -61,11 +61,11 @@ func (r *ZoneUserService) List(ctx context.Context, zoneID string, query ZoneUse
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s/users", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // An authenticated user entity

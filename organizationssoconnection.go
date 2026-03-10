@@ -48,11 +48,11 @@ func (r *OrganizationSSOConnectionService) Get(ctx context.Context, organization
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/sso-connection", url.PathEscape(organizationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Update SSO connection configuration
@@ -64,11 +64,11 @@ func (r *OrganizationSSOConnectionService) Update(ctx context.Context, organizat
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/sso-connection", url.PathEscape(organizationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Disable SSO for organization
@@ -81,11 +81,11 @@ func (r *OrganizationSSOConnectionService) Disable(ctx context.Context, organiza
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return err
 	}
 	path := fmt.Sprintf("organizations/%s/sso-connection", url.PathEscape(organizationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return
+	return err
 }
 
 // Enable SSO for organization
@@ -97,11 +97,11 @@ func (r *OrganizationSSOConnectionService) Enable(ctx context.Context, organizat
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/sso-connection", url.PathEscape(organizationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // SSO connection configuration for an organization

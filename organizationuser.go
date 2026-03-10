@@ -47,15 +47,15 @@ func (r *OrganizationUserService) Get(ctx context.Context, userID string, params
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	if userID == "" {
 		err = errors.New("missing required user_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/users/%s", url.PathEscape(params.OrganizationID), url.PathEscape(userID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Update user status in an organization
@@ -67,15 +67,15 @@ func (r *OrganizationUserService) Update(ctx context.Context, userID string, par
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	if userID == "" {
 		err = errors.New("missing required user_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/users/%s", url.PathEscape(params.OrganizationID), url.PathEscape(userID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // List users in an organization
@@ -87,11 +87,11 @@ func (r *OrganizationUserService) List(ctx context.Context, organizationID strin
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/users", url.PathEscape(organizationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Remove a user from an organization
@@ -104,15 +104,15 @@ func (r *OrganizationUserService) Delete(ctx context.Context, userID string, par
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return err
 	}
 	if userID == "" {
 		err = errors.New("missing required user_id parameter")
-		return
+		return err
 	}
 	path := fmt.Sprintf("organizations/%s/users/%s", url.PathEscape(params.OrganizationID), url.PathEscape(userID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return
+	return err
 }
 
 // User's role in the organization
