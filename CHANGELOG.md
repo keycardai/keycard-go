@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.0 (2026-03-10)
+
+Full Changelog: [v0.2.0...v0.3.0](https://github.com/keycardai/keycard-go/compare/v0.2.0...v0.3.0)
+
+### Features
+
+* jelmer/stainless keycardai configuration ([1b5920e](https://github.com/keycardai/keycard-go/commit/1b5920e3b038fa6217d18fcc69146b360a7c8e72))
+
+
+### Chores
+
+* sync repo ([f2c6b51](https://github.com/keycardai/keycard-go/commit/f2c6b519df73135eaa2e6eca4c602a652ad376aa))
+
 ## 0.2.0 (2026-03-07)
 
 Full Changelog: [v0.1.0...v0.2.0](https://github.com/keycardlabs/keycard-go/compare/v0.1.0...v0.2.0)
