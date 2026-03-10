@@ -1,8 +1,8 @@
 package paramutil
 
 import (
-	"github.com/keycardlabs/keycard-go/packages/param"
-	"github.com/keycardlabs/keycard-go/packages/respjson"
+	"github.com/keycardai/keycard-go/packages/param"
+	"github.com/keycardai/keycard-go/packages/respjson"
 )
 
 func AddrIfPresent[T comparable](v param.Opt[T]) *T {

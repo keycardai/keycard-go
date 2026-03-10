@@ -3,7 +3,7 @@ package param
 import (
 	"encoding/json"
 	"fmt"
-	shimjson "github.com/keycardlabs/keycard-go/internal/encoding/json"
+	shimjson "github.com/keycardai/keycard-go/internal/encoding/json"
 	"time"
 )
 
