@@ -40,7 +40,7 @@ func TestUserAgentHeader(t *testing.T) {
 			},
 		}),
 	)
-	client.Zones.List(context.Background(), keycard.ZoneListParams{})
+	_, _ = client.Zones.List(context.Background(), keycard.ZoneListParams{})
 	if userAgent != fmt.Sprintf("KeycardAPI/Go %s", internal.PackageVersion) {
 		t.Errorf("Expected User-Agent to be correct, but got: %#v", userAgent)
 	}
