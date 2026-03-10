@@ -48,15 +48,15 @@ func (r *OrganizationServiceAccountCredentialService) New(ctx context.Context, s
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	if serviceAccountID == "" {
 		err = errors.New("missing required service_account_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/service-accounts/%s/credentials", url.PathEscape(params.OrganizationID), url.PathEscape(serviceAccountID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Get a specific service account credential
@@ -68,19 +68,19 @@ func (r *OrganizationServiceAccountCredentialService) Get(ctx context.Context, c
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	if params.ServiceAccountID == "" {
 		err = errors.New("missing required service_account_id parameter")
-		return
+		return nil, err
 	}
 	if credentialID == "" {
 		err = errors.New("missing required credential_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/service-accounts/%s/credentials/%s", url.PathEscape(params.OrganizationID), url.PathEscape(params.ServiceAccountID), url.PathEscape(credentialID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Update a service account credential
@@ -92,19 +92,19 @@ func (r *OrganizationServiceAccountCredentialService) Update(ctx context.Context
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	if params.ServiceAccountID == "" {
 		err = errors.New("missing required service_account_id parameter")
-		return
+		return nil, err
 	}
 	if credentialID == "" {
 		err = errors.New("missing required credential_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/service-accounts/%s/credentials/%s", url.PathEscape(params.OrganizationID), url.PathEscape(params.ServiceAccountID), url.PathEscape(credentialID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // List credentials for a service account
@@ -116,15 +116,15 @@ func (r *OrganizationServiceAccountCredentialService) List(ctx context.Context, 
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	if serviceAccountID == "" {
 		err = errors.New("missing required service_account_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/service-accounts/%s/credentials", url.PathEscape(params.OrganizationID), url.PathEscape(serviceAccountID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Delete a service account credential
@@ -137,19 +137,19 @@ func (r *OrganizationServiceAccountCredentialService) Delete(ctx context.Context
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return err
 	}
 	if params.ServiceAccountID == "" {
 		err = errors.New("missing required service_account_id parameter")
-		return
+		return err
 	}
 	if credentialID == "" {
 		err = errors.New("missing required credential_id parameter")
-		return
+		return err
 	}
 	path := fmt.Sprintf("organizations/%s/service-accounts/%s/credentials/%s", url.PathEscape(params.OrganizationID), url.PathEscape(params.ServiceAccountID), url.PathEscape(credentialID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return
+	return err
 }
 
 // Service account credential (without secret)

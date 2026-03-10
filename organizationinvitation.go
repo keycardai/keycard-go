@@ -47,11 +47,11 @@ func (r *OrganizationInvitationService) New(ctx context.Context, organizationID 
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/invitations", url.PathEscape(organizationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // List invitations for an organization
@@ -63,11 +63,11 @@ func (r *OrganizationInvitationService) List(ctx context.Context, organizationID
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/invitations", url.PathEscape(organizationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Delete an invitation
@@ -80,15 +80,15 @@ func (r *OrganizationInvitationService) Delete(ctx context.Context, invitationID
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return err
 	}
 	if invitationID == "" {
 		err = errors.New("missing required invitation_id parameter")
-		return
+		return err
 	}
 	path := fmt.Sprintf("organizations/%s/invitations/%s", url.PathEscape(params.OrganizationID), url.PathEscape(invitationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return
+	return err
 }
 
 type Invitation struct {

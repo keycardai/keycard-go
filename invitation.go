@@ -46,11 +46,11 @@ func (r *InvitationService) Get(ctx context.Context, token string, query Invitat
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if token == "" {
 		err = errors.New("missing required token parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("invitations/%s", url.PathEscape(token))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Accept and consume an invitation token to join the organization
@@ -62,11 +62,11 @@ func (r *InvitationService) Accept(ctx context.Context, token string, body Invit
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if token == "" {
 		err = errors.New("missing required token parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("invitations/%s/accept", url.PathEscape(token))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Public invitation details viewable by token

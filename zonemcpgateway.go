@@ -42,15 +42,15 @@ func (r *ZoneMcpGatewayService) NewMcpServer(ctx context.Context, applicationID 
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
-		return
+		return nil, err
 	}
 	if applicationID == "" {
 		err = errors.New("missing required applicationId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s/mcp-gateways/%s/mcp-servers", url.PathEscape(params.ZoneID), url.PathEscape(applicationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Response containing the created upstream provider, upstream resource, and
