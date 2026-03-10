@@ -50,7 +50,8 @@ func (r *OrganizationService) New(ctx context.Context, params OrganizationNewPar
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	path := "organizations"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
 	return res, err
@@ -61,7 +62,8 @@ func (r *OrganizationService) Get(ctx context.Context, organizationID string, pa
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return nil, err
@@ -76,7 +78,8 @@ func (r *OrganizationService) Update(ctx context.Context, organizationID string,
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return nil, err
@@ -91,7 +94,8 @@ func (r *OrganizationService) List(ctx context.Context, params OrganizationListP
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	path := "organizations"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
 	return res, err
@@ -102,7 +106,8 @@ func (r *OrganizationService) ExchangeToken(ctx context.Context, organizationID 
 	if !param.IsOmitted(body.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", body.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return nil, err
@@ -117,7 +122,8 @@ func (r *OrganizationService) ListIdentities(ctx context.Context, organizationID
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return nil, err
@@ -140,7 +146,8 @@ func (r *OrganizationService) ListRoles(ctx context.Context, organizationID stri
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return nil, err

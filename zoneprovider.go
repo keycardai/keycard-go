@@ -41,7 +41,8 @@ func NewZoneProviderService(opts ...option.RequestOption) (r ZoneProviderService
 // Creates a new Provider - a system that supplies access to Resources and allows
 // actors to authenticate
 func (r *ZoneProviderService) New(ctx context.Context, zoneID string, body ZoneProviderNewParams, opts ...option.RequestOption) (res *Provider, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -53,7 +54,8 @@ func (r *ZoneProviderService) New(ctx context.Context, zoneID string, body ZoneP
 
 // Returns details of a specific Provider by ID
 func (r *ZoneProviderService) Get(ctx context.Context, id string, query ZoneProviderGetParams, opts ...option.RequestOption) (res *Provider, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -69,7 +71,8 @@ func (r *ZoneProviderService) Get(ctx context.Context, id string, query ZoneProv
 
 // Updates a Provider's configuration and metadata
 func (r *ZoneProviderService) Update(ctx context.Context, id string, params ZoneProviderUpdateParams, opts ...option.RequestOption) (res *Provider, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -85,7 +88,8 @@ func (r *ZoneProviderService) Update(ctx context.Context, id string, params Zone
 
 // Returns a list of providers in the specified zone
 func (r *ZoneProviderService) List(ctx context.Context, zoneID string, query ZoneProviderListParams, opts ...option.RequestOption) (res *ZoneProviderListResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -97,7 +101,8 @@ func (r *ZoneProviderService) List(ctx context.Context, zoneID string, query Zon
 
 // Permanently deletes a provider
 func (r *ZoneProviderService) Delete(ctx context.Context, id string, body ZoneProviderDeleteParams, opts ...option.RequestOption) (err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")

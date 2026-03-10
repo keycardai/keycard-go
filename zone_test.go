@@ -24,7 +24,8 @@ func TestZoneNewWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	_, err := client.Zones.New(context.TODO(), keycard.ZoneNewParams{
 		Name:                         "x",
@@ -63,7 +64,8 @@ func TestZoneGetWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	_, err := client.Zones.Get(
 		context.TODO(),
@@ -94,7 +96,8 @@ func TestZoneUpdateWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	_, err := client.Zones.Update(
 		context.TODO(),
@@ -138,7 +141,8 @@ func TestZoneListWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	_, err := client.Zones.List(context.TODO(), keycard.ZoneListParams{
 		After:  keycard.String("x"),
@@ -170,7 +174,8 @@ func TestZoneDelete(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	err := client.Zones.Delete(context.TODO(), "zoneId")
 	if err != nil {
@@ -193,7 +198,8 @@ func TestZoneDeleteMcpServer(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	err := client.Zones.DeleteMcpServer(
 		context.TODO(),
@@ -222,7 +228,8 @@ func TestZoneListSessionResourceAccessWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	_, err := client.Zones.ListSessionResourceAccess(
 		context.TODO(),

@@ -44,7 +44,8 @@ func (r *OrganizationSSOConnectionService) Get(ctx context.Context, organization
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return nil, err
@@ -59,7 +60,8 @@ func (r *OrganizationSSOConnectionService) Update(ctx context.Context, organizat
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return nil, err
@@ -74,7 +76,8 @@ func (r *OrganizationSSOConnectionService) Disable(ctx context.Context, organiza
 	if !param.IsOmitted(body.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", body.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
@@ -90,7 +93,8 @@ func (r *OrganizationSSOConnectionService) Enable(ctx context.Context, organizat
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return nil, err

@@ -40,7 +40,8 @@ func NewZoneUserService(opts ...option.RequestOption) (r ZoneUserService) {
 
 // Returns details of a specific user by user ID
 func (r *ZoneUserService) Get(ctx context.Context, id string, query ZoneUserGetParams, opts ...option.RequestOption) (res *User, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -56,7 +57,8 @@ func (r *ZoneUserService) Get(ctx context.Context, id string, query ZoneUserGetP
 
 // Returns a list of users in the specified zone. Can be filtered by email address.
 func (r *ZoneUserService) List(ctx context.Context, zoneID string, query ZoneUserListParams, opts ...option.RequestOption) (res *ZoneUserListResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err

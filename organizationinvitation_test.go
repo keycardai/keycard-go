@@ -24,7 +24,8 @@ func TestOrganizationInvitationNewWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	_, err := client.Organizations.Invitations.New(
 		context.TODO(),
@@ -55,7 +56,8 @@ func TestOrganizationInvitationListWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	_, err := client.Organizations.Invitations.List(
 		context.TODO(),
@@ -88,7 +90,8 @@ func TestOrganizationInvitationDeleteWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	err := client.Organizations.Invitations.Delete(
 		context.TODO(),

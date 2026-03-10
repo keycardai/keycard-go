@@ -24,7 +24,8 @@ func TestZoneDelegatedGrantGet(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	_, err := client.Zones.DelegatedGrants.Get(
 		context.TODO(),
@@ -53,7 +54,8 @@ func TestZoneDelegatedGrantUpdate(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	_, err := client.Zones.DelegatedGrants.Update(
 		context.TODO(),
@@ -83,7 +85,8 @@ func TestZoneDelegatedGrantListWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	_, err := client.Zones.DelegatedGrants.List(
 		context.TODO(),
@@ -121,7 +124,8 @@ func TestZoneDelegatedGrantDelete(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	err := client.Zones.DelegatedGrants.Delete(
 		context.TODO(),

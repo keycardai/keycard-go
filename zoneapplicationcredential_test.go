@@ -24,7 +24,8 @@ func TestZoneApplicationCredentialNewWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	_, err := client.Zones.ApplicationCredentials.New(
 		context.TODO(),
@@ -58,7 +59,8 @@ func TestZoneApplicationCredentialGet(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	_, err := client.Zones.ApplicationCredentials.Get(
 		context.TODO(),
@@ -87,7 +89,8 @@ func TestZoneApplicationCredentialUpdateWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	_, err := client.Zones.ApplicationCredentials.Update(
 		context.TODO(),
@@ -120,7 +123,8 @@ func TestZoneApplicationCredentialListWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	_, err := client.Zones.ApplicationCredentials.List(
 		context.TODO(),
@@ -157,7 +161,8 @@ func TestZoneApplicationCredentialDelete(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
 	)
 	err := client.Zones.ApplicationCredentials.Delete(
 		context.TODO(),

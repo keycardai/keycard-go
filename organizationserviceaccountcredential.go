@@ -44,7 +44,8 @@ func (r *OrganizationServiceAccountCredentialService) New(ctx context.Context, s
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return nil, err
@@ -63,7 +64,8 @@ func (r *OrganizationServiceAccountCredentialService) Get(ctx context.Context, c
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return nil, err
@@ -86,7 +88,8 @@ func (r *OrganizationServiceAccountCredentialService) Update(ctx context.Context
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return nil, err
@@ -109,7 +112,8 @@ func (r *OrganizationServiceAccountCredentialService) List(ctx context.Context, 
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return nil, err
@@ -128,7 +132,8 @@ func (r *OrganizationServiceAccountCredentialService) Delete(ctx context.Context
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	opts = slices.Concat(r.Options, opts)
+	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	opts = slices.Concat(preClientOpts, r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
