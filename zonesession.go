@@ -128,12 +128,13 @@ type SessionUnion struct {
 	// [SessionApplicationSessionTypeMetadata]
 	Metadata       SessionUnionMetadata `json:"metadata"`
 	OrganizationID string               `json:"organization_id"`
-	ParentID       string               `json:"parent_id"`
-	ProviderID     string               `json:"provider_id"`
-	SessionData    any                  `json:"session_data"`
-	Status         string               `json:"status"`
-	Subject        string               `json:"subject"`
-	UpdatedAt      time.Time            `json:"updated_at"`
+	// This field is from variant [SessionUserSessionType].
+	ParentID    string    `json:"parent_id"`
+	ProviderID  string    `json:"provider_id"`
+	SessionData any       `json:"session_data"`
+	Status      string    `json:"status"`
+	Subject     string    `json:"subject"`
+	UpdatedAt   time.Time `json:"updated_at"`
 	// This field is from variant [SessionUserSessionType].
 	User User `json:"user"`
 	// This field is from variant [SessionUserSessionType].
@@ -321,8 +322,14 @@ func (r *SessionUserSessionTypeMetadata) UnmarshalJSON(data []byte) error {
 type SessionApplicationSessionType struct {
 	// Application ID that initiated this session
 	ApplicationID string `json:"application_id" api:"required"`
+	// Issuer URL from IdP
+	Issuer string `json:"issuer" api:"required" format:"uri"`
+	// Provider ID
+	ProviderID string `json:"provider_id" api:"required"`
 	// Any of "application".
 	SessionType string `json:"session_type" api:"required"`
+	// Subject claim from IdP
+	Subject string `json:"subject" api:"required"`
 	// Session ID
 	ID string `json:"id"`
 	// Whether the session is currently active (deprecated - use status instead)
@@ -341,26 +348,15 @@ type SessionApplicationSessionType struct {
 	CreatedAt time.Time `json:"created_at" format:"date-time"`
 	// Date when session expires
 	ExpiresAt time.Time `json:"expires_at" format:"date-time"`
-	// Issuer URL from IdP
-	Issuer string `json:"issuer" format:"uri"`
 	// Session metadata
 	Metadata SessionApplicationSessionTypeMetadata `json:"metadata"`
 	// Organization that owns this session
 	OrganizationID string `json:"organization_id"`
-	// Parent session ID for hierarchical sessions (user sessions only). When null,
-	// this is a web session - a top-level session initiated directly by a user. When
-	// set, this is a child session derived from the parent, used for token refresh or
-	// delegation. Application sessions cannot have parents.
-	ParentID string `json:"parent_id"`
-	// Provider ID
-	ProviderID string `json:"provider_id"`
 	// Session claims data (ID token claims for users, application claims for
 	// applications)
 	SessionData map[string]any `json:"session_data"`
 	// Any of "active", "expired", "revoked".
 	Status string `json:"status"`
-	// Subject claim from IdP
-	Subject string `json:"subject"`
 	// Entity update timestamp
 	UpdatedAt time.Time `json:"updated_at" format:"date-time"`
 	// Zone this session belongs to
@@ -368,21 +364,20 @@ type SessionApplicationSessionType struct {
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ApplicationID   respjson.Field
+		Issuer          respjson.Field
+		ProviderID      respjson.Field
 		SessionType     respjson.Field
+		Subject         respjson.Field
 		ID              respjson.Field
 		Active          respjson.Field
 		Application     respjson.Field
 		AuthenticatedAt respjson.Field
 		CreatedAt       respjson.Field
 		ExpiresAt       respjson.Field
-		Issuer          respjson.Field
 		Metadata        respjson.Field
 		OrganizationID  respjson.Field
-		ParentID        respjson.Field
-		ProviderID      respjson.Field
 		SessionData     respjson.Field
 		Status          respjson.Field
-		Subject         respjson.Field
 		UpdatedAt       respjson.Field
 		ZoneID          respjson.Field
 		ExtraFields     map[string]respjson.Field
