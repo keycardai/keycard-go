@@ -172,7 +172,7 @@ func NewRequestConfig(ctx context.Context, method string, u string, body any, ds
 	}
 	cfg.ResponseBodyInto = dst
 	cfg.Security = Security{
-		BearerAuth: true,
+		OAuth2: true,
 	}
 	err = cfg.Apply(opts...)
 	if err != nil {
@@ -219,6 +219,10 @@ type RequestConfig struct {
 	HTTPClient     *http.Client
 	Middlewares    []middleware
 	APIKey         string
+	ClientID       string
+	ClientSecret   string
+	// OAuth2State holds the OAuth2 provider configuration and cached token information
+	OAuth2State *OAuth2State
 	// Configure which security scheme(s) should be enabled for this request
 	Security Security
 	// If ResponseBodyInto not nil, then we will attempt to deserialize into
@@ -416,6 +420,15 @@ func (cfg *RequestConfig) Execute() (err error) {
 		}
 	}
 
+	if cfg.OAuth2State != nil && cfg.Request.Header.Get("Authorization") == "" {
+		token, err := cfg.OAuth2State.GetToken(cfg)
+		if err != nil {
+			return err
+		}
+
+		cfg.Request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	}
+
 	handler := cfg.HTTPClient.Do
 	if cfg.CustomHTTPDoer != nil {
 		handler = cfg.CustomHTTPDoer.Do
@@ -595,6 +608,8 @@ func (cfg *RequestConfig) Clone(ctx context.Context) *RequestConfig {
 		HTTPClient:     cfg.HTTPClient,
 		Middlewares:    cfg.Middlewares,
 		APIKey:         cfg.APIKey,
+		ClientID:       cfg.ClientID,
+		ClientSecret:   cfg.ClientSecret,
 	}
 
 	return new
@@ -644,7 +659,7 @@ func WithDefaultBaseURL(baseURL string) RequestOption {
 }
 
 type Security struct {
-	BearerAuth bool
+	OAuth2 bool
 }
 
 func WithSecurity(security Security) RequestOption {
@@ -654,19 +669,17 @@ func WithSecurity(security Security) RequestOption {
 	})
 }
 
-// WithBearerAuthSecurity() should only be used within a method, not provided to at
-// the client-level.
-func WithBearerAuthSecurity() RequestOption {
+// WithOAuth2Security() should only be used within a method, not provided to at the
+// client-level.
+func WithOAuth2Security() RequestOption {
 	return RequestOptionFunc(func(r *RequestConfig) error {
 		r.Security = Security{
-			BearerAuth: true,
+			OAuth2: true,
 		}
 		return nil
 	})
 }
 
 func ApplySecurity(r RequestConfig) {
-	if r.Security.BearerAuth && r.APIKey != "" && r.Request.Header.Get("Authorization") == "" {
-		r.Request.Header.Set("authorization", fmt.Sprintf("Bearer %s", r.APIKey))
-	}
+
 }

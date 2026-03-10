@@ -49,13 +49,10 @@ import (
 	"fmt"
 
 	"github.com/keycardai/keycard-go"
-	"github.com/keycardai/keycard-go/option"
 )
 
 func main() {
-	client := keycard.NewClient(
-		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("KEYCARD_API_API_KEY")
-	)
+	client := keycard.NewClient()
 	zones, err := client.Zones.List(context.TODO(), keycard.ZoneListParams{})
 	if err != nil {
 		panic(err.Error())
