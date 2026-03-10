@@ -25,8 +25,6 @@ func TestZoneSessionGet(t *testing.T) {
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.Sessions.Get(
 		context.TODO(),
@@ -56,8 +54,6 @@ func TestZoneSessionUpdate(t *testing.T) {
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.Sessions.Update(
 		context.TODO(),
@@ -88,8 +84,6 @@ func TestZoneSessionListWithOptionalParams(t *testing.T) {
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.Sessions.List(
 		context.TODO(),
@@ -129,8 +123,6 @@ func TestZoneSessionDelete(t *testing.T) {
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	err := client.Zones.Sessions.Delete(
 		context.TODO(),

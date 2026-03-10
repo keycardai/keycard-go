@@ -24,8 +24,6 @@ func TestUsage(t *testing.T) {
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	zones, err := client.Zones.List(context.TODO(), keycard.ZoneListParams{})
 	if err != nil {

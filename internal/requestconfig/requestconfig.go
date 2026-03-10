@@ -5,7 +5,6 @@ package requestconfig
 import (
 	"bytes"
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -174,7 +173,6 @@ func NewRequestConfig(ctx context.Context, method string, u string, body any, ds
 	cfg.ResponseBodyInto = dst
 	cfg.Security = Security{
 		BearerAuth: true,
-		BasicAuth:  true,
 	}
 	err = cfg.Apply(opts...)
 	if err != nil {
@@ -221,8 +219,6 @@ type RequestConfig struct {
 	HTTPClient     *http.Client
 	Middlewares    []middleware
 	APIKey         string
-	Username       string
-	Password       string
 	// Configure which security scheme(s) should be enabled for this request
 	Security Security
 	// If ResponseBodyInto not nil, then we will attempt to deserialize into
@@ -599,8 +595,6 @@ func (cfg *RequestConfig) Clone(ctx context.Context) *RequestConfig {
 		HTTPClient:     cfg.HTTPClient,
 		Middlewares:    cfg.Middlewares,
 		APIKey:         cfg.APIKey,
-		Username:       cfg.Username,
-		Password:       cfg.Password,
 	}
 
 	return new
@@ -651,7 +645,6 @@ func WithDefaultBaseURL(baseURL string) RequestOption {
 
 type Security struct {
 	BearerAuth bool
-	BasicAuth  bool
 }
 
 func WithSecurity(security Security) RequestOption {
@@ -667,19 +660,6 @@ func WithBearerAuthSecurity() RequestOption {
 	return RequestOptionFunc(func(r *RequestConfig) error {
 		r.Security = Security{
 			BearerAuth: true,
-			BasicAuth:  false,
-		}
-		return nil
-	})
-}
-
-// WithBasicAuthSecurity() should only be used within a method, not provided to at
-// the client-level.
-func WithBasicAuthSecurity() RequestOption {
-	return RequestOptionFunc(func(r *RequestConfig) error {
-		r.Security = Security{
-			BearerAuth: false,
-			BasicAuth:  true,
 		}
 		return nil
 	})
@@ -688,9 +668,5 @@ func WithBasicAuthSecurity() RequestOption {
 func ApplySecurity(r RequestConfig) {
 	if r.Security.BearerAuth && r.APIKey != "" && r.Request.Header.Get("Authorization") == "" {
 		r.Request.Header.Set("authorization", fmt.Sprintf("Bearer %s", r.APIKey))
-	}
-
-	if r.Security.BasicAuth && r.Username != "" && r.Password != "" && r.Request.Header.Get("Authorization") == "" {
-		r.Request.Header.Set("authorization", fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(r.Username+":"+r.Password))))
 	}
 }

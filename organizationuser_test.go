@@ -25,8 +25,6 @@ func TestOrganizationUserGetWithOptionalParams(t *testing.T) {
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.Users.Get(
 		context.TODO(),
@@ -58,8 +56,6 @@ func TestOrganizationUserUpdateWithOptionalParams(t *testing.T) {
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.Users.Update(
 		context.TODO(),
@@ -92,8 +88,6 @@ func TestOrganizationUserListWithOptionalParams(t *testing.T) {
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Organizations.Users.List(
 		context.TODO(),
@@ -128,8 +122,6 @@ func TestOrganizationUserDeleteWithOptionalParams(t *testing.T) {
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	err := client.Organizations.Users.Delete(
 		context.TODO(),
