@@ -1,13 +1,5 @@
 # Changelog
 
-## 0.2.1 (2026-03-10)
-
-Full Changelog: [v0.2.0...v0.2.1](https://github.com/keycardlabs/keycard-go/compare/v0.2.0...v0.2.1)
-
-### Chores
-
-* **internal:** minor cleanup ([73d45bb](https://github.com/keycardlabs/keycard-go/commit/73d45bb44ddcd19bb250517989642f189b40c42b))
-
 ## 0.2.0 (2026-03-07)
 
 Full Changelog: [v0.1.0...v0.2.0](https://github.com/keycardlabs/keycard-go/compare/v0.1.0...v0.2.0)
