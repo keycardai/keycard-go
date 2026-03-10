@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 (2026-03-10)
+
+Full Changelog: [v0.3.0...v0.4.0](https://github.com/keycardai/keycard-go/compare/v0.3.0...v0.4.0)
+
+### Features
+
+* Typescript package name @keycardai/api ([240e21f](https://github.com/keycardai/keycard-go/commit/240e21fb569deedb5af81d2a45ac42e15f9ee7c4))
+
 ## 0.3.0 (2026-03-10)
 
 Full Changelog: [v0.2.0...v0.3.0](https://github.com/keycardai/keycard-go/compare/v0.2.0...v0.3.0)

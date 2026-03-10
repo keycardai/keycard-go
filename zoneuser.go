@@ -78,34 +78,34 @@ type User struct {
 	Email string `json:"email" api:"required" format:"email"`
 	// Whether the email address has been verified
 	EmailVerified bool `json:"email_verified" api:"required"`
-	// Issuer identifier of the identity provider
-	Issuer string `json:"issuer" api:"required"`
 	// Organization that owns this user
 	OrganizationID string `json:"organization_id" api:"required"`
-	// Subject identifier from the identity provider
-	Subject string `json:"subject" api:"required"`
 	// Entity update timestamp
 	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Zone this user belongs to
 	ZoneID string `json:"zone_id" api:"required"`
 	// Date when the user was last authenticated
 	AuthenticatedAt string `json:"authenticated_at"`
+	// Issuer identifier of the identity provider
+	Issuer string `json:"issuer"`
 	// Reference to the identity provider. This field is undefined when the source
 	// identity provider is deleted but the user is not deleted.
 	ProviderID string `json:"provider_id"`
+	// Subject identifier from the identity provider
+	Subject string `json:"subject"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID              respjson.Field
 		CreatedAt       respjson.Field
 		Email           respjson.Field
 		EmailVerified   respjson.Field
-		Issuer          respjson.Field
 		OrganizationID  respjson.Field
-		Subject         respjson.Field
 		UpdatedAt       respjson.Field
 		ZoneID          respjson.Field
 		AuthenticatedAt respjson.Field
+		Issuer          respjson.Field
 		ProviderID      respjson.Field
+		Subject         respjson.Field
 		ExtraFields     map[string]respjson.Field
 		raw             string
 	} `json:"-"`
