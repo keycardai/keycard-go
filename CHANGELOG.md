@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.1 (2026-03-10)
+
+Full Changelog: [v0.4.0...v0.4.1](https://github.com/keycardai/keycard-go/compare/v0.4.0...v0.4.1)
+
+### Chores
+
+* **internal:** use explicit returns ([9acde8f](https://github.com/keycardai/keycard-go/commit/9acde8f9cfbbe25b1620a79bb9362f99cd8b8836))
+
 ## 0.4.0 (2026-03-10)
 
 Full Changelog: [v0.3.0...v0.4.0](https://github.com/keycardai/keycard-go/compare/v0.3.0...v0.4.0)

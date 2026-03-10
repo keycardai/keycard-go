@@ -54,7 +54,7 @@ func (r *OrganizationService) New(ctx context.Context, params OrganizationNewPar
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	path := "organizations"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Get organization by ID or label
@@ -66,11 +66,11 @@ func (r *OrganizationService) Get(ctx context.Context, organizationID string, pa
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s", url.PathEscape(organizationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Update organization details
@@ -82,11 +82,11 @@ func (r *OrganizationService) Update(ctx context.Context, organizationID string,
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s", url.PathEscape(organizationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // List organizations for the current user
@@ -98,7 +98,7 @@ func (r *OrganizationService) List(ctx context.Context, params OrganizationListP
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	path := "organizations"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Exchange user token for organization-scoped M2M token
@@ -110,11 +110,11 @@ func (r *OrganizationService) ExchangeToken(ctx context.Context, organizationID 
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/token", url.PathEscape(organizationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // List unified view of users and invitations in an organization
@@ -126,11 +126,11 @@ func (r *OrganizationService) ListIdentities(ctx context.Context, organizationID
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/identities", url.PathEscape(organizationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Returns the list of available roles in the system for the organization. This
@@ -150,11 +150,11 @@ func (r *OrganizationService) ListRoles(ctx context.Context, organizationID stri
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("organizations/%s/roles", url.PathEscape(organizationID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 type Organization struct {

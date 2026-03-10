@@ -68,7 +68,7 @@ func (r *ZoneService) New(ctx context.Context, body ZoneNewParams, opts ...optio
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	path := "zones"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Returns details of a specific zone by ID
@@ -77,11 +77,11 @@ func (r *ZoneService) Get(ctx context.Context, zoneID string, query ZoneGetParam
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Updates a zone's configuration (partial update)
@@ -90,11 +90,11 @@ func (r *ZoneService) Update(ctx context.Context, zoneID string, body ZoneUpdate
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Returns a list of zones for the authenticated organization
@@ -103,7 +103,7 @@ func (r *ZoneService) List(ctx context.Context, query ZoneListParams, opts ...op
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	path := "zones"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Permanently deletes a zone and all its associated resources
@@ -113,11 +113,11 @@ func (r *ZoneService) Delete(ctx context.Context, zoneID string, opts ...option.
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
-		return
+		return err
 	}
 	path := fmt.Sprintf("zones/%s", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return
+	return err
 }
 
 // Removes downstream resource, dependency, and optionally upstream
@@ -128,15 +128,15 @@ func (r *ZoneService) DeleteMcpServer(ctx context.Context, downstreamID string, 
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
-		return
+		return err
 	}
 	if downstreamID == "" {
 		err = errors.New("missing required downstreamId parameter")
-		return
+		return err
 	}
 	path := fmt.Sprintf("zones/%s/mcp-servers/%s", url.PathEscape(body.ZoneID), url.PathEscape(downstreamID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return
+	return err
 }
 
 // Returns aggregated access records per session-resource pair. By default
@@ -148,11 +148,11 @@ func (r *ZoneService) ListSessionResourceAccess(ctx context.Context, zoneID stri
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s/session-resource-access", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // AWS KMS configuration for zone encryption. When not specified, the default

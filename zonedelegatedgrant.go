@@ -44,15 +44,15 @@ func (r *ZoneDelegatedGrantService) Get(ctx context.Context, id string, query Zo
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
-		return
+		return nil, err
 	}
 	if id == "" {
 		err = errors.New("missing required id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s/delegated-grants/%s", url.PathEscape(query.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Revokes an active delegated grant
@@ -61,15 +61,15 @@ func (r *ZoneDelegatedGrantService) Update(ctx context.Context, id string, param
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
-		return
+		return nil, err
 	}
 	if id == "" {
 		err = errors.New("missing required id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s/delegated-grants/%s", url.PathEscape(params.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Returns a list of delegated grants in the specified zone. Can be filtered by
@@ -79,11 +79,11 @@ func (r *ZoneDelegatedGrantService) List(ctx context.Context, zoneID string, que
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s/delegated-grants", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Permanently revokes a delegated grant, removing the user's access to the
@@ -94,15 +94,15 @@ func (r *ZoneDelegatedGrantService) Delete(ctx context.Context, id string, body 
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
-		return
+		return err
 	}
 	if id == "" {
 		err = errors.New("missing required id parameter")
-		return
+		return err
 	}
 	path := fmt.Sprintf("zones/%s/delegated-grants/%s", url.PathEscape(body.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return
+	return err
 }
 
 // User authorization for a resource to be accessed on their behalf. The grant
