@@ -14,7 +14,7 @@ import (
 	"encoding"
 	"encoding/base64"
 	"fmt"
-	"github.com/keycardlabs/keycard-go/internal/encoding/json/shims"
+	"github.com/keycardai/keycard-go/internal/encoding/json/shims"
 	"reflect"
 	"strconv"
 	"strings"

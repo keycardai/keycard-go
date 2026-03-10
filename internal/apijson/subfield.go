@@ -1,7 +1,7 @@
 package apijson
 
 import (
-	"github.com/keycardlabs/keycard-go/packages/respjson"
+	"github.com/keycardai/keycard-go/packages/respjson"
 	"reflect"
 )
 

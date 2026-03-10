@@ -1,4 +1,4 @@
-module github.com/keycardlabs/keycard-go
+module github.com/keycardai/keycard-go
 
 go 1.22
 
