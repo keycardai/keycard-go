@@ -173,8 +173,8 @@ func NewRequestConfig(ctx context.Context, method string, u string, body any, ds
 	}
 	cfg.ResponseBodyInto = dst
 	cfg.Security = Security{
-		OrgManagementBasicAuth: true,
-		VaultAPIBearerAuth:     true,
+		BearerAuth: true,
+		BasicAuth:  true,
 	}
 	err = cfg.Apply(opts...)
 	if err != nil {
@@ -650,8 +650,8 @@ func WithDefaultBaseURL(baseURL string) RequestOption {
 }
 
 type Security struct {
-	OrgManagementBasicAuth bool
-	VaultAPIBearerAuth     bool
+	BearerAuth bool
+	BasicAuth  bool
 }
 
 func WithSecurity(security Security) RequestOption {
@@ -661,36 +661,36 @@ func WithSecurity(security Security) RequestOption {
 	})
 }
 
-// WithOrgManagementBasicAuthSecurity() should only be used within a method, not
-// provided to at the client-level.
-func WithOrgManagementBasicAuthSecurity() RequestOption {
+// WithBearerAuthSecurity() should only be used within a method, not provided to at
+// the client-level.
+func WithBearerAuthSecurity() RequestOption {
 	return RequestOptionFunc(func(r *RequestConfig) error {
 		r.Security = Security{
-			OrgManagementBasicAuth: true,
-			VaultAPIBearerAuth:     false,
+			BearerAuth: true,
+			BasicAuth:  false,
 		}
 		return nil
 	})
 }
 
-// WithVaultAPIBearerAuthSecurity() should only be used within a method, not
-// provided to at the client-level.
-func WithVaultAPIBearerAuthSecurity() RequestOption {
+// WithBasicAuthSecurity() should only be used within a method, not provided to at
+// the client-level.
+func WithBasicAuthSecurity() RequestOption {
 	return RequestOptionFunc(func(r *RequestConfig) error {
 		r.Security = Security{
-			OrgManagementBasicAuth: false,
-			VaultAPIBearerAuth:     true,
+			BearerAuth: false,
+			BasicAuth:  true,
 		}
 		return nil
 	})
 }
 
 func ApplySecurity(r RequestConfig) {
-	if r.Security.OrgManagementBasicAuth && r.Username != "" && r.Password != "" && r.Request.Header.Get("Authorization") == "" {
-		r.Request.Header.Set("authorization", fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(r.Username+":"+r.Password))))
+	if r.Security.BearerAuth && r.APIKey != "" && r.Request.Header.Get("Authorization") == "" {
+		r.Request.Header.Set("authorization", fmt.Sprintf("Bearer %s", r.APIKey))
 	}
 
-	if r.Security.VaultAPIBearerAuth && r.APIKey != "" && r.Request.Header.Get("Authorization") == "" {
-		r.Request.Header.Set("authorization", fmt.Sprintf("Bearer %s", r.APIKey))
+	if r.Security.BasicAuth && r.Username != "" && r.Password != "" && r.Request.Header.Get("Authorization") == "" {
+		r.Request.Header.Set("authorization", fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(r.Username+":"+r.Password))))
 	}
 }

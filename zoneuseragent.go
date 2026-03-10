@@ -40,7 +40,7 @@ func NewZoneUserAgentService(opts ...option.RequestOption) (r ZoneUserAgentServi
 
 // Returns details of a specific user agent by user agent ID
 func (r *ZoneUserAgentService) Get(ctx context.Context, id string, query ZoneUserAgentGetParams, opts ...option.RequestOption) (res *UserAgent, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -59,7 +59,7 @@ func (r *ZoneUserAgentService) Get(ctx context.Context, id string, query ZoneUse
 // client software (browsers, desktop apps, CLI tools) registered via OAuth 2.0
 // Dynamic Client Registration.
 func (r *ZoneUserAgentService) List(ctx context.Context, zoneID string, query ZoneUserAgentListParams, opts ...option.RequestOption) (res *ZoneUserAgentListResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")

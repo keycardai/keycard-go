@@ -40,7 +40,7 @@ func NewZoneDelegatedGrantService(opts ...option.RequestOption) (r ZoneDelegated
 
 // Returns details of a specific delegated grant by grant ID
 func (r *ZoneDelegatedGrantService) Get(ctx context.Context, id string, query ZoneDelegatedGrantGetParams, opts ...option.RequestOption) (res *Grant, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -57,7 +57,7 @@ func (r *ZoneDelegatedGrantService) Get(ctx context.Context, id string, query Zo
 
 // Revokes an active delegated grant
 func (r *ZoneDelegatedGrantService) Update(ctx context.Context, id string, params ZoneDelegatedGrantUpdateParams, opts ...option.RequestOption) (res *Grant, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -75,7 +75,7 @@ func (r *ZoneDelegatedGrantService) Update(ctx context.Context, id string, param
 // Returns a list of delegated grants in the specified zone. Can be filtered by
 // user, resource, or status.
 func (r *ZoneDelegatedGrantService) List(ctx context.Context, zoneID string, query ZoneDelegatedGrantListParams, opts ...option.RequestOption) (res *ZoneDelegatedGrantListResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -89,7 +89,7 @@ func (r *ZoneDelegatedGrantService) List(ctx context.Context, zoneID string, que
 // Permanently revokes a delegated grant, removing the user's access to the
 // protected resource
 func (r *ZoneDelegatedGrantService) Delete(ctx context.Context, id string, body ZoneDelegatedGrantDeleteParams, opts ...option.RequestOption) (err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {

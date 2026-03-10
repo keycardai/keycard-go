@@ -41,7 +41,7 @@ func NewZoneApplicationCredentialService(opts ...option.RequestOption) (r ZoneAp
 
 // Creates a new application credential
 func (r *ZoneApplicationCredentialService) New(ctx context.Context, zoneID string, body ZoneApplicationCredentialNewParams, opts ...option.RequestOption) (res *ZoneApplicationCredentialNewResponseUnion, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -54,7 +54,7 @@ func (r *ZoneApplicationCredentialService) New(ctx context.Context, zoneID strin
 
 // Returns details of a specific application credential by ID
 func (r *ZoneApplicationCredentialService) Get(ctx context.Context, id string, query ZoneApplicationCredentialGetParams, opts ...option.RequestOption) (res *CredentialUnion, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -71,7 +71,7 @@ func (r *ZoneApplicationCredentialService) Get(ctx context.Context, id string, q
 
 // Updates an application credential's configuration
 func (r *ZoneApplicationCredentialService) Update(ctx context.Context, id string, params ZoneApplicationCredentialUpdateParams, opts ...option.RequestOption) (res *CredentialUnion, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -88,7 +88,7 @@ func (r *ZoneApplicationCredentialService) Update(ctx context.Context, id string
 
 // Returns a list of application credentials in the specified zone
 func (r *ZoneApplicationCredentialService) List(ctx context.Context, zoneID string, query ZoneApplicationCredentialListParams, opts ...option.RequestOption) (res *ZoneApplicationCredentialListResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -101,7 +101,7 @@ func (r *ZoneApplicationCredentialService) List(ctx context.Context, zoneID stri
 
 // Permanently deletes an application credential
 func (r *ZoneApplicationCredentialService) Delete(ctx context.Context, id string, body ZoneApplicationCredentialDeleteParams, opts ...option.RequestOption) (err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {

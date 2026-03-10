@@ -44,7 +44,7 @@ func NewZoneApplicationService(opts ...option.RequestOption) (r ZoneApplicationS
 // Creates a new Application - a software system with an identity that can access
 // Resources
 func (r *ZoneApplicationService) New(ctx context.Context, zoneID string, body ZoneApplicationNewParams, opts ...option.RequestOption) (res *Application, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -57,7 +57,7 @@ func (r *ZoneApplicationService) New(ctx context.Context, zoneID string, body Zo
 
 // Returns details of a specific Application by ID
 func (r *ZoneApplicationService) Get(ctx context.Context, id string, query ZoneApplicationGetParams, opts ...option.RequestOption) (res *Application, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -74,7 +74,7 @@ func (r *ZoneApplicationService) Get(ctx context.Context, id string, query ZoneA
 
 // Updates an Application's configuration and metadata
 func (r *ZoneApplicationService) Update(ctx context.Context, id string, params ZoneApplicationUpdateParams, opts ...option.RequestOption) (res *Application, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -91,7 +91,7 @@ func (r *ZoneApplicationService) Update(ctx context.Context, id string, params Z
 
 // Returns a list of applications in the specified zone
 func (r *ZoneApplicationService) List(ctx context.Context, zoneID string, query ZoneApplicationListParams, opts ...option.RequestOption) (res *ZoneApplicationListResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -104,7 +104,7 @@ func (r *ZoneApplicationService) List(ctx context.Context, zoneID string, query 
 
 // Permanently deletes an application
 func (r *ZoneApplicationService) Delete(ctx context.Context, id string, body ZoneApplicationDeleteParams, opts ...option.RequestOption) (err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
@@ -122,7 +122,7 @@ func (r *ZoneApplicationService) Delete(ctx context.Context, id string, body Zon
 
 // Returns a list of application credentials for a specific application
 func (r *ZoneApplicationService) ListCredentials(ctx context.Context, id string, params ZoneApplicationListCredentialsParams, opts ...option.RequestOption) (res *ZoneApplicationListCredentialsResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -139,7 +139,7 @@ func (r *ZoneApplicationService) ListCredentials(ctx context.Context, id string,
 
 // Returns a list of resources provided by an application
 func (r *ZoneApplicationService) ListResources(ctx context.Context, id string, params ZoneApplicationListResourcesParams, opts ...option.RequestOption) (res *ZoneApplicationListResourcesResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
+	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
