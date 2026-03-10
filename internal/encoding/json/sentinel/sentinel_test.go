@@ -1,8 +1,8 @@
 package sentinel_test
 
 import (
-	"github.com/keycardlabs/keycard-go/internal/encoding/json/sentinel"
-	"github.com/keycardlabs/keycard-go/packages/param"
+	"github.com/keycardai/keycard-go/internal/encoding/json/sentinel"
+	"github.com/keycardai/keycard-go/packages/param"
 	"reflect"
 	"slices"
 	"testing"
