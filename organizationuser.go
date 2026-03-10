@@ -43,8 +43,7 @@ func (r *OrganizationUserService) Get(ctx context.Context, userID string, params
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return nil, err
@@ -63,8 +62,7 @@ func (r *OrganizationUserService) Update(ctx context.Context, userID string, par
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return nil, err
@@ -83,8 +81,7 @@ func (r *OrganizationUserService) List(ctx context.Context, organizationID strin
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
 		return nil, err
@@ -99,8 +96,7 @@ func (r *OrganizationUserService) Delete(ctx context.Context, userID string, par
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if params.OrganizationID == "" {
 		err = errors.New("missing required organization_id parameter")

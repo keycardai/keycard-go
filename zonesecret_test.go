@@ -25,8 +25,6 @@ func TestZoneSecretNewWithOptionalParams(t *testing.T) {
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.Secrets.New(
 		context.TODO(),
@@ -67,8 +65,6 @@ func TestZoneSecretGetWithOptionalParams(t *testing.T) {
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.Secrets.Get(
 		context.TODO(),
@@ -99,8 +95,6 @@ func TestZoneSecretUpdateWithOptionalParams(t *testing.T) {
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.Secrets.Update(
 		context.TODO(),
@@ -140,8 +134,6 @@ func TestZoneSecretListWithOptionalParams(t *testing.T) {
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.Secrets.List(
 		context.TODO(),
@@ -173,8 +165,6 @@ func TestZoneSecretDeleteWithOptionalParams(t *testing.T) {
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	err := client.Zones.Secrets.Delete(
 		context.TODO(),

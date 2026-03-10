@@ -40,8 +40,7 @@ func NewZoneApplicationDependencyService(opts ...option.RequestOption) (r ZoneAp
 
 // Retrieves a specific resource dependency of an application
 func (r *ZoneApplicationDependencyService) Get(ctx context.Context, dependencyID string, query ZoneApplicationDependencyGetParams, opts ...option.RequestOption) (res *Resource, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -61,8 +60,7 @@ func (r *ZoneApplicationDependencyService) Get(ctx context.Context, dependencyID
 
 // Returns resource dependencies for an application
 func (r *ZoneApplicationDependencyService) List(ctx context.Context, id string, params ZoneApplicationDependencyListParams, opts ...option.RequestOption) (res *ZoneApplicationDependencyListResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -78,8 +76,7 @@ func (r *ZoneApplicationDependencyService) List(ctx context.Context, id string, 
 
 // Adds a resource dependency to an application
 func (r *ZoneApplicationDependencyService) Add(ctx context.Context, dependencyID string, params ZoneApplicationDependencyAddParams, opts ...option.RequestOption) (err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -100,8 +97,7 @@ func (r *ZoneApplicationDependencyService) Add(ctx context.Context, dependencyID
 
 // Removes a resource dependency from an application
 func (r *ZoneApplicationDependencyService) Remove(ctx context.Context, dependencyID string, body ZoneApplicationDependencyRemoveParams, opts ...option.RequestOption) (err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")

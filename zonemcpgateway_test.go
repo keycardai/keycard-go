@@ -25,8 +25,6 @@ func TestZoneMcpGatewayNewMcpServerWithOptionalParams(t *testing.T) {
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
-		option.WithUsername("My Username"),
-		option.WithPassword("My Password"),
 	)
 	_, err := client.Zones.McpGateways.NewMcpServer(
 		context.TODO(),
