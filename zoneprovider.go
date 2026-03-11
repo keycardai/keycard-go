@@ -552,7 +552,7 @@ type ZoneProviderListParams struct {
 // URLQuery serializes [ZoneProviderListParams]'s query parameters as `url.Values`.
 func (r ZoneProviderListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
