@@ -311,7 +311,7 @@ type ZoneMemberListParams struct {
 // URLQuery serializes [ZoneMemberListParams]'s query parameters as `url.Values`.
 func (r ZoneMemberListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

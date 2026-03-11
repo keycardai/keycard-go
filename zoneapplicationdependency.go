@@ -294,7 +294,7 @@ type ZoneApplicationDependencyListParams struct {
 // `url.Values`.
 func (r ZoneApplicationDependencyListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -327,7 +327,7 @@ type ZoneApplicationDependencyAddParams struct {
 // `url.Values`.
 func (r ZoneApplicationDependencyAddParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
