@@ -40,8 +40,7 @@ func NewZoneResourceService(opts ...option.RequestOption) (r ZoneResourceService
 // Creates a new Resource - a system that exposes protected information or
 // functionality requiring authentication
 func (r *ZoneResourceService) New(ctx context.Context, zoneID string, body ZoneResourceNewParams, opts ...option.RequestOption) (res *Resource, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -53,8 +52,7 @@ func (r *ZoneResourceService) New(ctx context.Context, zoneID string, body ZoneR
 
 // Returns details of a specific Resource by ID
 func (r *ZoneResourceService) Get(ctx context.Context, id string, query ZoneResourceGetParams, opts ...option.RequestOption) (res *Resource, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -70,8 +68,7 @@ func (r *ZoneResourceService) Get(ctx context.Context, id string, query ZoneReso
 
 // Updates a Resource's configuration and metadata
 func (r *ZoneResourceService) Update(ctx context.Context, id string, params ZoneResourceUpdateParams, opts ...option.RequestOption) (res *Resource, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -87,8 +84,7 @@ func (r *ZoneResourceService) Update(ctx context.Context, id string, params Zone
 
 // Returns a list of resources in the specified zone
 func (r *ZoneResourceService) List(ctx context.Context, zoneID string, query ZoneResourceListParams, opts ...option.RequestOption) (res *ZoneResourceListResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -100,8 +96,7 @@ func (r *ZoneResourceService) List(ctx context.Context, zoneID string, query Zon
 
 // Permanently deletes a Resource
 func (r *ZoneResourceService) Delete(ctx context.Context, id string, body ZoneResourceDeleteParams, opts ...option.RequestOption) (err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
