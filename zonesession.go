@@ -41,8 +41,7 @@ func NewZoneSessionService(opts ...option.RequestOption) (r ZoneSessionService) 
 
 // Returns details of a specific session by session ID
 func (r *ZoneSessionService) Get(ctx context.Context, id string, query ZoneSessionGetParams, opts ...option.RequestOption) (res *SessionUnion, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -58,8 +57,7 @@ func (r *ZoneSessionService) Get(ctx context.Context, id string, query ZoneSessi
 
 // Revokes an active session
 func (r *ZoneSessionService) Update(ctx context.Context, id string, params ZoneSessionUpdateParams, opts ...option.RequestOption) (res *SessionUnion, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -78,8 +76,7 @@ func (r *ZoneSessionService) Update(ctx context.Context, id string, params ZoneS
 // session). Use include_nested=true to include nested sessions. Can be filtered by
 // session type, status, and user.
 func (r *ZoneSessionService) List(ctx context.Context, zoneID string, query ZoneSessionListParams, opts ...option.RequestOption) (res *ZoneSessionListResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -91,8 +88,7 @@ func (r *ZoneSessionService) List(ctx context.Context, zoneID string, query Zone
 
 // Permanently deletes a session, effectively logging out the user or application
 func (r *ZoneSessionService) Delete(ctx context.Context, id string, body ZoneSessionDeleteParams, opts ...option.RequestOption) (err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -507,7 +503,7 @@ type ZoneSessionListParams struct {
 // URLQuery serializes [ZoneSessionListParams]'s query parameters as `url.Values`.
 func (r ZoneSessionListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

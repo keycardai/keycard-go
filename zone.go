@@ -64,8 +64,7 @@ func NewZoneService(opts ...option.RequestOption) (r ZoneService) {
 // Creates a new zone for the authenticated organization. A zone is an isolated
 // environment for IAM resources.
 func (r *ZoneService) New(ctx context.Context, body ZoneNewParams, opts ...option.RequestOption) (res *Zone, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	path := "zones"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return res, err
@@ -73,8 +72,7 @@ func (r *ZoneService) New(ctx context.Context, body ZoneNewParams, opts ...optio
 
 // Returns details of a specific zone by ID
 func (r *ZoneService) Get(ctx context.Context, zoneID string, query ZoneGetParams, opts ...option.RequestOption) (res *Zone, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -86,8 +84,7 @@ func (r *ZoneService) Get(ctx context.Context, zoneID string, query ZoneGetParam
 
 // Updates a zone's configuration (partial update)
 func (r *ZoneService) Update(ctx context.Context, zoneID string, body ZoneUpdateParams, opts ...option.RequestOption) (res *Zone, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -99,8 +96,7 @@ func (r *ZoneService) Update(ctx context.Context, zoneID string, body ZoneUpdate
 
 // Returns a list of zones for the authenticated organization
 func (r *ZoneService) List(ctx context.Context, query ZoneListParams, opts ...option.RequestOption) (res *ZoneListResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	path := "zones"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
@@ -108,8 +104,7 @@ func (r *ZoneService) List(ctx context.Context, query ZoneListParams, opts ...op
 
 // Permanently deletes a zone and all its associated resources
 func (r *ZoneService) Delete(ctx context.Context, zoneID string, opts ...option.RequestOption) (err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -120,32 +115,12 @@ func (r *ZoneService) Delete(ctx context.Context, zoneID string, opts ...option.
 	return err
 }
 
-// Removes downstream resource, dependency, and optionally upstream
-// resource/provider
-func (r *ZoneService) DeleteMcpServer(ctx context.Context, downstreamID string, body ZoneDeleteMcpServerParams, opts ...option.RequestOption) (err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
-	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
-	if body.ZoneID == "" {
-		err = errors.New("missing required zoneId parameter")
-		return err
-	}
-	if downstreamID == "" {
-		err = errors.New("missing required downstreamId parameter")
-		return err
-	}
-	path := fmt.Sprintf("zones/%s/mcp-servers/%s", url.PathEscape(body.ZoneID), url.PathEscape(downstreamID))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return err
-}
-
 // Returns aggregated access records per session-resource pair. By default
 // (rollup_children=true), includes access from descendant sessions. Set
 // rollup_children=false to return only direct session access. At least one of
 // user_id, session_id, or resource_id must be provided.
 func (r *ZoneService) ListSessionResourceAccess(ctx context.Context, zoneID string, query ZoneListSessionResourceAccessParams, opts ...option.RequestOption) (res *ZoneListSessionResourceAccessResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -603,7 +578,7 @@ type ZoneGetParams struct {
 // URLQuery serializes [ZoneGetParams]'s query parameters as `url.Values`.
 func (r ZoneGetParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -744,7 +719,7 @@ type ZoneListParams struct {
 // URLQuery serializes [ZoneListParams]'s query parameters as `url.Values`.
 func (r ZoneListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -766,11 +741,6 @@ const (
 	ZoneListParamsExpandStringTotalCount  ZoneListParamsExpandString = "total_count"
 	ZoneListParamsExpandStringPermissions ZoneListParamsExpandString = "permissions"
 )
-
-type ZoneDeleteMcpServerParams struct {
-	ZoneID string `path:"zoneId" api:"required" json:"-"`
-	paramObj
-}
 
 type ZoneListSessionResourceAccessParams struct {
 	// Cursor for forward pagination
@@ -797,7 +767,7 @@ type ZoneListSessionResourceAccessParams struct {
 // `url.Values`.
 func (r ZoneListSessionResourceAccessParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

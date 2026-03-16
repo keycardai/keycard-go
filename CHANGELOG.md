@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.5.0 (2026-03-16)
+
+Full Changelog: [v0.4.1...v0.5.0](https://github.com/keycardai/keycard-go/compare/v0.4.1...v0.5.0)
+
+### Features
+
+* add OAuth2 as alternative auth on management API endpoints ([55f93cc](https://github.com/keycardai/keycard-go/commit/55f93ccb8c595582d1728d508ebf714f2c679678))
+* add OAuth2 client_credentials auth to SDK config ([146cd2d](https://github.com/keycardai/keycard-go/commit/146cd2df49ec79e76eecec89f35444bc41a3c98c))
+* consolidate prefixed security schemes into canonical names ([5ea0b3a](https://github.com/keycardai/keycard-go/commit/5ea0b3a8c5e6fb323b85c5583e9e1acaacd06084))
+* Include `array_format: brackets` settings ([b54c425](https://github.com/keycardai/keycard-go/commit/b54c425b7f7d68cbb2a2a8e31eb817675e203010))
+* remove unused security schemes from joined spec ([a6b1b2e](https://github.com/keycardai/keycard-go/commit/a6b1b2e54d20c92a8d9a8c3a547c4920ab5d5480))
+* support HTTP Basic Auth for service account token endpoint (RFC 6749 2.3.1) ([476e7ba](https://github.com/keycardai/keycard-go/commit/476e7bab7abccd75e8ab4b561f6e6f4585958196))
+
+
+### Bug Fixes
+
+* **tests:** prevent tests failing due to making unnecessary OAuth token requests ([286daf8](https://github.com/keycardai/keycard-go/commit/286daf841ec1794bf74dfee47bb199cfbb848c50))
+
+
+### Chores
+
+* hide unstable mcp features from api documentation ([361cffc](https://github.com/keycardai/keycard-go/commit/361cffc3611dbcf7acebc76b248babe534a966bc))
+* **internal:** use explicit returns in more places ([03e2e8f](https://github.com/keycardai/keycard-go/commit/03e2e8fee7da79e8a30019dc29b17e745a5d9bf5))
+
 ## 0.4.1 (2026-03-10)
 
 Full Changelog: [v0.4.0...v0.4.1](https://github.com/keycardai/keycard-go/compare/v0.4.0...v0.4.1)

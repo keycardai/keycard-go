@@ -286,7 +286,7 @@ type OrganizationServiceAccountCredentialGetParams struct {
 // parameters as `url.Values`.
 func (r OrganizationServiceAccountCredentialGetParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -334,7 +334,7 @@ type OrganizationServiceAccountCredentialListParams struct {
 // parameters as `url.Values`.
 func (r OrganizationServiceAccountCredentialListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

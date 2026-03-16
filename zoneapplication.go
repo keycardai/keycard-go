@@ -44,8 +44,7 @@ func NewZoneApplicationService(opts ...option.RequestOption) (r ZoneApplicationS
 // Creates a new Application - a software system with an identity that can access
 // Resources
 func (r *ZoneApplicationService) New(ctx context.Context, zoneID string, body ZoneApplicationNewParams, opts ...option.RequestOption) (res *Application, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -57,8 +56,7 @@ func (r *ZoneApplicationService) New(ctx context.Context, zoneID string, body Zo
 
 // Returns details of a specific Application by ID
 func (r *ZoneApplicationService) Get(ctx context.Context, id string, query ZoneApplicationGetParams, opts ...option.RequestOption) (res *Application, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if query.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -74,8 +72,7 @@ func (r *ZoneApplicationService) Get(ctx context.Context, id string, query ZoneA
 
 // Updates an Application's configuration and metadata
 func (r *ZoneApplicationService) Update(ctx context.Context, id string, params ZoneApplicationUpdateParams, opts ...option.RequestOption) (res *Application, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -91,8 +88,7 @@ func (r *ZoneApplicationService) Update(ctx context.Context, id string, params Z
 
 // Returns a list of applications in the specified zone
 func (r *ZoneApplicationService) List(ctx context.Context, zoneID string, query ZoneApplicationListParams, opts ...option.RequestOption) (res *ZoneApplicationListResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -104,8 +100,7 @@ func (r *ZoneApplicationService) List(ctx context.Context, zoneID string, query 
 
 // Permanently deletes an application
 func (r *ZoneApplicationService) Delete(ctx context.Context, id string, body ZoneApplicationDeleteParams, opts ...option.RequestOption) (err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
@@ -122,8 +117,7 @@ func (r *ZoneApplicationService) Delete(ctx context.Context, id string, body Zon
 
 // Returns a list of application credentials for a specific application
 func (r *ZoneApplicationService) ListCredentials(ctx context.Context, id string, params ZoneApplicationListCredentialsParams, opts ...option.RequestOption) (res *ZoneApplicationListCredentialsResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -139,8 +133,7 @@ func (r *ZoneApplicationService) ListCredentials(ctx context.Context, id string,
 
 // Returns a list of resources provided by an application
 func (r *ZoneApplicationService) ListResources(ctx context.Context, id string, params ZoneApplicationListResourcesParams, opts ...option.RequestOption) (res *ZoneApplicationListResourcesResponse, err error) {
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
@@ -187,8 +180,6 @@ type Application struct {
 	Metadata Metadata `json:"metadata"`
 	// Protocol-specific configuration
 	Protocols ApplicationProtocols `json:"protocols" api:"nullable"`
-	// Traits of the application
-	Traits []ApplicationTrait `json:"traits" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                respjson.Field
@@ -204,7 +195,6 @@ type Application struct {
 		Description       respjson.Field
 		Metadata          respjson.Field
 		Protocols         respjson.Field
-		Traits            respjson.Field
 		ExtraFields       map[string]respjson.Field
 		raw               string
 	} `json:"-"`
@@ -484,8 +474,6 @@ type ZoneApplicationNewParams struct {
 	Metadata MetadataParam `json:"metadata,omitzero"`
 	// Protocol-specific configuration for application creation
 	Protocols ZoneApplicationNewParamsProtocols `json:"protocols,omitzero"`
-	// Traits of the application
-	Traits []ApplicationTrait `json:"traits,omitzero"`
 	paramObj
 }
 
@@ -562,8 +550,6 @@ type ZoneApplicationUpdateParams struct {
 	Metadata MetadataUpdateParam `json:"metadata,omitzero"`
 	// Protocol-specific configuration for application update
 	Protocols ZoneApplicationUpdateParamsProtocols `json:"protocols,omitzero"`
-	// Traits of the application
-	Traits []ApplicationTrait `json:"traits,omitzero"`
 	paramObj
 }
 
@@ -632,7 +618,7 @@ type ZoneApplicationListParams struct {
 // `url.Values`.
 func (r ZoneApplicationListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -676,7 +662,7 @@ type ZoneApplicationListCredentialsParams struct {
 // `url.Values`.
 func (r ZoneApplicationListCredentialsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -715,7 +701,7 @@ type ZoneApplicationListResourcesParams struct {
 // `url.Values`.
 func (r ZoneApplicationListResourcesParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

@@ -274,18 +274,22 @@ func WithAPIKey(value string) RequestOption {
 	})
 }
 
-// WithUsername returns a RequestOption that sets the client setting "username".
-func WithUsername(value string) RequestOption {
+// WithClientID returns a RequestOption that sets the client setting "client_id".
+func WithClientID(value string) RequestOption {
+	oauthState := requestconfig.OAuth2Cache["https://api.keycard.ai/service-account-token"]
 	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
-		r.Username = value
+		r.ClientID = value
+		r.OAuth2State = oauthState
 		return nil
 	})
 }
 
-// WithPassword returns a RequestOption that sets the client setting "password".
-func WithPassword(value string) RequestOption {
+// WithClientSecret returns a RequestOption that sets the client setting "client_secret".
+func WithClientSecret(value string) RequestOption {
+	oauthState := requestconfig.OAuth2Cache["https://api.keycard.ai/service-account-token"]
 	return requestconfig.RequestOptionFunc(func(r *requestconfig.RequestConfig) error {
-		r.Password = value
+		r.ClientSecret = value
+		r.OAuth2State = oauthState
 		return nil
 	})
 }

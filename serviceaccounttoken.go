@@ -33,7 +33,12 @@ func NewServiceAccountTokenService(opts ...option.RequestOption) (r ServiceAccou
 	return
 }
 
-// Exchange service account credentials for organization-scoped M2M token
+// Exchange service account credentials for an organization-scoped M2M token.
+//
+// Credentials may be provided via HTTP Basic Authentication (RFC 6749 Section
+// 2.3.1, preferred) or as form body parameters. The server MUST NOT accept
+// credentials in both locations simultaneously and will reject such requests with
+// a 400 error.
 func (r *ServiceAccountTokenService) New(ctx context.Context, params ServiceAccountTokenNewParams, opts ...option.RequestOption) (res *TokenResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
@@ -46,15 +51,15 @@ func (r *ServiceAccountTokenService) New(ctx context.Context, params ServiceAcco
 }
 
 type ServiceAccountTokenNewParams struct {
-	// Service account client ID
-	ClientID string `json:"client_id" api:"required"`
-	// Service account client secret
-	ClientSecret string `json:"client_secret" api:"required"`
 	// OAuth 2.0 grant type (must be "client_credentials")
 	//
 	// Any of "client_credentials".
-	GrantType        ServiceAccountTokenNewParamsGrantType `json:"grant_type,omitzero" api:"required"`
-	XClientRequestID param.Opt[string]                     `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
+	GrantType ServiceAccountTokenNewParamsGrantType `json:"grant_type,omitzero" api:"required"`
+	// Service account client ID. Required if not using HTTP Basic Authentication.
+	ClientID param.Opt[string] `json:"client_id,omitzero"`
+	// Service account client secret. Required if not using HTTP Basic Authentication.
+	ClientSecret     param.Opt[string] `json:"client_secret,omitzero"`
+	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 
