@@ -16,11 +16,10 @@ import (
 // interacting with the keycard-api API. You should not instantiate this client
 // directly, and instead use the [NewClient] method instead.
 type Client struct {
-	Options             []option.RequestOption
-	Zones               ZoneService
-	Organizations       OrganizationService
-	ServiceAccountToken ServiceAccountTokenService
-	Invitations         InvitationService
+	Options       []option.RequestOption
+	Zones         ZoneService
+	Organizations OrganizationService
+	Invitations   InvitationService
 }
 
 // DefaultClientOptions read from the environment (KEYCARD_API_API_KEY,
@@ -55,7 +54,6 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 
 	r.Zones = NewZoneService(opts...)
 	r.Organizations = NewOrganizationService(opts...)
-	r.ServiceAccountToken = NewServiceAccountTokenService(opts...)
 	r.Invitations = NewInvitationService(opts...)
 
 	return
