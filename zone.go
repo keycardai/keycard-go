@@ -31,7 +31,6 @@ type ZoneService struct {
 	Applications           ZoneApplicationService
 	ApplicationCredentials ZoneApplicationCredentialService
 	DelegatedGrants        ZoneDelegatedGrantService
-	McpGateways            ZoneMcpGatewayService
 	Providers              ZoneProviderService
 	Resources              ZoneResourceService
 	Sessions               ZoneSessionService
@@ -56,7 +55,6 @@ func NewZoneService(opts ...option.RequestOption) (r ZoneService) {
 	r.Applications = NewZoneApplicationService(opts...)
 	r.ApplicationCredentials = NewZoneApplicationCredentialService(opts...)
 	r.DelegatedGrants = NewZoneDelegatedGrantService(opts...)
-	r.McpGateways = NewZoneMcpGatewayService(opts...)
 	r.Providers = NewZoneProviderService(opts...)
 	r.Resources = NewZoneResourceService(opts...)
 	r.Sessions = NewZoneSessionService(opts...)
