@@ -50,8 +50,7 @@ func (r *ZonePolicySchemaService) Get(ctx context.Context, version string, param
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zone_id parameter")
 		return nil, err
@@ -73,8 +72,7 @@ func (r *ZonePolicySchemaService) List(ctx context.Context, zoneID string, param
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
 		err = errors.New("missing required zone_id parameter")
 		return nil, err
@@ -92,8 +90,7 @@ func (r *ZonePolicySchemaService) SetDefault(ctx context.Context, version string
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zone_id parameter")
 		return nil, err

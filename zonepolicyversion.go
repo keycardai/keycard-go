@@ -48,8 +48,7 @@ func (r *ZonePolicyVersionService) New(ctx context.Context, policyID string, par
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zone_id parameter")
 		return nil, err
@@ -71,8 +70,7 @@ func (r *ZonePolicyVersionService) Get(ctx context.Context, versionID string, pa
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zone_id parameter")
 		return nil, err
@@ -98,8 +96,7 @@ func (r *ZonePolicyVersionService) List(ctx context.Context, policyID string, pa
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zone_id parameter")
 		return nil, err
@@ -121,8 +118,7 @@ func (r *ZonePolicyVersionService) Archive(ctx context.Context, versionID string
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
 	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
+	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
 		err = errors.New("missing required zone_id parameter")
 		return nil, err
