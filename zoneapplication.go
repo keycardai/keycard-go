@@ -180,8 +180,6 @@ type Application struct {
 	Metadata Metadata `json:"metadata"`
 	// Protocol-specific configuration
 	Protocols ApplicationProtocols `json:"protocols" api:"nullable"`
-	// Traits of the application
-	Traits []ApplicationTrait `json:"traits" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                respjson.Field
@@ -197,7 +195,6 @@ type Application struct {
 		Description       respjson.Field
 		Metadata          respjson.Field
 		Protocols         respjson.Field
-		Traits            respjson.Field
 		ExtraFields       map[string]respjson.Field
 		raw               string
 	} `json:"-"`
@@ -477,8 +474,6 @@ type ZoneApplicationNewParams struct {
 	Metadata MetadataParam `json:"metadata,omitzero"`
 	// Protocol-specific configuration for application creation
 	Protocols ZoneApplicationNewParamsProtocols `json:"protocols,omitzero"`
-	// Traits of the application
-	Traits []ApplicationTrait `json:"traits,omitzero"`
 	paramObj
 }
 
@@ -555,8 +550,6 @@ type ZoneApplicationUpdateParams struct {
 	Metadata MetadataUpdateParam `json:"metadata,omitzero"`
 	// Protocol-specific configuration for application update
 	Protocols ZoneApplicationUpdateParamsProtocols `json:"protocols,omitzero"`
-	// Traits of the application
-	Traits []ApplicationTrait `json:"traits,omitzero"`
 	paramObj
 }
 

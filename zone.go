@@ -115,24 +115,6 @@ func (r *ZoneService) Delete(ctx context.Context, zoneID string, opts ...option.
 	return err
 }
 
-// Removes downstream resource, dependency, and optionally upstream
-// resource/provider
-func (r *ZoneService) DeleteMcpServer(ctx context.Context, downstreamID string, body ZoneDeleteMcpServerParams, opts ...option.RequestOption) (err error) {
-	opts = slices.Concat(r.Options, opts)
-	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
-	if body.ZoneID == "" {
-		err = errors.New("missing required zoneId parameter")
-		return err
-	}
-	if downstreamID == "" {
-		err = errors.New("missing required downstreamId parameter")
-		return err
-	}
-	path := fmt.Sprintf("zones/%s/mcp-servers/%s", url.PathEscape(body.ZoneID), url.PathEscape(downstreamID))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return err
-}
-
 // Returns aggregated access records per session-resource pair. By default
 // (rollup_children=true), includes access from descendant sessions. Set
 // rollup_children=false to return only direct session access. At least one of
@@ -759,11 +741,6 @@ const (
 	ZoneListParamsExpandStringTotalCount  ZoneListParamsExpandString = "total_count"
 	ZoneListParamsExpandStringPermissions ZoneListParamsExpandString = "permissions"
 )
-
-type ZoneDeleteMcpServerParams struct {
-	ZoneID string `path:"zoneId" api:"required" json:"-"`
-	paramObj
-}
 
 type ZoneListSessionResourceAccessParams struct {
 	// Cursor for forward pagination
