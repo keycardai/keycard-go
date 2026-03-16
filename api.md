@@ -19,7 +19,6 @@ Methods:
 - <code title="patch /zones/{zoneId}">client.Zones.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneService.Update">Update</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, zoneID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneUpdateParams">ZoneUpdateParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Zone">Zone</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /zones">client.Zones.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneService.List">List</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneListParams">ZoneListParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneListResponse">ZoneListResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="delete /zones/{zoneId}">client.Zones.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneService.Delete">Delete</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, zoneID <a href="https://pkg.go.dev/builtin#string">string</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
-- <code title="delete /zones/{zoneId}/mcp-servers/{downstreamId}">client.Zones.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneService.DeleteMcpServer">DeleteMcpServer</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, downstreamID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneDeleteMcpServerParams">ZoneDeleteMcpServerParams</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
 - <code title="get /zones/{zoneId}/session-resource-access">client.Zones.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneService.ListSessionResourceAccess">ListSessionResourceAccess</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, zoneID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneListSessionResourceAccessParams">ZoneListSessionResourceAccessParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneListSessionResourceAccessResponse">ZoneListSessionResourceAccessResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 ## Applications
@@ -33,7 +32,6 @@ Params Types:
 Response Types:
 
 - <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Application">Application</a>
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ApplicationTrait">ApplicationTrait</a>
 - <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Metadata">Metadata</a>
 - <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneApplicationListResponse">ZoneApplicationListResponse</a>
 - <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneApplicationListCredentialsResponse">ZoneApplicationListCredentialsResponse</a>
@@ -100,14 +98,6 @@ Methods:
 - <code title="delete /zones/{zoneId}/delegated-grants/{id}">client.Zones.DelegatedGrants.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneDelegatedGrantService.Delete">Delete</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, id <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneDelegatedGrantDeleteParams">ZoneDelegatedGrantDeleteParams</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
 
 ## McpGateways
-
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMcpGatewayNewMcpServerResponse">ZoneMcpGatewayNewMcpServerResponse</a>
-
-Methods:
-
-- <code title="post /zones/{zoneId}/mcp-gateways/{applicationId}/mcp-servers">client.Zones.McpGateways.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMcpGatewayService.NewMcpServer">NewMcpServer</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, applicationID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMcpGatewayNewMcpServerParams">ZoneMcpGatewayNewMcpServerParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMcpGatewayNewMcpServerResponse">ZoneMcpGatewayNewMcpServerResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 ## Providers
 

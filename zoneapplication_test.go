@@ -47,7 +47,6 @@ func TestZoneApplicationNewWithOptionalParams(t *testing.T) {
 					RedirectUris:           []string{"https://example.com"},
 				},
 			},
-			Traits: []keycard.ApplicationTrait{keycard.ApplicationTraitGateway},
 		},
 	)
 	if err != nil {
@@ -120,7 +119,6 @@ func TestZoneApplicationUpdateWithOptionalParams(t *testing.T) {
 					RedirectUris:           []string{"https://example.com"},
 				},
 			},
-			Traits: []keycard.ApplicationTrait{keycard.ApplicationTraitGateway},
 		},
 	)
 	if err != nil {
