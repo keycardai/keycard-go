@@ -31,7 +31,6 @@ type ZoneService struct {
 	Applications           ZoneApplicationService
 	ApplicationCredentials ZoneApplicationCredentialService
 	DelegatedGrants        ZoneDelegatedGrantService
-	McpGateways            ZoneMcpGatewayService
 	Providers              ZoneProviderService
 	Resources              ZoneResourceService
 	Sessions               ZoneSessionService
@@ -39,6 +38,12 @@ type ZoneService struct {
 	Users                  ZoneUserService
 	Members                ZoneMemberService
 	Secrets                ZoneSecretService
+	// Zone-scoped Cedar schema management
+	PolicySchemas ZonePolicySchemaService
+	// Policy CRUD operations
+	Policies ZonePolicyService
+	// Policy set CRUD and binding management
+	PolicySets ZonePolicySetService
 }
 
 // NewZoneService generates a new service that applies the given options to each
@@ -50,7 +55,6 @@ func NewZoneService(opts ...option.RequestOption) (r ZoneService) {
 	r.Applications = NewZoneApplicationService(opts...)
 	r.ApplicationCredentials = NewZoneApplicationCredentialService(opts...)
 	r.DelegatedGrants = NewZoneDelegatedGrantService(opts...)
-	r.McpGateways = NewZoneMcpGatewayService(opts...)
 	r.Providers = NewZoneProviderService(opts...)
 	r.Resources = NewZoneResourceService(opts...)
 	r.Sessions = NewZoneSessionService(opts...)
@@ -58,6 +62,9 @@ func NewZoneService(opts ...option.RequestOption) (r ZoneService) {
 	r.Users = NewZoneUserService(opts...)
 	r.Members = NewZoneMemberService(opts...)
 	r.Secrets = NewZoneSecretService(opts...)
+	r.PolicySchemas = NewZonePolicySchemaService(opts...)
+	r.Policies = NewZonePolicyService(opts...)
+	r.PolicySets = NewZonePolicySetService(opts...)
 	return
 }
 

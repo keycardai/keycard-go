@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.6.0 (2026-03-16)
+
+Full Changelog: [v0.5.0...v0.6.0](https://github.com/keycardai/keycard-go/compare/v0.5.0...v0.6.0)
+
+### Features
+
+* add OAuth2 client credentials security scheme from common spec ([7c9c2ff](https://github.com/keycardai/keycard-go/commit/7c9c2ffdd29dfa01475970e322ab07fca5922a8c))
+* update pkg-oapi-common and add OAuth2 security scheme ([7be0447](https://github.com/keycardai/keycard-go/commit/7be0447b0ed9c43a102abf16cbaebce593d99e66))
+* use common bearerAuth and OAuth2 security schemes ([598c4fd](https://github.com/keycardai/keycard-go/commit/598c4fdba1349d751883ee840a7b943c96c6c49f))
+
+
+### Chores
+
+* configure new SDK language ([baff3ed](https://github.com/keycardai/keycard-go/commit/baff3edd0210f28cfdcf49344c52d358eecdb5aa))
+* **internal:** tweak CI branches ([8e63a5a](https://github.com/keycardai/keycard-go/commit/8e63a5a4b1ff3793c0575550bfe6cb984b11660b))
+
+
+### Documentation
+
+* remove MCP endpoints ([a391a65](https://github.com/keycardai/keycard-go/commit/a391a65b98177875d5f9ab336bc8a3f385a3fd06))
+
 ## 0.5.0 (2026-03-16)
 
 Full Changelog: [v0.4.1...v0.5.0](https://github.com/keycardai/keycard-go/compare/v0.4.1...v0.5.0)
