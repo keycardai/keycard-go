@@ -244,6 +244,8 @@ type Zone struct {
 	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Application ID configured as the default MCP Gateway for the zone
 	DefaultMcpGatewayApplicationID string `json:"default_mcp_gateway_application_id"`
+	// Resource ID configured as the default resource for the zone
+	DefaultResourceID string `json:"default_resource_id"`
 	// Human-readable description
 	Description string `json:"description" api:"nullable"`
 	// AWS KMS configuration for zone encryption. When not specified, the default
@@ -273,6 +275,7 @@ type Zone struct {
 		Slug                           respjson.Field
 		UpdatedAt                      respjson.Field
 		DefaultMcpGatewayApplicationID respjson.Field
+		DefaultResourceID              respjson.Field
 		Description                    respjson.Field
 		EncryptionKey                  respjson.Field
 		LoginFlow                      respjson.Field
@@ -538,6 +541,9 @@ type ZoneUpdateParams struct {
 	// Application ID configured as the default MCP Gateway for the zone (set to null
 	// to unset)
 	DefaultMcpGatewayApplicationID param.Opt[string] `json:"default_mcp_gateway_application_id,omitzero"`
+	// Resource ID to configure as the default resource for the zone (set to null to
+	// unset)
+	DefaultResourceID param.Opt[string] `json:"default_resource_id,omitzero"`
 	// Human-readable description
 	Description param.Opt[string] `json:"description,omitzero"`
 	// Provider ID to configure for user login (set to null to unset)
