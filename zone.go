@@ -38,7 +38,26 @@ type ZoneService struct {
 	Users                  ZoneUserService
 	Members                ZoneMemberService
 	Secrets                ZoneSecretService
-	// Zone-scoped Cedar schema management
+	// Zone-scoped Cedar schema management.
+	//
+	// The Cedar schema defines the entity model used for authorization decisions. Key
+	// entity types and their attributes:
+	//
+	//   - **Keycard::User** — `email` (String), `groups` (Set of String)
+	//   - **Keycard::Application** — `registration_method` (RegistrationMethod entity),
+	//     `credential_type` (CredentialType entity)
+	//   - **Keycard::RegistrationMethod** — enum entity: `"managed"`, `"dcr"`
+	//   - **Keycard::CredentialType** — enum entity: `"token"`, `"password"`,
+	//     `"public-key"`, `"url"`, `"public"`
+	//   - **Keycard::Resource** — `id` (String), `name` (String), `scopes` (Set of
+	//     String)
+	//   - **Keycard::Claims** — `email` (String), `groups` (Set of String), plus
+	//     arbitrary additional fields
+	//
+	// Enum-like attributes use Cedar enum entity types (schema version `2026-03-16`+).
+	// In policies, reference values as `RegistrationMethod::"managed"` or
+	// `CredentialType::"token"`. See the Credentials API spec for the full entity
+	// model reference.
 	PolicySchemas ZonePolicySchemaService
 	// Policy CRUD operations
 	Policies ZonePolicyService
@@ -120,21 +139,6 @@ func (r *ZoneService) Delete(ctx context.Context, zoneID string, opts ...option.
 	path := fmt.Sprintf("zones/%s", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
 	return err
-}
-
-// Returns aggregated access records per session-resource pair. By default
-// (rollup_children=true), includes access from descendant sessions. Set
-// rollup_children=false to return only direct session access. At least one of
-// user_id, session_id, or resource_id must be provided.
-func (r *ZoneService) ListSessionResourceAccess(ctx context.Context, zoneID string, query ZoneListSessionResourceAccessParams, opts ...option.RequestOption) (res *ZoneListSessionResourceAccessResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
-	if zoneID == "" {
-		err = errors.New("missing required zoneId parameter")
-		return nil, err
-	}
-	path := fmt.Sprintf("zones/%s/session-resource-access", url.PathEscape(zoneID))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return res, err
 }
 
 // AWS KMS configuration for zone encryption. When not specified, the default
@@ -428,83 +432,6 @@ func (r *ZoneListResponsePagination) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type ZoneListSessionResourceAccessResponse struct {
-	Items []ZoneListSessionResourceAccessResponseItem `json:"items" api:"required"`
-	// Cursor-based pagination metadata
-	Pagination ZoneListSessionResourceAccessResponsePagination `json:"pagination" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Items       respjson.Field
-		Pagination  respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r ZoneListSessionResourceAccessResponse) RawJSON() string { return r.JSON.raw }
-func (r *ZoneListSessionResourceAccessResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Aggregated record of session-resource access events
-type ZoneListSessionResourceAccessResponseItem struct {
-	// When access first occurred
-	FirstAccessedAt time.Time `json:"first_accessed_at" api:"required" format:"date-time"`
-	// When access most recently occurred
-	LastAccessedAt time.Time `json:"last_accessed_at" api:"required" format:"date-time"`
-	// Organization ID
-	OrganizationID string `json:"organization_id" api:"required"`
-	// Resource ID
-	ResourceID string `json:"resource_id" api:"required"`
-	// Session ID
-	SessionID string `json:"session_id" api:"required"`
-	// Total number of access events for this session-resource pair
-	TotalAccessCount int64 `json:"total_access_count" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		FirstAccessedAt  respjson.Field
-		LastAccessedAt   respjson.Field
-		OrganizationID   respjson.Field
-		ResourceID       respjson.Field
-		SessionID        respjson.Field
-		TotalAccessCount respjson.Field
-		ExtraFields      map[string]respjson.Field
-		raw              string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r ZoneListSessionResourceAccessResponseItem) RawJSON() string { return r.JSON.raw }
-func (r *ZoneListSessionResourceAccessResponseItem) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Cursor-based pagination metadata
-type ZoneListSessionResourceAccessResponsePagination struct {
-	// An opaque cursor used for paginating through a list of results
-	AfterCursor string `json:"after_cursor" api:"required"`
-	// An opaque cursor used for paginating through a list of results
-	BeforeCursor string `json:"before_cursor" api:"required"`
-	// Total number of items matching the query. Only included when
-	// expand[]=total_count is requested.
-	TotalCount int64 `json:"total_count"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		AfterCursor  respjson.Field
-		BeforeCursor respjson.Field
-		TotalCount   respjson.Field
-		ExtraFields  map[string]respjson.Field
-		raw          string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r ZoneListSessionResourceAccessResponsePagination) RawJSON() string { return r.JSON.raw }
-func (r *ZoneListSessionResourceAccessResponsePagination) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
 type ZoneNewParams struct {
 	// Human-readable name
 	Name string `json:"name" api:"required"`
@@ -747,51 +674,4 @@ type ZoneListParamsExpandString string
 const (
 	ZoneListParamsExpandStringTotalCount  ZoneListParamsExpandString = "total_count"
 	ZoneListParamsExpandStringPermissions ZoneListParamsExpandString = "permissions"
-)
-
-type ZoneListSessionResourceAccessParams struct {
-	// Cursor for forward pagination
-	After param.Opt[string] `query:"after,omitzero" json:"-"`
-	// Cursor for backward pagination
-	Before param.Opt[string] `query:"before,omitzero" json:"-"`
-	// Maximum number of items to return
-	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
-	// Filter by resource ID
-	ResourceID param.Opt[string] `query:"resource_id,omitzero" json:"-"`
-	// Include resource access from descendant sessions. When true (default),
-	// aggregates access from the session and all its descendants. When false, returns
-	// only direct access for the session.
-	RollupChildren param.Opt[bool] `query:"rollup_children,omitzero" json:"-"`
-	// Filter by session ID
-	SessionID param.Opt[string] `query:"session_id,omitzero" json:"-"`
-	// Filter by user ID
-	UserID param.Opt[string]                              `query:"user_id,omitzero" json:"-"`
-	Expand ZoneListSessionResourceAccessParamsExpandUnion `query:"expand[],omitzero" json:"-"`
-	paramObj
-}
-
-// URLQuery serializes [ZoneListSessionResourceAccessParams]'s query parameters as
-// `url.Values`.
-func (r ZoneListSessionResourceAccessParams) URLQuery() (v url.Values, err error) {
-	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
-		NestedFormat: apiquery.NestedQueryFormatBrackets,
-	})
-}
-
-// Only one field can be non-zero.
-//
-// Use [param.IsOmitted] to confirm if a field is set.
-type ZoneListSessionResourceAccessParamsExpandUnion struct {
-	// Check if union is this variant with
-	// !param.IsOmitted(union.OfZoneListSessionResourceAccesssExpandString)
-	OfZoneListSessionResourceAccesssExpandString         param.Opt[string] `query:",omitzero,inline"`
-	OfZoneListSessionResourceAccesssExpandArrayItemArray []string          `query:",omitzero,inline"`
-	paramUnion
-}
-
-type ZoneListSessionResourceAccessParamsExpandString string
-
-const (
-	ZoneListSessionResourceAccessParamsExpandStringTotalCount ZoneListSessionResourceAccessParamsExpandString = "total_count"
 )

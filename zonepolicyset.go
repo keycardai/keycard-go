@@ -193,8 +193,20 @@ type PolicySet struct {
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	CreatedBy string    `json:"created_by" api:"required"`
 	Name      string    `json:"name" api:"required"`
+	// Who manages this policy set:
+	//
+	// - `"platform"` — managed by the Keycard platform (system policies).
+	// - `"customer"` — managed by the tenant (custom policies).
+	//
 	// Any of "platform", "customer".
 	OwnerType PolicySetOwnerType `json:"owner_type" api:"required"`
+	// The scope at which this policy set applies:
+	//
+	// - `"zone"` — applies to all requests in the zone.
+	// - `"resource"` — scoped to a specific resource.
+	// - `"user"` — scoped to a specific user.
+	// - `"session"` — scoped to a specific session.
+	//
 	// Any of "zone", "resource", "user", "session".
 	ScopeType  PolicySetScopeType `json:"scope_type" api:"required"`
 	UpdatedAt  time.Time          `json:"updated_at" api:"required" format:"date-time"`
@@ -229,6 +241,10 @@ func (r *PolicySet) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Who manages this policy set:
+//
+// - `"platform"` — managed by the Keycard platform (system policies).
+// - `"customer"` — managed by the tenant (custom policies).
 type PolicySetOwnerType string
 
 const (
@@ -236,6 +252,12 @@ const (
 	PolicySetOwnerTypeCustomer PolicySetOwnerType = "customer"
 )
 
+// The scope at which this policy set applies:
+//
+// - `"zone"` — applies to all requests in the zone.
+// - `"resource"` — scoped to a specific resource.
+// - `"user"` — scoped to a specific user.
+// - `"session"` — scoped to a specific session.
 type PolicySetScopeType string
 
 const (
@@ -408,6 +430,13 @@ type ZonePolicySetNewParams struct {
 	Name             string            `json:"name" api:"required"`
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
+	// The scope at which this policy set applies:
+	//
+	// - `"zone"` — applies to all requests in the zone.
+	// - `"resource"` — scoped to a specific resource.
+	// - `"user"` — scoped to a specific user.
+	// - `"session"` — scoped to a specific session.
+	//
 	// Any of "zone", "resource", "user", "session".
 	ScopeType ZonePolicySetNewParamsScopeType `json:"scope_type,omitzero"`
 	paramObj
@@ -421,6 +450,12 @@ func (r *ZonePolicySetNewParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// The scope at which this policy set applies:
+//
+// - `"zone"` — applies to all requests in the zone.
+// - `"resource"` — scoped to a specific resource.
+// - `"user"` — scoped to a specific user.
+// - `"session"` — scoped to a specific session.
 type ZonePolicySetNewParamsScopeType string
 
 const (
