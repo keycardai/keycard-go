@@ -153,6 +153,11 @@ type Policy struct {
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	CreatedBy string    `json:"created_by" api:"required"`
 	Name      string    `json:"name" api:"required"`
+	// Who manages this policy:
+	//
+	// - `"platform"` — managed by the Keycard platform (system policies).
+	// - `"customer"` — managed by the tenant (custom policies).
+	//
 	// Any of "platform", "customer".
 	OwnerType   PolicyOwnerType `json:"owner_type" api:"required"`
 	UpdatedAt   time.Time       `json:"updated_at" api:"required" format:"date-time"`
@@ -188,6 +193,10 @@ func (r *Policy) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Who manages this policy:
+//
+// - `"platform"` — managed by the Keycard platform (system policies).
+// - `"customer"` — managed by the tenant (custom policies).
 type PolicyOwnerType string
 
 const (

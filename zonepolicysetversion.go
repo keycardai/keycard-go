@@ -195,8 +195,10 @@ type PolicySetVersion struct {
 	CreatedBy string            `json:"created_by" api:"required"`
 	Manifest  PolicySetManifest `json:"manifest" api:"required"`
 	// Hex-encoded SHA-256 of the canonicalized manifest
-	ManifestSha   string `json:"manifest_sha" api:"required"`
-	PolicySetID   string `json:"policy_set_id" api:"required"`
+	ManifestSha string `json:"manifest_sha" api:"required"`
+	PolicySetID string `json:"policy_set_id" api:"required"`
+	// Schema version pinned to this policy set version. Determines the Cedar schema
+	// used for evaluation when activated.
 	SchemaVersion string `json:"schema_version" api:"required"`
 	Version       int64  `json:"version" api:"required"`
 	// Whether this policy set version is currently bound with mode='active'
@@ -324,11 +326,12 @@ func (r *ZonePolicySetVersionListPoliciesResponsePagination) UnmarshalJSON(data 
 }
 
 type ZonePolicySetVersionNewParams struct {
-	ZoneID           string                 `path:"zone_id" api:"required" json:"-"`
-	Manifest         PolicySetManifestParam `json:"manifest,omitzero" api:"required"`
-	SchemaVersion    string                 `json:"schema_version" api:"required"`
-	XAPIVersion      param.Opt[string]      `header:"X-API-Version,omitzero" json:"-"`
-	XClientRequestID param.Opt[string]      `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
+	ZoneID   string                 `path:"zone_id" api:"required" json:"-"`
+	Manifest PolicySetManifestParam `json:"manifest,omitzero" api:"required"`
+	// Schema version to pin to this policy set version.
+	SchemaVersion    string            `json:"schema_version" api:"required"`
+	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
+	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 

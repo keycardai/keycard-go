@@ -137,11 +137,12 @@ func (r *ZonePolicyVersionService) Archive(ctx context.Context, versionID string
 }
 
 type PolicyVersion struct {
-	ID            string    `json:"id" api:"required"`
-	CreatedAt     time.Time `json:"created_at" api:"required" format:"date-time"`
-	CreatedBy     string    `json:"created_by" api:"required"`
-	PolicyID      string    `json:"policy_id" api:"required"`
-	SchemaVersion string    `json:"schema_version" api:"required"`
+	ID        string    `json:"id" api:"required"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
+	CreatedBy string    `json:"created_by" api:"required"`
+	PolicyID  string    `json:"policy_id" api:"required"`
+	// Schema version this policy was validated against when created.
+	SchemaVersion string `json:"schema_version" api:"required"`
 	// Hex-encoded content hash
 	Sha        string    `json:"sha" api:"required"`
 	Version    int64     `json:"version" api:"required"`
@@ -222,7 +223,8 @@ func (r *ZonePolicyVersionListResponsePagination) UnmarshalJSON(data []byte) err
 }
 
 type ZonePolicyVersionNewParams struct {
-	ZoneID        string `path:"zone_id" api:"required" json:"-"`
+	ZoneID string `path:"zone_id" api:"required" json:"-"`
+	// Schema version to validate this policy against. Must not be archived.
 	SchemaVersion string `json:"schema_version" api:"required"`
 	// Cedar policy in human-readable Cedar syntax. Mutually exclusive with cedar_json.
 	CedarRaw         param.Opt[string] `json:"cedar_raw,omitzero"`
