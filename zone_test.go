@@ -104,6 +104,7 @@ func TestZoneUpdateWithOptionalParams(t *testing.T) {
 		"zoneId",
 		keycard.ZoneUpdateParams{
 			DefaultMcpGatewayApplicationID: keycard.String("default_mcp_gateway_application_id"),
+			DefaultResourceID:              keycard.String("default_resource_id"),
 			Description:                    keycard.String("description"),
 			EncryptionKey: keycard.ZoneUpdateParamsEncryptionKey{
 				Arn:  "x",
