@@ -256,7 +256,7 @@ Params Types:
 
 Response Types:
 
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Attestation">Attestation</a>
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#AttestationStatement">AttestationStatement</a>
 - <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PolicySet">PolicySet</a>
 - <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PolicySetManifest">PolicySetManifest</a>
 - <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PolicySetManifestEntry">PolicySetManifestEntry</a>
