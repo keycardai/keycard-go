@@ -196,7 +196,14 @@ type PolicySetVersion struct {
 	Manifest  PolicySetManifest `json:"manifest" api:"required"`
 	// Hex-encoded SHA-256 of the canonicalized manifest
 	ManifestSha string `json:"manifest_sha" api:"required"`
-	PolicySetID string `json:"policy_set_id" api:"required"`
+	// Who manages this policy set version:
+	//
+	// - `"platform"` — managed by the Keycard platform (system policy set versions).
+	// - `"customer"` — managed by the tenant (custom policy set versions).
+	//
+	// Any of "platform", "customer".
+	OwnerType   PolicySetVersionOwnerType `json:"owner_type" api:"required"`
+	PolicySetID string                    `json:"policy_set_id" api:"required"`
 	// Schema version pinned to this policy set version. Determines the Cedar schema
 	// used for evaluation when activated.
 	SchemaVersion string `json:"schema_version" api:"required"`
@@ -205,13 +212,10 @@ type PolicySetVersion struct {
 	Active     bool      `json:"active"`
 	ArchivedAt time.Time `json:"archived_at" api:"nullable" format:"date-time"`
 	ArchivedBy string    `json:"archived_by" api:"nullable"`
-	// JWS Flattened JSON Serialization (RFC 7515 §7.2.2) of a policy set attestation.
-	// The protected header carries the signing algorithm and key identifier; the
-	// payload is a base64url-encoded AttestationStatement canonicalized per RFC 8785
-	// (JCS). Verify using the zone JWKS endpoint (RFC 7517). Currently signed with
-	// RS256; future zone key types (e.g. EdDSA) will be indicated by the "alg" header
-	// — no envelope changes required.
-	Attestation Attestation `json:"attestation" api:"nullable"`
+	// Decoded content of an Attestation JWS payload. Describes the exact policy set
+	// version composition at attestation time. This schema defines what consumers see
+	// after base64url-decoding the Attestation.payload field.
+	Attestation AttestationStatement `json:"attestation" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID            respjson.Field
@@ -219,6 +223,7 @@ type PolicySetVersion struct {
 		CreatedBy     respjson.Field
 		Manifest      respjson.Field
 		ManifestSha   respjson.Field
+		OwnerType     respjson.Field
 		PolicySetID   respjson.Field
 		SchemaVersion respjson.Field
 		Version       respjson.Field
@@ -236,6 +241,17 @@ func (r PolicySetVersion) RawJSON() string { return r.JSON.raw }
 func (r *PolicySetVersion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Who manages this policy set version:
+//
+// - `"platform"` — managed by the Keycard platform (system policy set versions).
+// - `"customer"` — managed by the tenant (custom policy set versions).
+type PolicySetVersionOwnerType string
+
+const (
+	PolicySetVersionOwnerTypePlatform PolicySetVersionOwnerType = "platform"
+	PolicySetVersionOwnerTypeCustomer PolicySetVersionOwnerType = "customer"
+)
 
 type ZonePolicySetVersionListResponse struct {
 	Items      []PolicySetVersion                         `json:"items" api:"required"`
