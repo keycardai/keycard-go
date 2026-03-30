@@ -184,6 +184,7 @@ func TestOrganizationListIdentitiesWithOptionalParams(t *testing.T) {
 			Before:           keycard.String("x"),
 			Expand:           []string{"permissions"},
 			Limit:            keycard.Int(1),
+			QueryEmail:       keycard.String("x"),
 			Role:             keycard.OrganizationRoleOrgAdmin,
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},

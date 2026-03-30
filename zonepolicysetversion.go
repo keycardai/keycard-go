@@ -196,7 +196,14 @@ type PolicySetVersion struct {
 	Manifest  PolicySetManifest `json:"manifest" api:"required"`
 	// Hex-encoded SHA-256 of the canonicalized manifest
 	ManifestSha string `json:"manifest_sha" api:"required"`
-	PolicySetID string `json:"policy_set_id" api:"required"`
+	// Who manages this policy set version:
+	//
+	// - `"platform"` — managed by the Keycard platform (system policy set versions).
+	// - `"customer"` — managed by the tenant (custom policy set versions).
+	//
+	// Any of "platform", "customer".
+	OwnerType   PolicySetVersionOwnerType `json:"owner_type" api:"required"`
+	PolicySetID string                    `json:"policy_set_id" api:"required"`
 	// Schema version pinned to this policy set version. Determines the Cedar schema
 	// used for evaluation when activated.
 	SchemaVersion string `json:"schema_version" api:"required"`
@@ -216,6 +223,7 @@ type PolicySetVersion struct {
 		CreatedBy     respjson.Field
 		Manifest      respjson.Field
 		ManifestSha   respjson.Field
+		OwnerType     respjson.Field
 		PolicySetID   respjson.Field
 		SchemaVersion respjson.Field
 		Version       respjson.Field
@@ -233,6 +241,17 @@ func (r PolicySetVersion) RawJSON() string { return r.JSON.raw }
 func (r *PolicySetVersion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Who manages this policy set version:
+//
+// - `"platform"` — managed by the Keycard platform (system policy set versions).
+// - `"customer"` — managed by the tenant (custom policy set versions).
+type PolicySetVersionOwnerType string
+
+const (
+	PolicySetVersionOwnerTypePlatform PolicySetVersionOwnerType = "platform"
+	PolicySetVersionOwnerTypeCustomer PolicySetVersionOwnerType = "customer"
+)
 
 type ZonePolicySetVersionListResponse struct {
 	Items      []PolicySetVersion                         `json:"items" api:"required"`
