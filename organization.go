@@ -502,7 +502,9 @@ type OrganizationListIdentitiesParams struct {
 	// Cursor for backward pagination
 	Before param.Opt[string] `query:"before,omitzero" json:"-"`
 	// Maximum number of identities to return
-	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
+	// Search identities by email substring (case-insensitive)
+	QueryEmail       param.Opt[string] `query:"query[email],omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Fields to expand in the response. Currently supports "permissions" to include
 	// the permissions field with the caller's permissions for the resource.
