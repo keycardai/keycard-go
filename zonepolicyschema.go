@@ -4,7 +4,6 @@ package keycard
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -362,5 +361,5 @@ func (r ZonePolicySchemaSetDefaultParams) MarshalJSON() (data []byte, err error)
 	return shimjson.Marshal(r.Body)
 }
 func (r *ZonePolicySchemaSetDefaultParams) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &r.Body)
+	return apijson.UnmarshalRoot(data, r)
 }
