@@ -209,10 +209,13 @@ type OrganizationServiceAccountGetParams struct {
 	// Organization ID or label identifier
 	OrganizationID   string            `path:"organization_id" api:"required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// Fields to expand in the response. Currently supports "permissions" to include
-	// the permissions field with the caller's permissions for the resource.
+	// Fields to expand in the response. Supports "permissions" to include the
+	// permissions field with the caller's permissions for the resource. For list
+	// organization identities only, "total_count" populates pagination.total_count
+	// with the number of identities matching the same filters as the list (excluding
+	// cursor and limit). Other operations ignore expand values they do not use.
 	//
-	// Any of "permissions".
+	// Any of "permissions", "total_count".
 	Expand []string `query:"expand,omitzero" json:"-"`
 	paramObj
 }
@@ -253,10 +256,13 @@ type OrganizationServiceAccountListParams struct {
 	// Maximum number of service accounts to return
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// Fields to expand in the response. Currently supports "permissions" to include
-	// the permissions field with the caller's permissions for the resource.
+	// Fields to expand in the response. Supports "permissions" to include the
+	// permissions field with the caller's permissions for the resource. For list
+	// organization identities only, "total_count" populates pagination.total_count
+	// with the number of identities matching the same filters as the list (excluding
+	// cursor and limit). Other operations ignore expand values they do not use.
 	//
-	// Any of "permissions".
+	// Any of "permissions", "total_count".
 	Expand []string `query:"expand,omitzero" json:"-"`
 	paramObj
 }
