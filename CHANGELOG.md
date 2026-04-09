@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.7.0 (2026-04-09)
+
+Full Changelog: [v0.6.0...v0.7.0](https://github.com/keycardai/keycard-go/compare/v0.6.0...v0.7.0)
+
+### Features
+
+* add email search to list organization identities endpoint ([48f864e](https://github.com/keycardai/keycard-go/commit/48f864eb17e6cbf3005b29ef7937e8b1d5abb53c))
+* add owner_type and enforce protection for platform-owned versions (ACC-29) ([4489db3](https://github.com/keycardai/keycard-go/commit/4489db3ed11fe12717413abebc77a7c87e83988c))
+* add PRM discovery to MCP gateway endpoint ([59c0273](https://github.com/keycardai/keycard-go/commit/59c0273b50e3b727d3d6e44860a6f6c18db198fb))
+* improved identities pagination ([7ef0e9a](https://github.com/keycardai/keycard-go/commit/7ef0e9a3e87edd0297fea5d173ee60e0321f75c1))
+* **internal:** support comma format in multipart form encoding ([037ac98](https://github.com/keycardai/keycard-go/commit/037ac9887eeec2019d584582b2f0fdeccabcf73b))
+* normalize and validate user input (ACC-107) ([b59ba29](https://github.com/keycardai/keycard-go/commit/b59ba29a7aa324551e833ef5dd8c6d35cf57562b))
+* provide more context for policy schema ([56ae151](https://github.com/keycardai/keycard-go/commit/56ae151ea5012415b929564edce46400aa1fcba1))
+* shadow testing (ACC-14) ([fa8f1f8](https://github.com/keycardai/keycard-go/commit/fa8f1f8ce74e028503b1d863a25bfc6f506b4731))
+* Support for user identifier and provider user identifier claim ([25d5766](https://github.com/keycardai/keycard-go/commit/25d5766bafaab35478b0c88a33e76865ac341c00))
+
+
+### Bug Fixes
+
+* fix issue with unmarshaling in some cases ([a250d0a](https://github.com/keycardai/keycard-go/commit/a250d0a8959d352f32dc61e8bc950ac595959eb7))
+* prevent duplicate ? in query params ([f0417c6](https://github.com/keycardai/keycard-go/commit/f0417c621c61ef510533a3d34180cc49ce72db01))
+
+
+### Chores
+
+* **ci:** skip lint on metadata-only changes ([be6fe54](https://github.com/keycardai/keycard-go/commit/be6fe5401122d53ccae53891d6cdd09910f2e477))
+* **ci:** support opting out of skipping builds on metadata-only commits ([a4404ec](https://github.com/keycardai/keycard-go/commit/a4404ec69949e89ac7a630613871b6e708d04925))
+* **client:** fix multipart serialisation of Default() fields ([be83fa5](https://github.com/keycardai/keycard-go/commit/be83fa5eb24da807497ccb99d7db230e2f26ad22))
+* **internal:** support default value struct tag ([a665edc](https://github.com/keycardai/keycard-go/commit/a665edc93b242b3f625ca2f090bc073e9feadb1b))
+* **internal:** update gitignore ([164c888](https://github.com/keycardai/keycard-go/commit/164c888c1dc32f38a141ca025c2973663f4a56d2))
+* remove unnecessary error check for url parsing ([9cc3a26](https://github.com/keycardai/keycard-go/commit/9cc3a261c4cc3b0c2446ab5cb20386e4aa75dd01))
+* update docs for api:"required" ([62b583b](https://github.com/keycardai/keycard-go/commit/62b583b4d49b0c6908b067109e68872a1941a479))
+
 ## 0.6.0 (2026-03-16)
 
 Full Changelog: [v0.5.0...v0.6.0](https://github.com/keycardai/keycard-go/compare/v0.5.0...v0.6.0)
