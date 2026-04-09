@@ -436,10 +436,12 @@ func (r *ZoneListResponsePagination) UnmarshalJSON(data []byte) error {
 }
 
 type ZoneNewParams struct {
-	// Human-readable name
-	Name string `json:"name" api:"required"`
-	// Human-readable description
-	Description param.Opt[string] `json:"description,omitzero"`
+	// Human-readable name. Must not contain HTML tags (e.g. `<script>`, `<div>`) or
+	// control characters.
+	Name string `json:"name" api:"required" format:"safe-text"`
+	// Human-readable description. Must not contain HTML tags (e.g. `<script>`,
+	// `<div>`) or control characters.
+	Description param.Opt[string] `json:"description,omitzero" format:"safe-text"`
 	// Assign a default MCP Gateway application to the zone
 	DefaultMcpGatewayApplication param.Opt[bool] `json:"default_mcp_gateway_application,omitzero"`
 	// Whether the zone requires an invitation for email/password registration, only
@@ -544,12 +546,14 @@ type ZoneUpdateParams struct {
 	// Resource ID to configure as the default resource for the zone (set to null to
 	// unset)
 	DefaultResourceID param.Opt[string] `json:"default_resource_id,omitzero"`
-	// Human-readable description
-	Description param.Opt[string] `json:"description,omitzero"`
+	// Human-readable description. Must not contain HTML tags (e.g. `<script>`,
+	// `<div>`) or control characters.
+	Description param.Opt[string] `json:"description,omitzero" format:"safe-text"`
 	// Provider ID to configure for user login (set to null to unset)
 	UserIdentityProviderID param.Opt[string] `json:"user_identity_provider_id,omitzero"`
-	// Human-readable name
-	Name param.Opt[string] `json:"name,omitzero"`
+	// Human-readable name. Must not contain HTML tags (e.g. `<script>`, `<div>`) or
+	// control characters.
+	Name param.Opt[string] `json:"name,omitzero" format:"safe-text"`
 	// Whether the zone requires an invitation for email/password registration, only
 	// applies when user_identity_provider_id is not set
 	RequiresInvitation param.Opt[bool] `json:"requires_invitation,omitzero"`

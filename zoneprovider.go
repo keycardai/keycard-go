@@ -334,12 +334,15 @@ func (r *ZoneProviderListResponsePagination) UnmarshalJSON(data []byte) error {
 }
 
 type ZoneProviderNewParams struct {
-	// User specified identifier, unique within the zone
-	Identifier string `json:"identifier" api:"required"`
-	// Human-readable name
-	Name string `json:"name" api:"required"`
-	// Human-readable description
-	Description param.Opt[string] `json:"description,omitzero"`
+	// User specified identifier, unique within the zone. Must not contain HTML tags
+	// (e.g. `<script>`, `<div>`) or control characters.
+	Identifier string `json:"identifier" api:"required" format:"safe-text"`
+	// Human-readable name. Must not contain HTML tags (e.g. `<script>`, `<div>`) or
+	// control characters.
+	Name string `json:"name" api:"required" format:"safe-text"`
+	// Human-readable description. Must not contain HTML tags (e.g. `<script>`,
+	// `<div>`) or control characters.
+	Description param.Opt[string] `json:"description,omitzero" format:"safe-text"`
 	// OAuth 2.0 client identifier
 	ClientID param.Opt[string] `json:"client_id,omitzero"`
 	// OAuth 2.0 client secret (will be encrypted and stored securely)
@@ -444,12 +447,15 @@ type ZoneProviderUpdateParams struct {
 	// OAuth 2.0 client secret (will be encrypted and stored securely). Set to null to
 	// remove.
 	ClientSecret param.Opt[string] `json:"client_secret,omitzero"`
-	// Human-readable description
-	Description param.Opt[string] `json:"description,omitzero"`
-	// User specified identifier, unique within the zone
-	Identifier param.Opt[string] `json:"identifier,omitzero"`
-	// Human-readable name
-	Name param.Opt[string] `json:"name,omitzero"`
+	// Human-readable description. Must not contain HTML tags (e.g. `<script>`,
+	// `<div>`) or control characters.
+	Description param.Opt[string] `json:"description,omitzero" format:"safe-text"`
+	// User specified identifier, unique within the zone. Must not contain HTML tags
+	// (e.g. `<script>`, `<div>`) or control characters.
+	Identifier param.Opt[string] `json:"identifier,omitzero" format:"safe-text"`
+	// Human-readable name. Must not contain HTML tags (e.g. `<script>`, `<div>`) or
+	// control characters.
+	Name param.Opt[string] `json:"name,omitzero" format:"safe-text"`
 	// Provider metadata. Set to null to remove all metadata.
 	Metadata any `json:"metadata,omitzero"`
 	// Protocol-specific configuration. Set to null to remove all protocols.
