@@ -398,6 +398,10 @@ type PolicySetWithBinding struct {
 	// Any of "active", "shadow".
 	Mode          string `json:"mode" api:"nullable"`
 	ScopeTargetID string `json:"scope_target_id" api:"nullable"`
+	// Human-readable version number of the shadow version
+	ShadowVersion int64 `json:"shadow_version" api:"nullable"`
+	// Public ID of the shadow (observed) version, if any
+	ShadowVersionID string `json:"shadow_version_id" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Active          respjson.Field
@@ -405,6 +409,8 @@ type PolicySetWithBinding struct {
 		ActiveVersionID respjson.Field
 		Mode            respjson.Field
 		ScopeTargetID   respjson.Field
+		ShadowVersion   respjson.Field
+		ShadowVersionID respjson.Field
 		ExtraFields     map[string]respjson.Field
 		raw             string
 	} `json:"-"`
