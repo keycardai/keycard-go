@@ -33,6 +33,7 @@ func TestZoneApplicationNewWithOptionalParams(t *testing.T) {
 		keycard.ZoneApplicationNewParams{
 			Identifier: "x",
 			Name:       "x",
+			Consent:    keycard.ZoneApplicationNewParamsConsentImplicit,
 			Dependencies: []keycard.ZoneApplicationNewParamsDependency{{
 				ID:   "id",
 				Type: keycard.String("type"),
@@ -107,6 +108,7 @@ func TestZoneApplicationUpdateWithOptionalParams(t *testing.T) {
 		"id",
 		keycard.ZoneApplicationUpdateParams{
 			ZoneID:      "zoneId",
+			Consent:     keycard.ZoneApplicationUpdateParamsConsentImplicit,
 			Description: keycard.String("description"),
 			Identifier:  keycard.String("x"),
 			Metadata: keycard.MetadataUpdateParam{

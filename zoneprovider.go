@@ -259,12 +259,16 @@ func (r *ProviderProtocolsOauth2) UnmarshalJSON(data []byte) error {
 
 // OpenID Connect protocol configuration
 type ProviderProtocolsOpenid struct {
-	UserinfoEndpoint string `json:"userinfo_endpoint" api:"nullable" format:"uri"`
+	// Name of a top-level string claim in this provider's ID Token to use as the user
+	// identifier on user creation. When not set, the user's Keycard ID is used.
+	UserIdentifierClaim string `json:"user_identifier_claim" api:"nullable"`
+	UserinfoEndpoint    string `json:"userinfo_endpoint" api:"nullable" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		UserinfoEndpoint respjson.Field
-		ExtraFields      map[string]respjson.Field
-		raw              string
+		UserIdentifierClaim respjson.Field
+		UserinfoEndpoint    respjson.Field
+		ExtraFields         map[string]respjson.Field
+		raw                 string
 	} `json:"-"`
 }
 
@@ -330,12 +334,15 @@ func (r *ZoneProviderListResponsePagination) UnmarshalJSON(data []byte) error {
 }
 
 type ZoneProviderNewParams struct {
-	// User specified identifier, unique within the zone
-	Identifier string `json:"identifier" api:"required"`
-	// Human-readable name
-	Name string `json:"name" api:"required"`
-	// Human-readable description
-	Description param.Opt[string] `json:"description,omitzero"`
+	// User specified identifier, unique within the zone. Must not contain HTML tags
+	// (e.g. `<script>`, `<div>`) or control characters.
+	Identifier string `json:"identifier" api:"required" format:"safe-text"`
+	// Human-readable name. Must not contain HTML tags (e.g. `<script>`, `<div>`) or
+	// control characters.
+	Name string `json:"name" api:"required" format:"safe-text"`
+	// Human-readable description. Must not contain HTML tags (e.g. `<script>`,
+	// `<div>`) or control characters.
+	Description param.Opt[string] `json:"description,omitzero" format:"safe-text"`
 	// OAuth 2.0 client identifier
 	ClientID param.Opt[string] `json:"client_id,omitzero"`
 	// OAuth 2.0 client secret (will be encrypted and stored securely)
@@ -413,7 +420,10 @@ func (r *ZoneProviderNewParamsProtocolsOauth2) UnmarshalJSON(data []byte) error 
 
 // OpenID Connect protocol configuration for provider creation
 type ZoneProviderNewParamsProtocolsOpenid struct {
-	UserinfoEndpoint param.Opt[string] `json:"userinfo_endpoint,omitzero" format:"uri"`
+	// Name of a top-level string claim in this provider's ID Token to use as the user
+	// identifier on user creation. When not set, the user's Keycard ID is used.
+	UserIdentifierClaim param.Opt[string] `json:"user_identifier_claim,omitzero"`
+	UserinfoEndpoint    param.Opt[string] `json:"userinfo_endpoint,omitzero" format:"uri"`
 	paramObj
 }
 
@@ -437,12 +447,15 @@ type ZoneProviderUpdateParams struct {
 	// OAuth 2.0 client secret (will be encrypted and stored securely). Set to null to
 	// remove.
 	ClientSecret param.Opt[string] `json:"client_secret,omitzero"`
-	// Human-readable description
-	Description param.Opt[string] `json:"description,omitzero"`
-	// User specified identifier, unique within the zone
-	Identifier param.Opt[string] `json:"identifier,omitzero"`
-	// Human-readable name
-	Name param.Opt[string] `json:"name,omitzero"`
+	// Human-readable description. Must not contain HTML tags (e.g. `<script>`,
+	// `<div>`) or control characters.
+	Description param.Opt[string] `json:"description,omitzero" format:"safe-text"`
+	// User specified identifier, unique within the zone. Must not contain HTML tags
+	// (e.g. `<script>`, `<div>`) or control characters.
+	Identifier param.Opt[string] `json:"identifier,omitzero" format:"safe-text"`
+	// Human-readable name. Must not contain HTML tags (e.g. `<script>`, `<div>`) or
+	// control characters.
+	Name param.Opt[string] `json:"name,omitzero" format:"safe-text"`
 	// Provider metadata. Set to null to remove all metadata.
 	Metadata any `json:"metadata,omitzero"`
 	// Protocol-specific configuration. Set to null to remove all protocols.
@@ -516,7 +529,11 @@ func (r *ZoneProviderUpdateParamsProtocolsOauth2) UnmarshalJSON(data []byte) err
 
 // OpenID Connect protocol configuration. Set to null to remove all OpenID config.
 type ZoneProviderUpdateParamsProtocolsOpenid struct {
-	UserinfoEndpoint param.Opt[string] `json:"userinfo_endpoint,omitzero" format:"uri"`
+	// Name of a top-level string claim in this provider's ID Token to use as the user
+	// identifier on user creation. Set to null to revert to default. Changing this
+	// value does not affect existing users.
+	UserIdentifierClaim param.Opt[string] `json:"user_identifier_claim,omitzero"`
+	UserinfoEndpoint    param.Opt[string] `json:"userinfo_endpoint,omitzero" format:"uri"`
 	paramObj
 }
 

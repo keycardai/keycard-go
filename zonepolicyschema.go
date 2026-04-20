@@ -4,7 +4,6 @@ package keycard
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -21,7 +20,26 @@ import (
 	"github.com/keycardai/keycard-go/packages/respjson"
 )
 
-// Zone-scoped Cedar schema management
+// Zone-scoped Cedar schema management.
+//
+// The Cedar schema defines the entity model used for authorization decisions. Key
+// entity types and their attributes:
+//
+//   - **Keycard::User** — `email` (String), `groups` (Set of String)
+//   - **Keycard::Application** — `registration_method` (RegistrationMethod entity),
+//     `credential_type` (CredentialType entity)
+//   - **Keycard::RegistrationMethod** — enum entity: `"managed"`, `"dcr"`
+//   - **Keycard::CredentialType** — enum entity: `"token"`, `"password"`,
+//     `"public-key"`, `"url"`, `"public"`
+//   - **Keycard::Resource** — `id` (String), `name` (String), `scopes` (Set of
+//     String)
+//   - **Keycard::Claims** — `email` (String), `groups` (Set of String), plus
+//     arbitrary additional fields
+//
+// Enum-like attributes use Cedar enum entity types (schema version `2026-03-16`+).
+// In policies, reference values as `RegistrationMethod::"managed"` or
+// `CredentialType::"token"`. See the Credentials API spec for the full entity
+// model reference.
 //
 // ZonePolicySchemaService contains methods and other services that help with
 // interacting with the keycard-api API.
@@ -104,8 +122,21 @@ func (r *ZonePolicySchemaService) SetDefault(ctx context.Context, version string
 	return res, err
 }
 
+// A versioned Cedar schema that defines the entity model, actions, and context
+// shape used for policy evaluation. The schema contains the valid entity types
+// (User, Application, Resource), their attributes, and the allowed attribute
+// values. See the Credentials API spec for a full reference of entity attributes
+// and valid values.
 type SchemaVersion struct {
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
+	// Controls what can be done with this schema version:
+	//
+	//   - `"active"` - new policy versions can be created and validated against it.
+	//   - `"deprecated"` - superseded by a newer version but still accepts new policy
+	//     versions.
+	//   - `"archived"` - closed to new policy versions. Existing policy set versions
+	//     pinned to this schema still evaluate normally.
+	//
 	// Any of "active", "deprecated", "archived".
 	Status     SchemaVersionStatus `json:"status" api:"required"`
 	UpdatedAt  time.Time           `json:"updated_at" api:"required" format:"date-time"`
@@ -137,6 +168,13 @@ func (r *SchemaVersion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Controls what can be done with this schema version:
+//
+//   - `"active"` - new policy versions can be created and validated against it.
+//   - `"deprecated"` - superseded by a newer version but still accepts new policy
+//     versions.
+//   - `"archived"` - closed to new policy versions. Existing policy set versions
+//     pinned to this schema still evaluate normally.
 type SchemaVersionStatus string
 
 const (
@@ -145,7 +183,14 @@ const (
 	SchemaVersionStatusArchived   SchemaVersionStatus = "archived"
 )
 
+// A versioned Cedar schema that defines the entity model, actions, and context
+// shape used for policy evaluation. The schema contains the valid entity types
+// (User, Application, Resource), their attributes, and the allowed attribute
+// values. See the Credentials API spec for a full reference of entity attributes
+// and valid values.
 type SchemaVersionWithZoneInfo struct {
+	// Whether this is the zone's default schema. Clients use this to pre-select which
+	// schema to write policies against. Has no effect on evaluation.
 	IsDefault bool `json:"is_default" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -316,5 +361,5 @@ func (r ZonePolicySchemaSetDefaultParams) MarshalJSON() (data []byte, err error)
 	return shimjson.Marshal(r.Body)
 }
 func (r *ZonePolicySchemaSetDefaultParams) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &r.Body)
+	return apijson.UnmarshalRoot(data, r)
 }

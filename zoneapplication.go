@@ -153,6 +153,11 @@ func (r *ZoneApplicationService) ListResources(ctx context.Context, id string, p
 type Application struct {
 	// Unique identifier of the application
 	ID string `json:"id" api:"required"`
+	// Consent mode for the application. 'implicit' means consent is automatically
+	// granted, 'required' means explicit user consent is needed.
+	//
+	// Any of "implicit", "required".
+	Consent ApplicationConsent `json:"consent" api:"required"`
 	// Entity creation timestamp
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Number of resource dependencies
@@ -183,6 +188,7 @@ type Application struct {
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                respjson.Field
+		Consent           respjson.Field
 		CreatedAt         respjson.Field
 		DependenciesCount respjson.Field
 		Identifier        respjson.Field
@@ -205,6 +211,15 @@ func (r Application) RawJSON() string { return r.JSON.raw }
 func (r *Application) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Consent mode for the application. 'implicit' means consent is automatically
+// granted, 'required' means explicit user consent is needed.
+type ApplicationConsent string
+
+const (
+	ApplicationConsentImplicit ApplicationConsent = "implicit"
+	ApplicationConsentRequired ApplicationConsent = "required"
+)
 
 // Who owns this application. Platform-owned applications cannot be modified via
 // API.
@@ -462,12 +477,19 @@ func (r *ZoneApplicationListResourcesResponsePagination) UnmarshalJSON(data []by
 }
 
 type ZoneApplicationNewParams struct {
-	// User specified identifier, unique within the zone
-	Identifier string `json:"identifier" api:"required"`
-	// Human-readable name
-	Name string `json:"name" api:"required"`
-	// Human-readable description
-	Description param.Opt[string] `json:"description,omitzero"`
+	// User specified identifier, unique within the zone. Must not contain HTML tags
+	// (e.g. `<script>`, `<div>`) or control characters.
+	Identifier string `json:"identifier" api:"required" format:"safe-text"`
+	// Human-readable name. Must not contain HTML tags (e.g. `<script>`, `<div>`) or
+	// control characters.
+	Name string `json:"name" api:"required" format:"safe-text"`
+	// Human-readable description. Must not contain HTML tags (e.g. `<script>`,
+	// `<div>`) or control characters.
+	Description param.Opt[string] `json:"description,omitzero" format:"safe-text"`
+	// Consent mode for the application. Defaults to 'required'.
+	//
+	// Any of "implicit", "required".
+	Consent ZoneApplicationNewParamsConsent `json:"consent,omitzero"`
 	// Dependencies of the application
 	Dependencies []ZoneApplicationNewParamsDependency `json:"dependencies,omitzero"`
 	// Entity metadata
@@ -484,6 +506,14 @@ func (r ZoneApplicationNewParams) MarshalJSON() (data []byte, err error) {
 func (r *ZoneApplicationNewParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Consent mode for the application. Defaults to 'required'.
+type ZoneApplicationNewParamsConsent string
+
+const (
+	ZoneApplicationNewParamsConsentImplicit ZoneApplicationNewParamsConsent = "implicit"
+	ZoneApplicationNewParamsConsentRequired ZoneApplicationNewParamsConsent = "required"
+)
 
 // The property ID is required.
 type ZoneApplicationNewParamsDependency struct {
@@ -540,16 +570,24 @@ type ZoneApplicationGetParams struct {
 
 type ZoneApplicationUpdateParams struct {
 	ZoneID string `path:"zoneId" api:"required" json:"-"`
-	// Human-readable description
-	Description param.Opt[string] `json:"description,omitzero"`
-	// User specified identifier, unique within the zone
-	Identifier param.Opt[string] `json:"identifier,omitzero"`
-	// Human-readable name
-	Name param.Opt[string] `json:"name,omitzero"`
+	// Human-readable description. Must not contain HTML tags (e.g. `<script>`,
+	// `<div>`) or control characters.
+	Description param.Opt[string] `json:"description,omitzero" format:"safe-text"`
+	// User specified identifier, unique within the zone. Must not contain HTML tags
+	// (e.g. `<script>`, `<div>`) or control characters.
+	Identifier param.Opt[string] `json:"identifier,omitzero" format:"safe-text"`
+	// Human-readable name. Must not contain HTML tags (e.g. `<script>`, `<div>`) or
+	// control characters.
+	Name param.Opt[string] `json:"name,omitzero" format:"safe-text"`
 	// Entity metadata (set to null or {} to remove metadata)
 	Metadata MetadataUpdateParam `json:"metadata,omitzero"`
 	// Protocol-specific configuration for application update
 	Protocols ZoneApplicationUpdateParamsProtocols `json:"protocols,omitzero"`
+	// Consent mode for the application. 'implicit' means consent is automatically
+	// granted, 'required' means explicit user consent is needed.
+	//
+	// Any of "implicit", "required".
+	Consent ZoneApplicationUpdateParamsConsent `json:"consent,omitzero"`
 	paramObj
 }
 
@@ -560,6 +598,15 @@ func (r ZoneApplicationUpdateParams) MarshalJSON() (data []byte, err error) {
 func (r *ZoneApplicationUpdateParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Consent mode for the application. 'implicit' means consent is automatically
+// granted, 'required' means explicit user consent is needed.
+type ZoneApplicationUpdateParamsConsent string
+
+const (
+	ZoneApplicationUpdateParamsConsentImplicit ZoneApplicationUpdateParamsConsent = "implicit"
+	ZoneApplicationUpdateParamsConsentRequired ZoneApplicationUpdateParamsConsent = "required"
+)
 
 // Protocol-specific configuration for application update
 type ZoneApplicationUpdateParamsProtocols struct {

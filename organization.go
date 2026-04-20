@@ -280,6 +280,8 @@ type OrganizationListIdentitiesResponse struct {
 	Items []OrganizationListIdentitiesResponseItem `json:"items" api:"required"`
 	// Pagination information using cursor-based pagination
 	PageInfo PageInfoCursor `json:"page_info" api:"required"`
+	// Cursor-based pagination metadata returned alongside a list of results
+	Pagination OrganizationListIdentitiesResponsePagination `json:"pagination" api:"required"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -289,6 +291,7 @@ type OrganizationListIdentitiesResponse struct {
 	JSON struct {
 		Items       respjson.Field
 		PageInfo    respjson.Field
+		Pagination  respjson.Field
 		Permissions respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -366,6 +369,31 @@ const (
 	OrganizationListIdentitiesResponseItemStatusRevoked  OrganizationListIdentitiesResponseItemStatus = "revoked"
 )
 
+// Cursor-based pagination metadata returned alongside a list of results
+type OrganizationListIdentitiesResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor" api:"required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor" api:"required"`
+	// Total number of items across all pages. Only present when the request includes
+	// ?expand=total_count.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrganizationListIdentitiesResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *OrganizationListIdentitiesResponsePagination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // List of available roles
 type OrganizationListRolesResponse struct {
 	// List of roles
@@ -436,10 +464,13 @@ func (r *OrganizationNewParams) UnmarshalJSON(data []byte) error {
 
 type OrganizationGetParams struct {
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// Fields to expand in the response. Currently supports "permissions" to include
-	// the permissions field with the caller's permissions for the resource.
+	// Fields to expand in the response. Supports "permissions" to include the
+	// permissions field with the caller's permissions for the resource. For list
+	// organization identities only, "total_count" populates pagination.total_count
+	// with the number of identities matching the same filters as the list (excluding
+	// cursor and limit). Other operations ignore expand values they do not use.
 	//
-	// Any of "permissions".
+	// Any of "permissions", "total_count".
 	Expand []string `query:"expand,omitzero" json:"-"`
 	paramObj
 }
@@ -475,10 +506,13 @@ type OrganizationListParams struct {
 	// Maximum number of organizations to return
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// Fields to expand in the response. Currently supports "permissions" to include
-	// the permissions field with the caller's permissions for the resource.
+	// Fields to expand in the response. Supports "permissions" to include the
+	// permissions field with the caller's permissions for the resource. For list
+	// organization identities only, "total_count" populates pagination.total_count
+	// with the number of identities matching the same filters as the list (excluding
+	// cursor and limit). Other operations ignore expand values they do not use.
 	//
-	// Any of "permissions".
+	// Any of "permissions", "total_count".
 	Expand []string `query:"expand,omitzero" json:"-"`
 	paramObj
 }
@@ -502,12 +536,17 @@ type OrganizationListIdentitiesParams struct {
 	// Cursor for backward pagination
 	Before param.Opt[string] `query:"before,omitzero" json:"-"`
 	// Maximum number of identities to return
-	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
+	// Search identities by email substring (case-insensitive)
+	QueryEmail       param.Opt[string] `query:"query[email],omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// Fields to expand in the response. Currently supports "permissions" to include
-	// the permissions field with the caller's permissions for the resource.
+	// Fields to expand in the response. Supports "permissions" to include the
+	// permissions field with the caller's permissions for the resource. For list
+	// organization identities only, "total_count" populates pagination.total_count
+	// with the number of identities matching the same filters as the list (excluding
+	// cursor and limit). Other operations ignore expand values they do not use.
 	//
-	// Any of "permissions".
+	// Any of "permissions", "total_count".
 	Expand []string `query:"expand,omitzero" json:"-"`
 	// Filter identities by role
 	//
@@ -527,10 +566,13 @@ func (r OrganizationListIdentitiesParams) URLQuery() (v url.Values, err error) {
 
 type OrganizationListRolesParams struct {
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// Fields to expand in the response. Currently supports "permissions" to include
-	// the permissions field with the caller's permissions for the resource.
+	// Fields to expand in the response. Supports "permissions" to include the
+	// permissions field with the caller's permissions for the resource. For list
+	// organization identities only, "total_count" populates pagination.total_count
+	// with the number of identities matching the same filters as the list (excluding
+	// cursor and limit). Other operations ignore expand values they do not use.
 	//
-	// Any of "permissions".
+	// Any of "permissions", "total_count".
 	Expand []string `query:"expand,omitzero" json:"-"`
 	// Filter roles by scope (organization or zone level)
 	//

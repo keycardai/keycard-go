@@ -154,47 +154,94 @@ func (r *ZonePolicySetService) Archive(ctx context.Context, policySetID string, 
 	return res, err
 }
 
-// JWS Flattened JSON Serialization (RFC 7515 §7.2.2) of a policy set attestation.
-// The protected header carries the signing algorithm and key identifier; the
-// payload is a base64url-encoded AttestationStatement canonicalized per RFC 8785
-// (JCS). Verify using the zone JWKS endpoint (RFC 7517). Currently signed with
-// RS256; future zone key types (e.g. EdDSA) will be indicated by the "alg" header
-// — no envelope changes required.
-type Attestation struct {
-	// Base64url-encoded AttestationStatement (RFC 7515 §3). Decode to inspect
-	// attestation content. The RFC 8785 canonical form of the decoded JSON is the JWS
-	// Signing Input alongside the protected header.
-	Payload string `json:"payload" api:"required"`
-	// Base64url-encoded JWS protected header (RFC 7515 §4). Contains at minimum "alg"
-	// (signing algorithm — currently RS256, will migrate to EdDSA) and "kid" (signing
-	// key identifier resolvable via the zone JWKS endpoint).
-	Protected string `json:"protected" api:"required"`
-	// Base64url-encoded digital signature computed over the JWS Signing Input
-	// (ASCII(protected) || '.' || payload) per RFC 7515 §5.1.
-	Signature string `json:"signature" api:"required"`
+// Decoded content of an Attestation JWS payload. Describes the exact policy set
+// version composition at attestation time. This schema defines what consumers see
+// after base64url-decoding the Attestation.payload field.
+type AttestationStatement struct {
+	AttestedAt time.Time `json:"attested_at" api:"required" format:"date-time"`
+	AttestedBy string    `json:"attested_by" api:"required"`
+	// Key ID of the signing key used to produce the attestation signature. Matches the
+	// "kid" in the JWS protected header.
+	KeyID string `json:"key_id" api:"required"`
+	// SHA-256 of the policy set version manifest. Verifiers MUST check this matches
+	// the policy_set_version.manifest_sha to detect attestation/version mismatches.
+	ManifestSha      string `json:"manifest_sha" api:"required"`
+	PolicySetID      string `json:"policy_set_id" api:"required"`
+	PolicySetVersion int64  `json:"policy_set_version" api:"required"`
+	// Event that produced this attestation. "created" is the initial attestation at
+	// version creation; "re_signed" is a re-attestation after key rotation (same
+	// content, new signature).
+	//
+	// Any of "created", "re_signed".
+	Status AttestationStatementStatus `json:"status" api:"required"`
+	// Statement type discriminator
+	//
+	// Any of "policy_set_attestation".
+	Type AttestationStatementType `json:"type" api:"required"`
+	// Statement schema version
+	//
+	// Any of 1.
+	V      int64  `json:"v" api:"required"`
+	ZoneID string `json:"zone_id" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Payload     respjson.Field
-		Protected   respjson.Field
-		Signature   respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		AttestedAt       respjson.Field
+		AttestedBy       respjson.Field
+		KeyID            respjson.Field
+		ManifestSha      respjson.Field
+		PolicySetID      respjson.Field
+		PolicySetVersion respjson.Field
+		Status           respjson.Field
+		Type             respjson.Field
+		V                respjson.Field
+		ZoneID           respjson.Field
+		ExtraFields      map[string]respjson.Field
+		raw              string
 	} `json:"-"`
 }
 
 // Returns the unmodified JSON received from the API
-func (r Attestation) RawJSON() string { return r.JSON.raw }
-func (r *Attestation) UnmarshalJSON(data []byte) error {
+func (r AttestationStatement) RawJSON() string { return r.JSON.raw }
+func (r *AttestationStatement) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Event that produced this attestation. "created" is the initial attestation at
+// version creation; "re_signed" is a re-attestation after key rotation (same
+// content, new signature).
+type AttestationStatementStatus string
+
+const (
+	AttestationStatementStatusCreated  AttestationStatementStatus = "created"
+	AttestationStatementStatusReSigned AttestationStatementStatus = "re_signed"
+)
+
+// Statement type discriminator
+type AttestationStatementType string
+
+const (
+	AttestationStatementTypePolicySetAttestation AttestationStatementType = "policy_set_attestation"
+)
 
 type PolicySet struct {
 	ID        string    `json:"id" api:"required"`
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	CreatedBy string    `json:"created_by" api:"required"`
 	Name      string    `json:"name" api:"required"`
+	// Who manages this policy set:
+	//
+	// - `"platform"` — managed by the Keycard platform (system policies).
+	// - `"customer"` — managed by the tenant (custom policies).
+	//
 	// Any of "platform", "customer".
 	OwnerType PolicySetOwnerType `json:"owner_type" api:"required"`
+	// The scope at which this policy set applies:
+	//
+	// - `"zone"` — applies to all requests in the zone.
+	// - `"resource"` — scoped to a specific resource.
+	// - `"user"` — scoped to a specific user.
+	// - `"session"` — scoped to a specific session.
+	//
 	// Any of "zone", "resource", "user", "session".
 	ScopeType  PolicySetScopeType `json:"scope_type" api:"required"`
 	UpdatedAt  time.Time          `json:"updated_at" api:"required" format:"date-time"`
@@ -229,6 +276,10 @@ func (r *PolicySet) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Who manages this policy set:
+//
+// - `"platform"` — managed by the Keycard platform (system policies).
+// - `"customer"` — managed by the tenant (custom policies).
 type PolicySetOwnerType string
 
 const (
@@ -236,6 +287,12 @@ const (
 	PolicySetOwnerTypeCustomer PolicySetOwnerType = "customer"
 )
 
+// The scope at which this policy set applies:
+//
+// - `"zone"` — applies to all requests in the zone.
+// - `"resource"` — scoped to a specific resource.
+// - `"user"` — scoped to a specific user.
+// - `"session"` — scoped to a specific session.
 type PolicySetScopeType string
 
 const (
@@ -341,6 +398,10 @@ type PolicySetWithBinding struct {
 	// Any of "active", "shadow".
 	Mode          string `json:"mode" api:"nullable"`
 	ScopeTargetID string `json:"scope_target_id" api:"nullable"`
+	// Human-readable version number of the shadow version
+	ShadowVersion int64 `json:"shadow_version" api:"nullable"`
+	// Public ID of the shadow (observed) version, if any
+	ShadowVersionID string `json:"shadow_version_id" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Active          respjson.Field
@@ -348,6 +409,8 @@ type PolicySetWithBinding struct {
 		ActiveVersionID respjson.Field
 		Mode            respjson.Field
 		ScopeTargetID   respjson.Field
+		ShadowVersion   respjson.Field
+		ShadowVersionID respjson.Field
 		ExtraFields     map[string]respjson.Field
 		raw             string
 	} `json:"-"`
@@ -408,6 +471,13 @@ type ZonePolicySetNewParams struct {
 	Name             string            `json:"name" api:"required"`
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
+	// The scope at which this policy set applies:
+	//
+	// - `"zone"` — applies to all requests in the zone.
+	// - `"resource"` — scoped to a specific resource.
+	// - `"user"` — scoped to a specific user.
+	// - `"session"` — scoped to a specific session.
+	//
 	// Any of "zone", "resource", "user", "session".
 	ScopeType ZonePolicySetNewParamsScopeType `json:"scope_type,omitzero"`
 	paramObj
@@ -421,6 +491,12 @@ func (r *ZonePolicySetNewParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// The scope at which this policy set applies:
+//
+// - `"zone"` — applies to all requests in the zone.
+// - `"resource"` — scoped to a specific resource.
+// - `"user"` — scoped to a specific user.
+// - `"session"` — scoped to a specific session.
 type ZonePolicySetNewParamsScopeType string
 
 const (

@@ -76,6 +76,10 @@ type User struct {
 	Email string `json:"email" api:"required" format:"email"`
 	// Whether the email address has been verified
 	EmailVerified bool `json:"email_verified" api:"required"`
+	// Zone-scoped user identifier. Defaults to the user's Keycard ID. When the
+	// provider has user_identifier_claim configured, the value is set from that claim
+	// at user creation time.
+	Identifier string `json:"identifier" api:"required"`
 	// Organization that owns this user
 	OrganizationID string `json:"organization_id" api:"required"`
 	// Entity update timestamp
@@ -97,6 +101,7 @@ type User struct {
 		CreatedAt       respjson.Field
 		Email           respjson.Field
 		EmailVerified   respjson.Field
+		Identifier      respjson.Field
 		OrganizationID  respjson.Field
 		UpdatedAt       respjson.Field
 		ZoneID          respjson.Field

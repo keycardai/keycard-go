@@ -137,11 +137,19 @@ func (r *ZonePolicyVersionService) Archive(ctx context.Context, versionID string
 }
 
 type PolicyVersion struct {
-	ID            string    `json:"id" api:"required"`
-	CreatedAt     time.Time `json:"created_at" api:"required" format:"date-time"`
-	CreatedBy     string    `json:"created_by" api:"required"`
-	PolicyID      string    `json:"policy_id" api:"required"`
-	SchemaVersion string    `json:"schema_version" api:"required"`
+	ID        string    `json:"id" api:"required"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
+	CreatedBy string    `json:"created_by" api:"required"`
+	// Who manages this policy version:
+	//
+	// - `"platform"` — managed by the Keycard platform (system policy versions).
+	// - `"customer"` — managed by the tenant (custom policy versions).
+	//
+	// Any of "platform", "customer".
+	OwnerType PolicyVersionOwnerType `json:"owner_type" api:"required"`
+	PolicyID  string                 `json:"policy_id" api:"required"`
+	// Schema version this policy was validated against when created.
+	SchemaVersion string `json:"schema_version" api:"required"`
 	// Hex-encoded content hash
 	Sha        string    `json:"sha" api:"required"`
 	Version    int64     `json:"version" api:"required"`
@@ -157,6 +165,7 @@ type PolicyVersion struct {
 		ID            respjson.Field
 		CreatedAt     respjson.Field
 		CreatedBy     respjson.Field
+		OwnerType     respjson.Field
 		PolicyID      respjson.Field
 		SchemaVersion respjson.Field
 		Sha           respjson.Field
@@ -176,6 +185,17 @@ func (r PolicyVersion) RawJSON() string { return r.JSON.raw }
 func (r *PolicyVersion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Who manages this policy version:
+//
+// - `"platform"` — managed by the Keycard platform (system policy versions).
+// - `"customer"` — managed by the tenant (custom policy versions).
+type PolicyVersionOwnerType string
+
+const (
+	PolicyVersionOwnerTypePlatform PolicyVersionOwnerType = "platform"
+	PolicyVersionOwnerTypeCustomer PolicyVersionOwnerType = "customer"
+)
 
 type ZonePolicyVersionListResponse struct {
 	Items      []PolicyVersion                         `json:"items" api:"required"`
@@ -222,7 +242,8 @@ func (r *ZonePolicyVersionListResponsePagination) UnmarshalJSON(data []byte) err
 }
 
 type ZonePolicyVersionNewParams struct {
-	ZoneID        string `path:"zone_id" api:"required" json:"-"`
+	ZoneID string `path:"zone_id" api:"required" json:"-"`
+	// Schema version to validate this policy against. Must not be archived.
 	SchemaVersion string `json:"schema_version" api:"required"`
 	// Cedar policy in human-readable Cedar syntax. Mutually exclusive with cedar_json.
 	CedarRaw         param.Opt[string] `json:"cedar_raw,omitzero"`

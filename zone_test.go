@@ -104,6 +104,7 @@ func TestZoneUpdateWithOptionalParams(t *testing.T) {
 		"zoneId",
 		keycard.ZoneUpdateParams{
 			DefaultMcpGatewayApplicationID: keycard.String("default_mcp_gateway_application_id"),
+			DefaultResourceID:              keycard.String("default_resource_id"),
 			Description:                    keycard.String("description"),
 			EncryptionKey: keycard.ZoneUpdateParamsEncryptionKey{
 				Arn:  "x",
@@ -178,45 +179,6 @@ func TestZoneDelete(t *testing.T) {
 		option.WithClientSecret("My Client Secret"),
 	)
 	err := client.Zones.Delete(context.TODO(), "zoneId")
-	if err != nil {
-		var apierr *keycard.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestZoneListSessionResourceAccessWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := keycard.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithClientID("My Client ID"),
-		option.WithClientSecret("My Client Secret"),
-	)
-	_, err := client.Zones.ListSessionResourceAccess(
-		context.TODO(),
-		"zoneId",
-		keycard.ZoneListSessionResourceAccessParams{
-			After:  keycard.String("x"),
-			Before: keycard.String("x"),
-			Expand: keycard.ZoneListSessionResourceAccessParamsExpandUnion{
-				OfZoneListSessionResourceAccesssExpandString: keycard.String("total_count"),
-			},
-			Limit:          keycard.Int(1),
-			ResourceID:     keycard.String("resource_id"),
-			RollupChildren: keycard.Bool(true),
-			SessionID:      keycard.String("session_id"),
-			UserID:         keycard.String("user_id"),
-		},
-	)
 	if err != nil {
 		var apierr *keycard.Error
 		if errors.As(err, &apierr) {
