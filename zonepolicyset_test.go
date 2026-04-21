@@ -130,6 +130,7 @@ func TestZonePolicySetListWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"zone_id",
 		keycard.ZonePolicySetListParams{
+			Active:           keycard.Bool(true),
 			After:            keycard.String("after"),
 			Before:           keycard.String("before"),
 			Expand:           []string{"total_count"},

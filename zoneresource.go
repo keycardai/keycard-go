@@ -169,6 +169,10 @@ type ZoneResourceNewParams struct {
 	ApplicationID param.Opt[string] `json:"application_id,omitzero"`
 	// ID of the credential provider to associate with the resource
 	CredentialProviderID param.Opt[string] `json:"credential_provider_id,omitzero"`
+	// When true, the resource identifier is treated as a URI prefix and protects all
+	// URLs that share the identifier as a prefix. Defaults to false: resources only
+	// match by exact identifier unless explicitly enabled.
+	Prefix param.Opt[bool] `json:"prefix,omitzero"`
 	// The expected type of client for this credential. Native clients must use
 	// localhost URLs for redirect_uris or URIs with custom schemes. Web clients must
 	// use https URLs and must not use localhost as the hostname.
@@ -221,6 +225,9 @@ type ZoneResourceUpdateParams struct {
 	// Human-readable name. Must not contain HTML tags (e.g. `<script>`, `<div>`) or
 	// control characters.
 	Name param.Opt[string] `json:"name,omitzero" format:"safe-text"`
+	// When true, the resource identifier is treated as a URI prefix, protecting all
+	// URLs that share the identifier as a prefix.
+	Prefix param.Opt[bool] `json:"prefix,omitzero"`
 	// Entity metadata (set to null or {} to remove metadata)
 	Metadata MetadataUpdateParam `json:"metadata,omitzero"`
 	// Scopes supported by the resource (set to null to unset)
