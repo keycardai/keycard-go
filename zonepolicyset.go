@@ -531,6 +531,10 @@ func (r *ZonePolicySetUpdateParams) UnmarshalJSON(data []byte) error {
 }
 
 type ZonePolicySetListParams struct {
+	// Filter by active binding status. When `true`, returns only policy sets with an
+	// active binding. When `false`, returns only policy sets without one. Omit to
+	// return all.
+	Active param.Opt[bool] `query:"active,omitzero" json:"-"`
 	// Return items after this cursor (forward pagination). Use after_cursor from a
 	// previous response. Mutually exclusive with before.
 	After param.Opt[string] `query:"after,omitzero" json:"-"`
