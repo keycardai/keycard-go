@@ -101,8 +101,8 @@ func TestZonePolicyVersionListWithOptionalParams(t *testing.T) {
 		"policy_id",
 		keycard.ZonePolicyVersionListParams{
 			ZoneID:           "zone_id",
-			After:            keycard.String("after"),
-			Before:           keycard.String("before"),
+			After:            keycard.String("x"),
+			Before:           keycard.String("x"),
 			Expand:           []string{"total_count"},
 			Format:           keycard.ZonePolicyVersionListParamsFormatCedar,
 			Limit:            keycard.Int(1),

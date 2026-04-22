@@ -139,8 +139,8 @@ func TestZonePolicySetVersionListWithOptionalParams(t *testing.T) {
 		"policy_set_id",
 		keycard.ZonePolicySetVersionListParams{
 			ZoneID:           "zone_id",
-			After:            keycard.String("after"),
-			Before:           keycard.String("before"),
+			After:            keycard.String("x"),
+			Before:           keycard.String("x"),
 			Expand:           []string{"total_count"},
 			Limit:            keycard.Int(1),
 			Order:            keycard.ZonePolicySetVersionListParamsOrderAsc,
@@ -211,8 +211,8 @@ func TestZonePolicySetVersionListPoliciesWithOptionalParams(t *testing.T) {
 		keycard.ZonePolicySetVersionListPoliciesParams{
 			ZoneID:           "zone_id",
 			PolicySetID:      "policy_set_id",
-			After:            keycard.String("after"),
-			Before:           keycard.String("before"),
+			After:            keycard.String("x"),
+			Before:           keycard.String("x"),
 			Expand:           []string{"total_count"},
 			Format:           keycard.ZonePolicySetVersionListPoliciesParamsFormatCedar,
 			Limit:            keycard.Int(1),
