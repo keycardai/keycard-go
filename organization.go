@@ -376,7 +376,7 @@ type OrganizationListIdentitiesResponsePagination struct {
 	// An opaque cursor used for paginating through a list of results
 	BeforeCursor string `json:"before_cursor" api:"required"`
 	// Total number of items across all pages. Only present when the request includes
-	// ?expand=total_count.
+	// ?expand[]=total_count.
 	TotalCount int64 `json:"total_count"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
