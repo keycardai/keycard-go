@@ -66,22 +66,7 @@ func TestZoneUserListWithOptionalParams(t *testing.T) {
 			Expand: keycard.ZoneUserListParamsExpandUnion{
 				OfZoneUserListsExpandString: keycard.String("total_count"),
 			},
-			FilterEmail: keycard.ZoneUserListParamsFilterEmailUnion{
-				OfString: keycard.String("dev@stainless.com"),
-			},
 			Limit: keycard.Int(1),
-			Query: keycard.ZoneUserListParamsQueryUnion{
-				OfString: keycard.String("x"),
-			},
-			QueryEmail: keycard.ZoneUserListParamsQueryEmailUnion{
-				OfString: keycard.String("x"),
-			},
-			QueryIdentifier: keycard.ZoneUserListParamsQueryIdentifierUnion{
-				OfString: keycard.String("x"),
-			},
-			QuerySubject: keycard.ZoneUserListParamsQuerySubjectUnion{
-				OfString: keycard.String("x"),
-			},
 		},
 	)
 	if err != nil {
