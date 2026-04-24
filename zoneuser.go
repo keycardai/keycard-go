@@ -54,12 +54,7 @@ func (r *ZoneUserService) Get(ctx context.Context, id string, query ZoneUserGetP
 	return res, err
 }
 
-// Returns users in the specified zone with cursor-based pagination (after, before,
-// limit). Use expand[]=total_count to include the total number of matching users.
-// Exact match: filter[email] (repeatable for OR). Substring search
-// (case-insensitive, repeatable for OR within each parameter): query[email],
-// query[subject], query[identifier], query[] (across email, identifier, and
-// subject). Non-empty query parameters are combined with AND.
+// Returns a list of users in the specified zone. Can be filtered by email address.
 func (r *ZoneUserService) List(ctx context.Context, zoneID string, query ZoneUserListParams, opts ...option.RequestOption) (res *ZoneUserListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -182,16 +177,6 @@ type ZoneUserListParams struct {
 	// Maximum number of items to return
 	Limit  param.Opt[int64]              `query:"limit,omitzero" json:"-"`
 	Expand ZoneUserListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
-	// Filter by exact email address
-	FilterEmail ZoneUserListParamsFilterEmailUnion `query:"filter[email],omitzero" format:"email" json:"-"`
-	// Search across email, identifier, and federated subject (substring match)
-	Query ZoneUserListParamsQueryUnion `query:"query[],omitzero" json:"-"`
-	// Search by email (substring match)
-	QueryEmail ZoneUserListParamsQueryEmailUnion `query:"query[email],omitzero" json:"-"`
-	// Search by user identifier (substring match)
-	QueryIdentifier ZoneUserListParamsQueryIdentifierUnion `query:"query[identifier],omitzero" json:"-"`
-	// Search by federated credential subject (substring match)
-	QuerySubject ZoneUserListParamsQuerySubjectUnion `query:"query[subject],omitzero" json:"-"`
 	paramObj
 }
 
@@ -219,48 +204,3 @@ type ZoneUserListParamsExpandString string
 const (
 	ZoneUserListParamsExpandStringTotalCount ZoneUserListParamsExpandString = "total_count"
 )
-
-// Only one field can be non-zero.
-//
-// Use [param.IsOmitted] to confirm if a field is set.
-type ZoneUserListParamsFilterEmailUnion struct {
-	OfString      param.Opt[string] `query:",omitzero,inline"`
-	OfStringArray []string          `query:",omitzero,inline"`
-	paramUnion
-}
-
-// Only one field can be non-zero.
-//
-// Use [param.IsOmitted] to confirm if a field is set.
-type ZoneUserListParamsQueryUnion struct {
-	OfString      param.Opt[string] `query:",omitzero,inline"`
-	OfStringArray []string          `query:",omitzero,inline"`
-	paramUnion
-}
-
-// Only one field can be non-zero.
-//
-// Use [param.IsOmitted] to confirm if a field is set.
-type ZoneUserListParamsQueryEmailUnion struct {
-	OfString      param.Opt[string] `query:",omitzero,inline"`
-	OfStringArray []string          `query:",omitzero,inline"`
-	paramUnion
-}
-
-// Only one field can be non-zero.
-//
-// Use [param.IsOmitted] to confirm if a field is set.
-type ZoneUserListParamsQueryIdentifierUnion struct {
-	OfString      param.Opt[string] `query:",omitzero,inline"`
-	OfStringArray []string          `query:",omitzero,inline"`
-	paramUnion
-}
-
-// Only one field can be non-zero.
-//
-// Use [param.IsOmitted] to confirm if a field is set.
-type ZoneUserListParamsQuerySubjectUnion struct {
-	OfString      param.Opt[string] `query:",omitzero,inline"`
-	OfStringArray []string          `query:",omitzero,inline"`
-	paramUnion
-}
