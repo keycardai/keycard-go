@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.8.0 (2026-04-24)
+
+Full Changelog: [v0.7.0...v0.8.0](https://github.com/keycardai/keycard-go/compare/v0.7.0...v0.8.0)
+
+### Features
+
+* add filter/query to policy (set) queries (ACC-147) ([7459744](https://github.com/keycardai/keycard-go/commit/745974476ad57a44bdd254715888a8b758340f43))
+* add standard pagination/filter/search definitions ([7d87282](https://github.com/keycardai/keycard-go/commit/7d87282440b5915951213aa20ace8617df136d5e))
+* **go:** add default http client with timeout ([730af09](https://github.com/keycardai/keycard-go/commit/730af09665b961536d313ebf20c78372617c9b4e))
+* Matte/revert in progress commits ([98e6c1a](https://github.com/keycardai/keycard-go/commit/98e6c1a054c7c11ca4b2fcc2823c7455c916821e))
+* **mgmt api:** add list Users pagination, querying, filtering ([b2410ea](https://github.com/keycardai/keycard-go/commit/b2410eae6c4b8939f585e453f5847d167caea2c0))
+* resource prefix flag ([a77fdaa](https://github.com/keycardai/keycard-go/commit/a77fdaaa7e07cfc5914fa770596fbed974967ac9))
+* store all evaluation requests for replay and impact (ACC-134) ([67c8efa](https://github.com/keycardai/keycard-go/commit/67c8efac1302c3fe52e6e671fc3d55fd1b9311f5))
+
+
+### Chores
+
+* **internal:** more robust bootstrap script ([d880f99](https://github.com/keycardai/keycard-go/commit/d880f997d18632aaf6c0dc5fe7c180f1e5be19c2))
+
 ## 0.7.0 (2026-04-09)
 
 Full Changelog: [v0.6.0...v0.7.0](https://github.com/keycardai/keycard-go/compare/v0.6.0...v0.7.0)

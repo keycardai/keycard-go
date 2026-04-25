@@ -140,6 +140,11 @@ type Resource struct {
 	//
 	// Any of "platform", "customer".
 	OwnerType ResourceOwnerType `json:"owner_type" api:"required"`
+	// When true, the resource identifier is treated as a URI prefix, protecting all
+	// URLs that share the identifier as a prefix at path/query/fragment boundaries.
+	// Protocol and hostname must match exactly. When multiple prefix resources satisfy
+	// an identifier query, the resource with the longest prefix is matched.
+	Prefix bool `json:"prefix" api:"required"`
 	// URL-safe identifier, unique within the zone
 	Slug string `json:"slug" api:"required"`
 	// Entity update timestamp
@@ -179,6 +184,7 @@ type Resource struct {
 		Name                 respjson.Field
 		OrganizationID       respjson.Field
 		OwnerType            respjson.Field
+		Prefix               respjson.Field
 		Slug                 respjson.Field
 		UpdatedAt            respjson.Field
 		ZoneID               respjson.Field
@@ -290,7 +296,7 @@ type ZoneApplicationDependencyListParams struct {
 // `url.Values`.
 func (r ZoneApplicationDependencyListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
+		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -323,7 +329,7 @@ type ZoneApplicationDependencyAddParams struct {
 // `url.Values`.
 func (r ZoneApplicationDependencyAddParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
+		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

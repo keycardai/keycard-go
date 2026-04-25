@@ -254,7 +254,8 @@ const (
 )
 
 type ZonePolicySetVersionListResponse struct {
-	Items      []PolicySetVersion                         `json:"items" api:"required"`
+	Items []PolicySetVersion `json:"items" api:"required"`
+	// Cursor-based pagination metadata returned alongside a list of results
 	Pagination ZonePolicySetVersionListResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -271,16 +272,15 @@ func (r *ZonePolicySetVersionListResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Cursor-based pagination metadata returned alongside a list of results
 type ZonePolicySetVersionListResponsePagination struct {
-	// Cursor of the last item on the current page. Pass to after for the next page.
-	// Null when there is no next page.
+	// An opaque cursor used for paginating through a list of results
 	AfterCursor string `json:"after_cursor" api:"required"`
-	// Cursor of the first item on the current page. Pass to before for the previous
-	// page. Null when there is no previous page.
+	// An opaque cursor used for paginating through a list of results
 	BeforeCursor string `json:"before_cursor" api:"required"`
-	// Total number of items matching the current filters. Only included when
-	// expand=total_count is requested.
-	TotalCount int64 `json:"total_count" api:"nullable"`
+	// Total number of items across all pages. Only present when the request includes
+	// ?expand[]=total_count.
+	TotalCount int64 `json:"total_count"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AfterCursor  respjson.Field
@@ -298,7 +298,8 @@ func (r *ZonePolicySetVersionListResponsePagination) UnmarshalJSON(data []byte) 
 }
 
 type ZonePolicySetVersionListPoliciesResponse struct {
-	Items      []PolicyVersion                                    `json:"items" api:"required"`
+	Items []PolicyVersion `json:"items" api:"required"`
+	// Cursor-based pagination metadata returned alongside a list of results
 	Pagination ZonePolicySetVersionListPoliciesResponsePagination `json:"pagination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -315,16 +316,15 @@ func (r *ZonePolicySetVersionListPoliciesResponse) UnmarshalJSON(data []byte) er
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Cursor-based pagination metadata returned alongside a list of results
 type ZonePolicySetVersionListPoliciesResponsePagination struct {
-	// Cursor of the last item on the current page. Pass to after for the next page.
-	// Null when there is no next page.
+	// An opaque cursor used for paginating through a list of results
 	AfterCursor string `json:"after_cursor" api:"required"`
-	// Cursor of the first item on the current page. Pass to before for the previous
-	// page. Null when there is no previous page.
+	// An opaque cursor used for paginating through a list of results
 	BeforeCursor string `json:"before_cursor" api:"required"`
-	// Total number of items matching the current filters. Only included when
-	// expand=total_count is requested.
-	TotalCount int64 `json:"total_count" api:"nullable"`
+	// Total number of items across all pages. Only present when the request includes
+	// ?expand[]=total_count.
+	TotalCount int64 `json:"total_count"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AfterCursor  respjson.Field
@@ -389,17 +389,21 @@ func (r *ZonePolicySetVersionUpdateParams) UnmarshalJSON(data []byte) error {
 
 type ZonePolicySetVersionListParams struct {
 	ZoneID string `path:"zone_id" api:"required" json:"-"`
-	// Return items after this cursor (forward pagination). Use after_cursor from a
-	// previous response. Mutually exclusive with before.
+	// Cursor for forward pagination. Returned in `Pagination.after_cursor`. Mutually
+	// exclusive with `before`.
 	After param.Opt[string] `query:"after,omitzero" json:"-"`
-	// Return items before this cursor (backward pagination). Use before_cursor from a
-	// previous response. Mutually exclusive with after.
+	// Cursor for backward pagination. Returned in `Pagination.before_cursor`. Mutually
+	// exclusive with `after`.
 	Before param.Opt[string] `query:"before,omitzero" json:"-"`
-	// Maximum number of items to return
+	// Maximum number of items to return per page.
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// Opt-in to additional response fields
+	// **Deprecated.** Use `expand[]` instead.
+	//
+	// Opt-in to additional response fields. Still honored for backward compatibility;
+	// supplying both `expand` and `expand[]` with disagreeing values returns
+	// `400 Bad Request`.
 	//
 	// Any of "total_count".
 	Expand []string `query:"expand,omitzero" json:"-"`
@@ -418,7 +422,7 @@ type ZonePolicySetVersionListParams struct {
 // `url.Values`.
 func (r ZonePolicySetVersionListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
+		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -449,17 +453,21 @@ type ZonePolicySetVersionArchiveParams struct {
 type ZonePolicySetVersionListPoliciesParams struct {
 	ZoneID      string `path:"zone_id" api:"required" json:"-"`
 	PolicySetID string `path:"policy_set_id" api:"required" json:"-"`
-	// Return items after this cursor (forward pagination). Use after_cursor from a
-	// previous response. Mutually exclusive with before.
+	// Cursor for forward pagination. Returned in `Pagination.after_cursor`. Mutually
+	// exclusive with `before`.
 	After param.Opt[string] `query:"after,omitzero" json:"-"`
-	// Return items before this cursor (backward pagination). Use before_cursor from a
-	// previous response. Mutually exclusive with after.
+	// Cursor for backward pagination. Returned in `Pagination.before_cursor`. Mutually
+	// exclusive with `after`.
 	Before param.Opt[string] `query:"before,omitzero" json:"-"`
-	// Maximum number of items to return
+	// Maximum number of items to return per page.
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// Opt-in to additional response fields
+	// **Deprecated.** Use `expand[]` instead.
+	//
+	// Opt-in to additional response fields. Still honored for backward compatibility;
+	// supplying both `expand` and `expand[]` with disagreeing values returns
+	// `400 Bad Request`.
 	//
 	// Any of "total_count".
 	Expand []string `query:"expand,omitzero" json:"-"`
@@ -483,7 +491,7 @@ type ZonePolicySetVersionListPoliciesParams struct {
 // as `url.Values`.
 func (r ZonePolicySetVersionListPoliciesParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
+		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

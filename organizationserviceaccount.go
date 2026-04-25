@@ -224,7 +224,7 @@ type OrganizationServiceAccountGetParams struct {
 // `url.Values`.
 func (r OrganizationServiceAccountGetParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
+		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -271,7 +271,7 @@ type OrganizationServiceAccountListParams struct {
 // `url.Values`.
 func (r OrganizationServiceAccountListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
+		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

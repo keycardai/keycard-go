@@ -517,7 +517,7 @@ type ZoneGetParams struct {
 // URLQuery serializes [ZoneGetParams]'s query parameters as `url.Values`.
 func (r ZoneGetParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
+		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -663,7 +663,7 @@ type ZoneListParams struct {
 // URLQuery serializes [ZoneListParams]'s query parameters as `url.Values`.
 func (r ZoneListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
+		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

@@ -376,7 +376,7 @@ type OrganizationListIdentitiesResponsePagination struct {
 	// An opaque cursor used for paginating through a list of results
 	BeforeCursor string `json:"before_cursor" api:"required"`
 	// Total number of items across all pages. Only present when the request includes
-	// ?expand=total_count.
+	// ?expand[]=total_count.
 	TotalCount int64 `json:"total_count"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -478,7 +478,7 @@ type OrganizationGetParams struct {
 // URLQuery serializes [OrganizationGetParams]'s query parameters as `url.Values`.
 func (r OrganizationGetParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
+		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -520,7 +520,7 @@ type OrganizationListParams struct {
 // URLQuery serializes [OrganizationListParams]'s query parameters as `url.Values`.
 func (r OrganizationListParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
+		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -559,7 +559,7 @@ type OrganizationListIdentitiesParams struct {
 // `url.Values`.
 func (r OrganizationListIdentitiesParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
+		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -585,7 +585,7 @@ type OrganizationListRolesParams struct {
 // `url.Values`.
 func (r OrganizationListRolesParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatBrackets,
+		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
