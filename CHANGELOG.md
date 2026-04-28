@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.0 (2026-04-27)
+
+Full Changelog: [v0.8.0...v0.9.0](https://github.com/keycardai/keycard-go/compare/v0.8.0...v0.9.0)
+
+### Features
+
+* support setting headers via env ([ec6734b](https://github.com/keycardai/keycard-go/commit/ec6734bb9c89d2ed36bb62a2070e710ac6186e37))
+
 ## 0.8.0 (2026-04-24)
 
 Full Changelog: [v0.7.0...v0.8.0](https://github.com/keycardai/keycard-go/compare/v0.7.0...v0.8.0)
