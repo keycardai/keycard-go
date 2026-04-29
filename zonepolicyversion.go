@@ -156,9 +156,13 @@ type PolicyVersion struct {
 	ZoneID     string    `json:"zone_id" api:"required"`
 	ArchivedAt time.Time `json:"archived_at" api:"nullable" format:"date-time"`
 	ArchivedBy string    `json:"archived_by" api:"nullable"`
-	// Cedar policy in JSON representation. Populated when format=json (default).
+	// Cedar policy in JSON representation. Populated by default and when `format=json`
+	// is passed; null when `format=cedar` narrows the response to the text
+	// representation only.
 	CedarJson any `json:"cedar_json" api:"nullable"`
-	// Cedar policy in human-readable syntax. Populated when format=cedar.
+	// Cedar policy in human-readable syntax. Populated by default and when
+	// `format=cedar` is passed; null when `format=json` narrows the response to the
+	// JSON representation only.
 	CedarRaw string `json:"cedar_raw" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -267,8 +271,10 @@ type ZonePolicyVersionGetParams struct {
 	PolicyID         string            `path:"policy_id" api:"required" json:"-"`
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// Policy representation format. `json` returns cedar_json, `cedar` returns
-	// cedar_raw.
+	// Narrows which Cedar representation the response includes. When omitted, both
+	// `cedar_json` and `cedar_raw` are populated. Pass `json` to receive only
+	// `cedar_json`, or `cedar` to receive only `cedar_raw`. Callers that don't care
+	// about payload size can skip this parameter.
 	//
 	// Any of "cedar", "json".
 	Format ZonePolicyVersionGetParamsFormat `query:"format,omitzero" json:"-"`
@@ -284,8 +290,10 @@ func (r ZonePolicyVersionGetParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
-// Policy representation format. `json` returns cedar_json, `cedar` returns
-// cedar_raw.
+// Narrows which Cedar representation the response includes. When omitted, both
+// `cedar_json` and `cedar_raw` are populated. Pass `json` to receive only
+// `cedar_json`, or `cedar` to receive only `cedar_raw`. Callers that don't care
+// about payload size can skip this parameter.
 type ZonePolicyVersionGetParamsFormat string
 
 const (
@@ -313,8 +321,10 @@ type ZonePolicyVersionListParams struct {
 	//
 	// Any of "total_count".
 	Expand []string `query:"expand,omitzero" json:"-"`
-	// Policy representation format. `json` returns cedar_json, `cedar` returns
-	// cedar_raw.
+	// Narrows which Cedar representation the response includes. When omitted, both
+	// `cedar_json` and `cedar_raw` are populated. Pass `json` to receive only
+	// `cedar_json`, or `cedar` to receive only `cedar_raw`. Callers that don't care
+	// about payload size can skip this parameter.
 	//
 	// Any of "cedar", "json".
 	Format ZonePolicyVersionListParamsFormat `query:"format,omitzero" json:"-"`
@@ -338,8 +348,10 @@ func (r ZonePolicyVersionListParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
-// Policy representation format. `json` returns cedar_json, `cedar` returns
-// cedar_raw.
+// Narrows which Cedar representation the response includes. When omitted, both
+// `cedar_json` and `cedar_raw` are populated. Pass `json` to receive only
+// `cedar_json`, or `cedar` to receive only `cedar_raw`. Callers that don't care
+// about payload size can skip this parameter.
 type ZonePolicyVersionListParamsFormat string
 
 const (
