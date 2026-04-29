@@ -164,26 +164,31 @@ type Policy struct {
 	ZoneID      string          `json:"zone_id" api:"required"`
 	ArchivedAt  time.Time       `json:"archived_at" api:"nullable" format:"date-time"`
 	Description string          `json:"description" api:"nullable"`
+	// Schema version the latest version was validated against (e.g., "2026-02-24").
+	// Null when the policy has no published versions. Denormalized from
+	// `PolicyVersion.schema_version` for the policy referenced by `latest_version_id`.
+	LatestSchemaVersion string `json:"latest_schema_version" api:"nullable"`
 	// Human-readable version number of the latest version (e.g., 1, 2, 3)
 	LatestVersion   int64  `json:"latest_version" api:"nullable"`
 	LatestVersionID string `json:"latest_version_id" api:"nullable"`
 	UpdatedBy       string `json:"updated_by" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID              respjson.Field
-		CreatedAt       respjson.Field
-		CreatedBy       respjson.Field
-		Name            respjson.Field
-		OwnerType       respjson.Field
-		UpdatedAt       respjson.Field
-		ZoneID          respjson.Field
-		ArchivedAt      respjson.Field
-		Description     respjson.Field
-		LatestVersion   respjson.Field
-		LatestVersionID respjson.Field
-		UpdatedBy       respjson.Field
-		ExtraFields     map[string]respjson.Field
-		raw             string
+		ID                  respjson.Field
+		CreatedAt           respjson.Field
+		CreatedBy           respjson.Field
+		Name                respjson.Field
+		OwnerType           respjson.Field
+		UpdatedAt           respjson.Field
+		ZoneID              respjson.Field
+		ArchivedAt          respjson.Field
+		Description         respjson.Field
+		LatestSchemaVersion respjson.Field
+		LatestVersion       respjson.Field
+		LatestVersionID     respjson.Field
+		UpdatedBy           respjson.Field
+		ExtraFields         map[string]respjson.Field
+		raw                 string
 	} `json:"-"`
 }
 
