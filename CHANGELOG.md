@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.10.0 (2026-04-30)
+
+Full Changelog: [v0.9.0...v0.10.0](https://github.com/keycardai/keycard-go/compare/v0.9.0...v0.10.0)
+
+### Features
+
+* **ACC-225:** return both cedar_json and cedar_raw on policy version fetch ([a1e61fb](https://github.com/keycardai/keycard-go/commit/a1e61fbd07ea097f7ac8cffaeeeda62a95821cda))
+* **api:** add latest_schema_version to the Policy entity (ACC-251) ([c41b31f](https://github.com/keycardai/keycard-go/commit/c41b31fae15578f3750dea35ade7617b0e108281))
+
 ## 0.9.0 (2026-04-27)
 
 Full Changelog: [v0.8.0...v0.9.0](https://github.com/keycardai/keycard-go/compare/v0.8.0...v0.9.0)
