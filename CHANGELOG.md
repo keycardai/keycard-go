@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.10.1 (2026-04-30)
+
+Full Changelog: [v0.10.0...v0.10.1](https://github.com/keycardai/keycard-go/compare/v0.10.0...v0.10.1)
+
+### Chores
+
+* avoid embedding reflect.Type for dead code elimination ([427afc9](https://github.com/keycardai/keycard-go/commit/427afc9c71d6b70d2587a06199c764e95093c220))
+
 ## 0.10.0 (2026-04-30)
 
 Full Changelog: [v0.9.0...v0.10.0](https://github.com/keycardai/keycard-go/compare/v0.9.0...v0.10.0)
