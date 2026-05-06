@@ -651,8 +651,9 @@ type ZoneListParams struct {
 	// Cursor for forward pagination
 	After param.Opt[string] `query:"after,omitzero" json:"-"`
 	// Cursor for backward pagination
-	Before param.Opt[string] `query:"before,omitzero" json:"-"`
-	Cursor param.Opt[string] `query:"cursor,omitzero" json:"-"`
+	Before               param.Opt[string] `query:"before,omitzero" json:"-"`
+	Cursor               param.Opt[string] `query:"cursor,omitzero" json:"-"`
+	FilterOrganizationID param.Opt[string] `query:"filter[organization_id],omitzero" json:"-"`
 	// Maximum number of items to return
 	Limit  param.Opt[int64]          `query:"limit,omitzero" json:"-"`
 	Slug   param.Opt[string]         `query:"slug,omitzero" json:"-"`
