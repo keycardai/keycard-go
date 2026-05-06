@@ -152,8 +152,9 @@ func TestZoneListWithOptionalParams(t *testing.T) {
 		Expand: keycard.ZoneListParamsExpandUnion{
 			OfZoneListsExpandString: keycard.String("total_count"),
 		},
-		Limit: keycard.Int(1),
-		Slug:  keycard.String("slug"),
+		FilterOrganizationID: keycard.String("filter[organization_id]"),
+		Limit:                keycard.Int(1),
+		Slug:                 keycard.String("slug"),
 	})
 	if err != nil {
 		var apierr *keycard.Error
