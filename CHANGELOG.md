@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.11.0 (2026-05-06)
+
+Full Changelog: [v0.10.1...v0.11.0](https://github.com/keycardai/keycard-go/compare/v0.10.1...v0.11.0)
+
+### Features
+
+* **mgmt api:** cursor pagination works with sort on listInvitations ([dea91be](https://github.com/keycardai/keycard-go/commit/dea91be2797cce6f0e12dca1962f46381d8cb167))
+
 ## 0.10.1 (2026-04-30)
 
 Full Changelog: [v0.10.0...v0.10.1](https://github.com/keycardai/keycard-go/compare/v0.10.0...v0.10.1)
