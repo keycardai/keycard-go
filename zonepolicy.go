@@ -108,7 +108,16 @@ func (r *ZonePolicyService) Update(ctx context.Context, policyID string, params 
 	return res, err
 }
 
-// List policies in a zone
+// Returns a paginated list of policies in the zone. Supports cursor-based
+// pagination, sorting, full-text search, and composable filters.
+//
+// The `filter[id]` parameter restricts results to a known set of policy IDs (up to
+// 100). It composes with other filters (`filter[owner_type]`, `query[]`, etc.) but
+// **cannot** be combined with cursor pagination (`after` / `before`) — the server
+// returns 400 if both are present. When `filter[id]` is used without an explicit
+// `limit`, the limit defaults to the number of requested IDs so all results fit in
+// a single page. IDs that don't exist or fall outside the zone are silently
+// omitted.
 func (r *ZonePolicyService) List(ctx context.Context, zoneID string, params ZonePolicyListParams, opts ...option.RequestOption) (res *ZonePolicyListResponse, err error) {
 	if !param.IsOmitted(params.XAPIVersion) {
 		opts = append(opts, option.WithHeader("X-API-Version", fmt.Sprintf("%v", params.XAPIVersion.Value)))
@@ -313,6 +322,20 @@ type ZonePolicyListParams struct {
 	//
 	// Any of "total_count".
 	Expand []string `query:"expand,omitzero" json:"-"`
+	// Filter by policy ID. Repeatable; multiple values are OR-ed (e.g.
+	// `?filter[id]=p1&filter[id]=p2`). Capped at 100 IDs per request — over-cap
+	// returns 400.
+	//
+	// Cannot be combined with cursor pagination (`after` or `before`). The server
+	// returns 400 if both are present.
+	//
+	// Composes with other filters (`filter[owner_type]`, `query[]`, etc.). When no
+	// explicit `limit` is provided, it defaults to the number of requested IDs so all
+	// results fit in a single page.
+	//
+	// IDs that don't exist or fall outside the zone scope are silently omitted;
+	// callers diff against the request set if they care about missing IDs.
+	FilterID []string `query:"filter[id],omitzero" json:"-"`
 	// Filter on `owner_type`. Repeatable; repeated instances OR across values (e.g.
 	// `?filter[owner_type]=platform&filter[owner_type]=customer` matches either). See
 	// `FilterValues` in the shared spec for the full wire convention.
