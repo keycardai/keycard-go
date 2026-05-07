@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.12.0 (2026-05-07)
+
+Full Changelog: [v0.11.0...v0.12.0](https://github.com/keycardai/keycard-go/compare/v0.11.0...v0.12.0)
+
+### Features
+
+* **ACC-255:** active-first sort on listPolicySets (multi-key sort MVP) ([e94be46](https://github.com/keycardai/keycard-go/commit/e94be46c91693a70fdfca95a759f671661941208))
+
+
+### Chores
+
+* redact api-key headers in debug logs ([3b16c0c](https://github.com/keycardai/keycard-go/commit/3b16c0c00c1ff0273794f97b88def60ccee40da1))
+
 ## 0.11.0 (2026-05-06)
 
 Full Changelog: [v0.10.1...v0.11.0](https://github.com/keycardai/keycard-go/compare/v0.10.1...v0.11.0)
