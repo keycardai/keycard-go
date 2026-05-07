@@ -134,6 +134,7 @@ func TestZonePolicyListWithOptionalParams(t *testing.T) {
 			After:            keycard.String("x"),
 			Before:           keycard.String("x"),
 			Expand:           []string{"total_count"},
+			FilterID:         []string{"string"},
 			FilterOwnerType:  []string{"string"},
 			Limit:            keycard.Int(1),
 			Order:            keycard.ZonePolicyListParamsOrderAsc,

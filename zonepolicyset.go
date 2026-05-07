@@ -598,9 +598,12 @@ type ZonePolicySetListParams struct {
 	// Case-insensitive substring search on `name`. Repeatable; if multiple terms are
 	// supplied they are OR-ed (any matching term returns the row).
 	QueryName []string `query:"query[name],omitzero" json:"-"`
-	// Field to sort by.
+	// Field to sort by. `created_at` (default) sorts by creation date. `status` sorts
+	// active-first, then by creation date within each group. When `sort=status`, only
+	// descending order and forward pagination are supported; `order=asc` or `before`
+	// cursors return 400.
 	//
-	// Any of "created_at".
+	// Any of "created_at", "status".
 	Sort ZonePolicySetListParamsSort `query:"sort,omitzero" json:"-"`
 	paramObj
 }
@@ -622,11 +625,15 @@ const (
 	ZonePolicySetListParamsOrderDesc ZonePolicySetListParamsOrder = "desc"
 )
 
-// Field to sort by.
+// Field to sort by. `created_at` (default) sorts by creation date. `status` sorts
+// active-first, then by creation date within each group. When `sort=status`, only
+// descending order and forward pagination are supported; `order=asc` or `before`
+// cursors return 400.
 type ZonePolicySetListParamsSort string
 
 const (
 	ZonePolicySetListParamsSortCreatedAt ZonePolicySetListParamsSort = "created_at"
+	ZonePolicySetListParamsSortStatus    ZonePolicySetListParamsSort = "status"
 )
 
 type ZonePolicySetArchiveParams struct {
