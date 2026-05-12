@@ -35,9 +35,12 @@ func TestZoneNewWithOptionalParams(t *testing.T) {
 			Arn:  "x",
 			Type: keycard.EncryptionKeyAwsKmsConfigTypeAws,
 		},
-		LoginFlow: keycard.ZoneNewParamsLoginFlowDefault,
 		Protocols: keycard.ZoneNewParamsProtocols{
 			Oauth2: keycard.ZoneNewParamsProtocolsOauth2{
+				Cimd: keycard.ZoneNewParamsProtocolsOauth2Cimd{
+					AllowedClientIDs: []string{"string"},
+					Enabled:          true,
+				},
 				DcrEnabled:   keycard.Bool(true),
 				PkceRequired: keycard.Bool(true),
 			},
@@ -110,10 +113,13 @@ func TestZoneUpdateWithOptionalParams(t *testing.T) {
 				Arn:  "x",
 				Type: "aws",
 			},
-			LoginFlow: keycard.ZoneUpdateParamsLoginFlowDefault,
-			Name:      keycard.String("x"),
+			Name: keycard.String("x"),
 			Protocols: keycard.ZoneUpdateParamsProtocols{
 				Oauth2: keycard.ZoneUpdateParamsProtocolsOauth2{
+					Cimd: keycard.ZoneUpdateParamsProtocolsOauth2Cimd{
+						AllowedClientIDs: []string{"string"},
+						Enabled:          true,
+					},
 					DcrEnabled:   keycard.Bool(true),
 					PkceRequired: keycard.Bool(true),
 				},
