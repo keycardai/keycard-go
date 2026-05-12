@@ -251,11 +251,6 @@ type Zone struct {
 	// AWS KMS configuration for zone encryption. When not specified, the default
 	// Keycard Cloud encryption key will be used.
 	EncryptionKey EncryptionKeyAwsKmsConfig `json:"encryption_key"`
-	// Login flow style for the zone. 'default' uses standard authentication,
-	// 'identifier_first' uses identifier-based provider routing.
-	//
-	// Any of "default", "identifier_first".
-	LoginFlow ZoneLoginFlow `json:"login_flow"`
 	// Permissions granted to the authenticated principal. Only populated when
 	// expand[]=permissions query parameter is provided. Keys are resource types,
 	// values are objects mapping action names to boolean values.
@@ -278,7 +273,6 @@ type Zone struct {
 		DefaultResourceID              respjson.Field
 		Description                    respjson.Field
 		EncryptionKey                  respjson.Field
-		LoginFlow                      respjson.Field
 		Permissions                    respjson.Field
 		RequiresInvitation             respjson.Field
 		UserIdentityProviderID         respjson.Field
@@ -321,6 +315,8 @@ type ZoneProtocolsOauth2 struct {
 	// OAuth 2.0 Authorization Server Metadata endpoint
 	// (.well-known/oauth-authorization-server)
 	AuthorizationServerMetadata string `json:"authorization_server_metadata" api:"required" format:"uri"`
+	// Client ID Metadata Document auto-provisioning configuration
+	Cimd ZoneProtocolsOauth2Cimd `json:"cimd" api:"required"`
 	// Whether Dynamic Client Registration is enabled
 	DcrEnabled bool `json:"dcr_enabled" api:"required"`
 	// OAuth 2.0 issuer identifier
@@ -339,6 +335,7 @@ type ZoneProtocolsOauth2 struct {
 	JSON struct {
 		AuthorizationEndpoint       respjson.Field
 		AuthorizationServerMetadata respjson.Field
+		Cimd                        respjson.Field
 		DcrEnabled                  respjson.Field
 		Issuer                      respjson.Field
 		JwksUri                     respjson.Field
@@ -354,6 +351,30 @@ type ZoneProtocolsOauth2 struct {
 // Returns the unmodified JSON received from the API
 func (r ZoneProtocolsOauth2) RawJSON() string { return r.JSON.raw }
 func (r *ZoneProtocolsOauth2) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Client ID Metadata Document auto-provisioning configuration
+type ZoneProtocolsOauth2Cimd struct {
+	// Allowlist for CIMD client_id URLs. Each entry is an exact URL, a wildcard origin
+	// with a single _ replacing one subdomain label (e.g. https://_.example.com
+	// matches https://app.example.com but not https://a.b.example.com), or the literal
+	// _ to allow any client. Only one _ is permitted per entry.
+	AllowedClientIDs []string `json:"allowed_client_ids" api:"required"`
+	// Whether CIMD auto-provisioning is enabled for unregistered URL-based clients
+	Enabled bool `json:"enabled" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AllowedClientIDs respjson.Field
+		Enabled          respjson.Field
+		ExtraFields      map[string]respjson.Field
+		raw              string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZoneProtocolsOauth2Cimd) RawJSON() string { return r.JSON.raw }
+func (r *ZoneProtocolsOauth2Cimd) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -378,15 +399,6 @@ func (r ZoneProtocolsOpenid) RawJSON() string { return r.JSON.raw }
 func (r *ZoneProtocolsOpenid) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-// Login flow style for the zone. 'default' uses standard authentication,
-// 'identifier_first' uses identifier-based provider routing.
-type ZoneLoginFlow string
-
-const (
-	ZoneLoginFlowDefault         ZoneLoginFlow = "default"
-	ZoneLoginFlowIdentifierFirst ZoneLoginFlow = "identifier_first"
-)
 
 type ZoneListResponse struct {
 	Items []Zone `json:"items" api:"required"`
@@ -450,11 +462,6 @@ type ZoneNewParams struct {
 	// AWS KMS configuration for zone encryption. When not specified, the default
 	// Keycard Cloud encryption key will be used.
 	EncryptionKey EncryptionKeyAwsKmsConfigParam `json:"encryption_key,omitzero"`
-	// Login flow style for the zone. 'default' uses standard authentication,
-	// 'identifier_first' uses identifier-based provider routing.
-	//
-	// Any of "default", "identifier_first".
-	LoginFlow ZoneNewParamsLoginFlow `json:"login_flow,omitzero"`
 	// Protocol configuration for zone creation
 	Protocols ZoneNewParamsProtocols `json:"protocols,omitzero"`
 	paramObj
@@ -467,15 +474,6 @@ func (r ZoneNewParams) MarshalJSON() (data []byte, err error) {
 func (r *ZoneNewParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-// Login flow style for the zone. 'default' uses standard authentication,
-// 'identifier_first' uses identifier-based provider routing.
-type ZoneNewParamsLoginFlow string
-
-const (
-	ZoneNewParamsLoginFlowDefault         ZoneNewParamsLoginFlow = "default"
-	ZoneNewParamsLoginFlowIdentifierFirst ZoneNewParamsLoginFlow = "identifier_first"
-)
 
 // Protocol configuration for zone creation
 type ZoneNewParamsProtocols struct {
@@ -498,6 +496,8 @@ type ZoneNewParamsProtocolsOauth2 struct {
 	DcrEnabled param.Opt[bool] `json:"dcr_enabled,omitzero"`
 	// Whether PKCE is required for authorization code flows
 	PkceRequired param.Opt[bool] `json:"pkce_required,omitzero"`
+	// Client ID Metadata Document auto-provisioning configuration
+	Cimd ZoneNewParamsProtocolsOauth2Cimd `json:"cimd,omitzero"`
 	paramObj
 }
 
@@ -506,6 +506,28 @@ func (r ZoneNewParamsProtocolsOauth2) MarshalJSON() (data []byte, err error) {
 	return param.MarshalObject(r, (*shadow)(&r))
 }
 func (r *ZoneNewParamsProtocolsOauth2) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Client ID Metadata Document auto-provisioning configuration
+//
+// The properties AllowedClientIDs, Enabled are required.
+type ZoneNewParamsProtocolsOauth2Cimd struct {
+	// Allowlist for CIMD client_id URLs. Each entry is an exact URL, a wildcard origin
+	// with a single _ replacing one subdomain label (e.g. https://_.example.com
+	// matches https://app.example.com but not https://a.b.example.com), or the literal
+	// _ to allow any client. Only one _ is permitted per entry.
+	AllowedClientIDs []string `json:"allowed_client_ids,omitzero" api:"required"`
+	// Whether CIMD auto-provisioning is enabled for unregistered URL-based clients
+	Enabled bool `json:"enabled" api:"required"`
+	paramObj
+}
+
+func (r ZoneNewParamsProtocolsOauth2Cimd) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneNewParamsProtocolsOauth2Cimd
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZoneNewParamsProtocolsOauth2Cimd) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -560,12 +582,6 @@ type ZoneUpdateParams struct {
 	// AWS KMS configuration for zone encryption update (set to null to remove
 	// customer-managed key and revert to default)
 	EncryptionKey ZoneUpdateParamsEncryptionKey `json:"encryption_key,omitzero"`
-	// Login flow style for the zone. 'default' uses standard authentication,
-	// 'identifier_first' uses identifier-based provider routing. Set to null to reset
-	// to 'default'.
-	//
-	// Any of "default", "identifier_first".
-	LoginFlow ZoneUpdateParamsLoginFlow `json:"login_flow,omitzero"`
 	// Protocol configuration update for a zone (partial update)
 	Protocols ZoneUpdateParamsProtocols `json:"protocols,omitzero"`
 	paramObj
@@ -605,16 +621,6 @@ func init() {
 	)
 }
 
-// Login flow style for the zone. 'default' uses standard authentication,
-// 'identifier_first' uses identifier-based provider routing. Set to null to reset
-// to 'default'.
-type ZoneUpdateParamsLoginFlow string
-
-const (
-	ZoneUpdateParamsLoginFlowDefault         ZoneUpdateParamsLoginFlow = "default"
-	ZoneUpdateParamsLoginFlowIdentifierFirst ZoneUpdateParamsLoginFlow = "identifier_first"
-)
-
 // Protocol configuration update for a zone (partial update)
 type ZoneUpdateParamsProtocols struct {
 	// OAuth 2.0 protocol configuration update for a zone (partial update)
@@ -636,6 +642,8 @@ type ZoneUpdateParamsProtocolsOauth2 struct {
 	DcrEnabled param.Opt[bool] `json:"dcr_enabled,omitzero"`
 	// Whether PKCE is required for authorization code flows
 	PkceRequired param.Opt[bool] `json:"pkce_required,omitzero"`
+	// Client ID Metadata Document auto-provisioning configuration
+	Cimd ZoneUpdateParamsProtocolsOauth2Cimd `json:"cimd,omitzero"`
 	paramObj
 }
 
@@ -644,6 +652,28 @@ func (r ZoneUpdateParamsProtocolsOauth2) MarshalJSON() (data []byte, err error) 
 	return param.MarshalObject(r, (*shadow)(&r))
 }
 func (r *ZoneUpdateParamsProtocolsOauth2) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Client ID Metadata Document auto-provisioning configuration
+//
+// The properties AllowedClientIDs, Enabled are required.
+type ZoneUpdateParamsProtocolsOauth2Cimd struct {
+	// Allowlist for CIMD client_id URLs. Each entry is an exact URL, a wildcard origin
+	// with a single _ replacing one subdomain label (e.g. https://_.example.com
+	// matches https://app.example.com but not https://a.b.example.com), or the literal
+	// _ to allow any client. Only one _ is permitted per entry.
+	AllowedClientIDs []string `json:"allowed_client_ids,omitzero" api:"required"`
+	// Whether CIMD auto-provisioning is enabled for unregistered URL-based clients
+	Enabled bool `json:"enabled" api:"required"`
+	paramObj
+}
+
+func (r ZoneUpdateParamsProtocolsOauth2Cimd) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneUpdateParamsProtocolsOauth2Cimd
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZoneUpdateParamsProtocolsOauth2Cimd) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
