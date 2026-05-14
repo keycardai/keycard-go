@@ -167,9 +167,6 @@ type ZoneResourceNewParams struct {
 	Description param.Opt[string] `json:"description,omitzero" format:"safe-text"`
 	// ID of the application that provides this resource
 	ApplicationID param.Opt[string] `json:"application_id,omitzero"`
-	// Credential lifetime override in seconds. When set, overrides the default
-	// credential lifetime for this resource.
-	CredentialLifetimeSeconds param.Opt[int64] `json:"credential_lifetime_seconds,omitzero"`
 	// ID of the credential provider to associate with the resource
 	CredentialProviderID param.Opt[string] `json:"credential_provider_id,omitzero"`
 	// When true, the resource identifier is treated as a URI prefix and protects all
@@ -216,9 +213,6 @@ type ZoneResourceUpdateParams struct {
 	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	// ID of the application that provides this resource (set to null to unset)
 	ApplicationID param.Opt[string] `json:"application_id,omitzero"`
-	// Credential lifetime override in seconds. Set to null to clear the override and
-	// use the default.
-	CredentialLifetimeSeconds param.Opt[int64] `json:"credential_lifetime_seconds,omitzero"`
 	// ID of the credential provider to associate with the resource (set to null to
 	// unset)
 	CredentialProviderID param.Opt[string] `json:"credential_provider_id,omitzero"`

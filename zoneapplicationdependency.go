@@ -159,10 +159,6 @@ type Resource struct {
 	Application Application `json:"application"`
 	// ID of the application that provides this resource
 	ApplicationID string `json:"application_id"`
-	// Credential lifetime override in seconds. When set, overrides the default
-	// credential lifetime for this resource. When absent, the default from the
-	// provider or zone is used.
-	CredentialLifetimeSeconds int64 `json:"credential_lifetime_seconds" api:"nullable"`
 	// A Provider is a system that supplies access to Resources and allows actors
 	// (Users or Applications) to authenticate.
 	//
@@ -181,28 +177,27 @@ type Resource struct {
 	WhenAccessing []string `json:"when_accessing"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID                        respjson.Field
-		ApplicationType           respjson.Field
-		CreatedAt                 respjson.Field
-		Identifier                respjson.Field
-		Name                      respjson.Field
-		OrganizationID            respjson.Field
-		OwnerType                 respjson.Field
-		Prefix                    respjson.Field
-		Slug                      respjson.Field
-		UpdatedAt                 respjson.Field
-		ZoneID                    respjson.Field
-		Application               respjson.Field
-		ApplicationID             respjson.Field
-		CredentialLifetimeSeconds respjson.Field
-		CredentialProvider        respjson.Field
-		CredentialProviderID      respjson.Field
-		Description               respjson.Field
-		Metadata                  respjson.Field
-		Scopes                    respjson.Field
-		WhenAccessing             respjson.Field
-		ExtraFields               map[string]respjson.Field
-		raw                       string
+		ID                   respjson.Field
+		ApplicationType      respjson.Field
+		CreatedAt            respjson.Field
+		Identifier           respjson.Field
+		Name                 respjson.Field
+		OrganizationID       respjson.Field
+		OwnerType            respjson.Field
+		Prefix               respjson.Field
+		Slug                 respjson.Field
+		UpdatedAt            respjson.Field
+		ZoneID               respjson.Field
+		Application          respjson.Field
+		ApplicationID        respjson.Field
+		CredentialProvider   respjson.Field
+		CredentialProviderID respjson.Field
+		Description          respjson.Field
+		Metadata             respjson.Field
+		Scopes               respjson.Field
+		WhenAccessing        respjson.Field
+		ExtraFields          map[string]respjson.Field
+		raw                  string
 	} `json:"-"`
 }
 
