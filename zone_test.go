@@ -35,9 +35,13 @@ func TestZoneNewWithOptionalParams(t *testing.T) {
 			Arn:  "x",
 			Type: keycard.EncryptionKeyAwsKmsConfigTypeAws,
 		},
-		LoginFlow: keycard.ZoneNewParamsLoginFlowDefault,
+		OrganizationID: keycard.String("organization_id"),
 		Protocols: keycard.ZoneNewParamsProtocols{
 			Oauth2: keycard.ZoneNewParamsProtocolsOauth2{
+				Cimd: keycard.ZoneNewParamsProtocolsOauth2Cimd{
+					AllowedClientIDs: []string{"string"},
+					Enabled:          true,
+				},
 				DcrEnabled:   keycard.Bool(true),
 				PkceRequired: keycard.Bool(true),
 			},
@@ -110,10 +114,13 @@ func TestZoneUpdateWithOptionalParams(t *testing.T) {
 				Arn:  "x",
 				Type: "aws",
 			},
-			LoginFlow: keycard.ZoneUpdateParamsLoginFlowDefault,
-			Name:      keycard.String("x"),
+			Name: keycard.String("x"),
 			Protocols: keycard.ZoneUpdateParamsProtocols{
 				Oauth2: keycard.ZoneUpdateParamsProtocolsOauth2{
+					Cimd: keycard.ZoneUpdateParamsProtocolsOauth2Cimd{
+						AllowedClientIDs: []string{"string"},
+						Enabled:          true,
+					},
 					DcrEnabled:   keycard.Bool(true),
 					PkceRequired: keycard.Bool(true),
 				},
@@ -152,8 +159,9 @@ func TestZoneListWithOptionalParams(t *testing.T) {
 		Expand: keycard.ZoneListParamsExpandUnion{
 			OfZoneListsExpandString: keycard.String("total_count"),
 		},
-		Limit: keycard.Int(1),
-		Slug:  keycard.String("slug"),
+		FilterOrganizationID: keycard.String("filter[organization_id]"),
+		Limit:                keycard.Int(1),
+		Slug:                 keycard.String("slug"),
 	})
 	if err != nil {
 		var apierr *keycard.Error
