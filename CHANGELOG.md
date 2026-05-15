@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.14.0 (2026-05-15)
+
+Full Changelog: [v0.13.0...v0.14.0](https://github.com/keycardai/keycard-go/compare/v0.13.0...v0.14.0)
+
+### Features
+
+* **ACC-277:** list policy versions pinned by a policy-set draft ([8e809a1](https://github.com/keycardai/keycard-go/commit/8e809a17a2d4d5b8cd1cd5c8e0f4c5c65cf7eb05))
+* accept ID Zone platform principals in management API ([ccf9a69](https://github.com/keycardai/keycard-go/commit/ccf9a694243307e2a9aeeb5d8630208e956c1172))
+* add jwt_lifetime_seconds to resources ([0443214](https://github.com/keycardai/keycard-go/commit/0443214c78f4e0cca06043abb56df243052e9285))
+* **client:** optimize json encoder for internal types ([37e6a6e](https://github.com/keycardai/keycard-go/commit/37e6a6eab5ea38e1a3014c8a7cb99726563fb1c5))
+
+
+### Bug Fixes
+
+* housekeeping ([e4c0444](https://github.com/keycardai/keycard-go/commit/e4c0444080fcaecc39f4e8956350577bd30d76e5))
+
 ## 0.13.0 (2026-05-11)
 
 Full Changelog: [v0.12.1...v0.13.0](https://github.com/keycardai/keycard-go/compare/v0.12.1...v0.13.0)
