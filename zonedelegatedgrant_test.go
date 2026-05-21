@@ -100,6 +100,7 @@ func TestZoneDelegatedGrantListWithOptionalParams(t *testing.T) {
 			},
 			Limit:      keycard.Int(1),
 			ResourceID: keycard.String("resource_id"),
+			Sort:       keycard.String("-created_at, \u000b\f-created_at,\r\r \t\u000b\n\r-created_at,\n\n\f\t-created_at,\n\u000b\r \r\fcreated_at,\n\t\t\n\t\f\f\ncreated_at,\n\u000b\u000b  \n\r\r -created_at,\f \u000b\u000b\f\t\n\n -created_at"),
 			Status:     keycard.ZoneDelegatedGrantListParamsStatusActive,
 			UserID:     keycard.String("user_id"),
 		},

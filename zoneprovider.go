@@ -259,12 +259,16 @@ func (r *ProviderProtocolsOauth2) UnmarshalJSON(data []byte) error {
 
 // OpenID Connect protocol configuration
 type ProviderProtocolsOpenid struct {
+	// Additional OIDC scopes to request from this provider during authentication (e.g.
+	// "groups"). Merged with the default scopes (openid, profile, email).
+	Scopes []string `json:"scopes" api:"nullable"`
 	// Name of a top-level string claim in this provider's ID Token to use as the user
 	// identifier on user creation. When not set, the user's Keycard ID is used.
 	UserIdentifierClaim string `json:"user_identifier_claim" api:"nullable"`
 	UserinfoEndpoint    string `json:"userinfo_endpoint" api:"nullable" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		Scopes              respjson.Field
 		UserIdentifierClaim respjson.Field
 		UserinfoEndpoint    respjson.Field
 		ExtraFields         map[string]respjson.Field
@@ -424,6 +428,9 @@ type ZoneProviderNewParamsProtocolsOpenid struct {
 	// identifier on user creation. When not set, the user's Keycard ID is used.
 	UserIdentifierClaim param.Opt[string] `json:"user_identifier_claim,omitzero"`
 	UserinfoEndpoint    param.Opt[string] `json:"userinfo_endpoint,omitzero" format:"uri"`
+	// Additional OIDC scopes to request from this provider during authentication (e.g.
+	// "groups"). Merged with the default scopes (openid, profile, email).
+	Scopes []string `json:"scopes,omitzero"`
 	paramObj
 }
 
@@ -534,6 +541,10 @@ type ZoneProviderUpdateParamsProtocolsOpenid struct {
 	// value does not affect existing users.
 	UserIdentifierClaim param.Opt[string] `json:"user_identifier_claim,omitzero"`
 	UserinfoEndpoint    param.Opt[string] `json:"userinfo_endpoint,omitzero" format:"uri"`
+	// Additional OIDC scopes to request from this provider during authentication (e.g.
+	// "groups"). Merged with the default scopes (openid, profile, email). Set to null
+	// to clear.
+	Scopes []string `json:"scopes,omitzero"`
 	paramObj
 }
 
