@@ -66,14 +66,15 @@ func (r *ZoneUserService) Get(ctx context.Context, id string, query ZoneUserGetP
 //
 // Use cursor pagination via `after`/`before`. Sort: comma-separated field list;
 // prefix with `-` for descending. Use `expand[]=total_count` to include the
-// matching row count. Filter by exact email via `filter[email]`; search via
-// `query[email]` / `query[subject]` / `query[]` (substring match, OR'd across
-// repeated values). `query[]` matches against email and federation credential
-// subject. Pass `filter[id]` (repeatable, max 100) to restrict results to a known
-// set of users — mutually exclusive with `after`/`before` (returns 400 if
-// combined). When `filter[id]` is set, `limit` is ignored and the response
-// contains every requested user that exists in the zone, in a single page. IDs not
-// in the zone are silently omitted.
+// matching row count, `expand[]=session_count` to include per-user session counts,
+// and `expand[]=grant_count` to include per-user delegated-grant counts. Filter by
+// exact email via `filter[email]`; search via `query[email]` / `query[subject]` /
+// `query[]` (substring match, OR'd across repeated values). `query[]` matches
+// against email and federation credential subject. Pass `filter[id]` (repeatable,
+// max 100) to restrict results to a known set of users — mutually exclusive with
+// `after`/`before` (returns 400 if combined). When `filter[id]` is set, `limit` is
+// ignored and the response contains every requested user that exists in the zone,
+// in a single page. IDs not in the zone are silently omitted.
 func (r *ZoneUserService) List(ctx context.Context, zoneID string, query ZoneUserListParams, opts ...option.RequestOption) (res *ZoneUserListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -107,11 +108,17 @@ type User struct {
 	ZoneID string `json:"zone_id" api:"required"`
 	// Date when the user was last authenticated
 	AuthenticatedAt string `json:"authenticated_at"`
+	// Delegated-grant count for this user. Populated only when `expand[]=grant_count`
+	// is set on the listing endpoint.
+	GrantCount int64 `json:"grant_count"`
 	// Issuer identifier of the identity provider
 	Issuer string `json:"issuer"`
 	// Reference to the identity provider. This field is undefined when the source
 	// identity provider is deleted but the user is not deleted.
 	ProviderID string `json:"provider_id"`
+	// Session count for this user. Populated only when `expand[]=session_count` is set
+	// on the listing endpoint.
+	SessionCount int64 `json:"session_count"`
 	// Subject identifier from the identity provider
 	Subject string `json:"subject"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -125,8 +132,10 @@ type User struct {
 		UpdatedAt       respjson.Field
 		ZoneID          respjson.Field
 		AuthenticatedAt respjson.Field
+		GrantCount      respjson.Field
 		Issuer          respjson.Field
 		ProviderID      respjson.Field
+		SessionCount    respjson.Field
 		Subject         respjson.Field
 		ExtraFields     map[string]respjson.Field
 		raw             string
@@ -235,7 +244,9 @@ type ZoneUserListParamsExpandUnion struct {
 type ZoneUserListParamsExpandString string
 
 const (
-	ZoneUserListParamsExpandStringTotalCount ZoneUserListParamsExpandString = "total_count"
+	ZoneUserListParamsExpandStringTotalCount   ZoneUserListParamsExpandString = "total_count"
+	ZoneUserListParamsExpandStringSessionCount ZoneUserListParamsExpandString = "session_count"
+	ZoneUserListParamsExpandStringGrantCount   ZoneUserListParamsExpandString = "grant_count"
 )
 
 // Only one field can be non-zero.

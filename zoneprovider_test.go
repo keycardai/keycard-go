@@ -56,6 +56,7 @@ func TestZoneProviderNewWithOptionalParams(t *testing.T) {
 					TokenResponseAccessTokenPointer: keycard.String("token_response_access_token_pointer"),
 				},
 				Openid: keycard.ZoneProviderNewParamsProtocolsOpenid{
+					Scopes:              []string{"string"},
 					UserIdentifierClaim: keycard.String("user_identifier_claim"),
 					UserinfoEndpoint:    keycard.String("https://example.com"),
 				},
@@ -145,6 +146,7 @@ func TestZoneProviderUpdateWithOptionalParams(t *testing.T) {
 					TokenResponseAccessTokenPointer: keycard.String("token_response_access_token_pointer"),
 				},
 				Openid: keycard.ZoneProviderUpdateParamsProtocolsOpenid{
+					Scopes:              []string{"string"},
 					UserIdentifierClaim: keycard.String("user_identifier_claim"),
 					UserinfoEndpoint:    keycard.String("https://example.com"),
 				},

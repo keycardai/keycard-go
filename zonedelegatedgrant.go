@@ -71,7 +71,9 @@ func (r *ZoneDelegatedGrantService) Update(ctx context.Context, id string, param
 }
 
 // Returns a list of delegated grants in the specified zone. Can be filtered by
-// user, resource, or status.
+// user, resource, or status. Use cursor pagination via `after`/`before`. Sort:
+// comma-separated field list; prefix with `-` for descending. Use
+// `expand[]=total_count` to include the matching row count.
 func (r *ZoneDelegatedGrantService) List(ctx context.Context, zoneID string, query ZoneDelegatedGrantListParams, opts ...option.RequestOption) (res *ZoneDelegatedGrantListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -268,6 +270,8 @@ type ZoneDelegatedGrantListParams struct {
 	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Filter by resource ID
 	ResourceID param.Opt[string] `query:"resource_id,omitzero" json:"-"`
+	// Comma-separated sort fields. Prefix with - for descending. Allowed: created_at
+	Sort param.Opt[string] `query:"sort,omitzero" json:"-"`
 	// Filter by user ID
 	UserID param.Opt[string] `query:"user_id,omitzero" json:"-"`
 	// Any of "true".
