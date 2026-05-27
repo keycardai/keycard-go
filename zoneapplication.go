@@ -86,7 +86,17 @@ func (r *ZoneApplicationService) Update(ctx context.Context, id string, params Z
 	return res, err
 }
 
-// Returns a list of applications in the specified zone
+// Returns a paginated list of applications in the specified zone. Use cursor
+// pagination via `after`/`before`. Sort: comma-separated field list; prefix with
+// `-` for descending. Use `expand[]=total_count` to include the matching row
+// count. Filter by exact slug via `filter[slug]` and by exact identifier via
+// `filter[identifier]`. Search via `query[name]` / `query[identifier]` / `query[]`
+// (substring match, OR'd across repeated values). `query[]` matches against name
+// and identifier. Pass `filter[id]` (repeatable, max 100) to restrict results to a
+// known set of applications — mutually exclusive with `after`/`before` (returns
+// 400 if combined). When `filter[id]` is set, `limit` is ignored and the response
+// contains every requested application that exists in the zone, in a single page.
+// IDs not in the zone are silently omitted.
 func (r *ZoneApplicationService) List(ctx context.Context, zoneID string, query ZoneApplicationListParams, opts ...option.RequestOption) (res *ZoneApplicationListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -338,6 +348,8 @@ func (r *MetadataUpdateParam) UnmarshalJSON(data []byte) error {
 type ZoneApplicationListResponse struct {
 	Items []Application `json:"items" api:"required"`
 	// Pagination information
+	//
+	// Deprecated: deprecated
 	PageInfo PageInfoPagination `json:"page_info" api:"required"`
 	// Cursor-based pagination metadata
 	Pagination ZoneApplicationListResponsePagination `json:"pagination" api:"required"`
@@ -646,12 +658,27 @@ type ZoneApplicationListParams struct {
 	After param.Opt[string] `query:"after,omitzero" json:"-"`
 	// Cursor for backward pagination
 	Before     param.Opt[string] `query:"before,omitzero" json:"-"`
-	Cursor     param.Opt[string] `query:"cursor,omitzero" json:"-"`
 	Identifier param.Opt[string] `query:"identifier,omitzero" json:"-"`
 	// Maximum number of items to return
-	Limit  param.Opt[int64]                     `query:"limit,omitzero" json:"-"`
-	Slug   param.Opt[string]                    `query:"slug,omitzero" json:"-"`
+	Limit param.Opt[int64]  `query:"limit,omitzero" json:"-"`
+	Slug  param.Opt[string] `query:"slug,omitzero" json:"-"`
+	// Comma-separated sort fields. Prefix with - for descending. Allowed: created_at,
+	// name, identifier
+	Sort   param.Opt[string]                    `query:"sort,omitzero" json:"-"`
 	Expand ZoneApplicationListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Restrict results to applications with this publicId. Repeatable, max 100.
+	// Mutually exclusive with after/before.
+	FilterID ZoneApplicationListParamsFilterIDUnion `query:"filter[id],omitzero" json:"-"`
+	// Filter by exact application identifier
+	FilterIdentifier ZoneApplicationListParamsFilterIdentifierUnion `query:"filter[identifier],omitzero" json:"-"`
+	// Filter by exact application slug
+	FilterSlug ZoneApplicationListParamsFilterSlugUnion `query:"filter[slug],omitzero" json:"-"`
+	// Search across name and identifier (substring match)
+	Query ZoneApplicationListParamsQueryUnion `query:"query[],omitzero" json:"-"`
+	// Search by identifier (substring match)
+	QueryIdentifier ZoneApplicationListParamsQueryIdentifierUnion `query:"query[identifier],omitzero" json:"-"`
+	// Search by name (substring match)
+	QueryName ZoneApplicationListParamsQueryNameUnion `query:"query[name],omitzero" json:"-"`
 	// Filter by traits (OR matching - returns applications with any of the specified
 	// traits)
 	Traits []ApplicationTrait `query:"traits,omitzero" json:"-"`
@@ -686,6 +713,60 @@ type ZoneApplicationListParamsExpandString string
 const (
 	ZoneApplicationListParamsExpandStringTotalCount ZoneApplicationListParamsExpandString = "total_count"
 )
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneApplicationListParamsFilterIDUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneApplicationListParamsFilterIdentifierUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneApplicationListParamsFilterSlugUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneApplicationListParamsQueryUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneApplicationListParamsQueryIdentifierUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneApplicationListParamsQueryNameUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
 
 type ZoneApplicationDeleteParams struct {
 	ZoneID string `path:"zoneId" api:"required" json:"-"`
