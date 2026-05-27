@@ -152,15 +152,33 @@ func TestZoneApplicationListWithOptionalParams(t *testing.T) {
 		keycard.ZoneApplicationListParams{
 			After:  keycard.String("x"),
 			Before: keycard.String("x"),
-			Cursor: keycard.String("cursor"),
 			Expand: keycard.ZoneApplicationListParamsExpandUnion{
 				OfZoneApplicationListsExpandString: keycard.String("total_count"),
 			},
+			FilterID: keycard.ZoneApplicationListParamsFilterIDUnion{
+				OfString: keycard.String("string"),
+			},
+			FilterIdentifier: keycard.ZoneApplicationListParamsFilterIdentifierUnion{
+				OfString: keycard.String("string"),
+			},
+			FilterSlug: keycard.ZoneApplicationListParamsFilterSlugUnion{
+				OfString: keycard.String("string"),
+			},
 			Identifier: keycard.String("identifier"),
 			Limit:      keycard.Int(1),
-			Slug:       keycard.String("slug"),
-			Traits:     []keycard.ApplicationTrait{keycard.ApplicationTraitGateway},
-			TraitsAll:  []keycard.ApplicationTrait{keycard.ApplicationTraitGateway},
+			Query: keycard.ZoneApplicationListParamsQueryUnion{
+				OfString: keycard.String("x"),
+			},
+			QueryIdentifier: keycard.ZoneApplicationListParamsQueryIdentifierUnion{
+				OfString: keycard.String("x"),
+			},
+			QueryName: keycard.ZoneApplicationListParamsQueryNameUnion{
+				OfString: keycard.String("x"),
+			},
+			Slug:      keycard.String("slug"),
+			Sort:      keycard.String("-identifier,\t\r\r \tidentifier,\n\f\t\f\ncreated_at"),
+			Traits:    []keycard.ApplicationTrait{keycard.ApplicationTraitGateway},
+			TraitsAll: []keycard.ApplicationTrait{keycard.ApplicationTraitGateway},
 		},
 	)
 	if err != nil {
