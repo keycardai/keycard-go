@@ -19,6 +19,8 @@ import (
 	"github.com/keycardai/keycard-go/packages/respjson"
 )
 
+// Browse available packages and their versions.
+//
 // ZonePackageVersionService contains methods and other services that help with
 // interacting with the keycard-api API.
 //

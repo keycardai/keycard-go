@@ -19,6 +19,8 @@ import (
 	"github.com/keycardai/keycard-go/packages/respjson"
 )
 
+// Install packages and manage package installations.
+//
 // ZoneInstallService contains methods and other services that help with
 // interacting with the keycard-api API.
 //
