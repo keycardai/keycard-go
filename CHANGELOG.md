@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.17.0 (2026-05-28)
+
+Full Changelog: [v0.16.0...v0.17.0](https://github.com/keycardai/keycard-go/compare/v0.16.0...v0.17.0)
+
+### Features
+
+* add openapi tags ([94ffe5b](https://github.com/keycardai/keycard-go/commit/94ffe5b17260e2c974f435eb5f47e3a7cdf7a2e4))
+
 ## 0.16.0 (2026-05-28)
 
 Full Changelog: [v0.15.0...v0.16.0](https://github.com/keycardai/keycard-go/compare/v0.15.0...v0.16.0)
