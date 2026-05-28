@@ -60,7 +60,10 @@ type ZoneService struct {
 	// model reference.
 	PolicySchemas ZonePolicySchemaService
 	// Policy CRUD operations
-	Policies ZonePolicyService
+	Policies     ZonePolicyService
+	Packages     ZonePackageService
+	Installs     ZoneInstallService
+	CatalogTasks ZoneCatalogTaskService
 	// Policy set CRUD and binding management
 	PolicySets ZonePolicySetService
 }
@@ -83,6 +86,9 @@ func NewZoneService(opts ...option.RequestOption) (r ZoneService) {
 	r.Secrets = NewZoneSecretService(opts...)
 	r.PolicySchemas = NewZonePolicySchemaService(opts...)
 	r.Policies = NewZonePolicyService(opts...)
+	r.Packages = NewZonePackageService(opts...)
+	r.Installs = NewZoneInstallService(opts...)
+	r.CatalogTasks = NewZoneCatalogTaskService(opts...)
 	r.PolicySets = NewZonePolicySetService(opts...)
 	return
 }
