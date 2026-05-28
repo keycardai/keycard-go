@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.16.0 (2026-05-28)
+
+Full Changelog: [v0.15.0...v0.16.0](https://github.com/keycardai/keycard-go/compare/v0.15.0...v0.16.0)
+
+### Features
+
+* add svc-catalog resources to Stainless SDK config ([662e1a7](https://github.com/keycardai/keycard-go/commit/662e1a7963db9684f1328b43b9a41751d2cd5276))
+* **ID-229:** paginate listApplications behind application-pagination flag ([b364885](https://github.com/keycardai/keycard-go/commit/b3648857af9fc24fbf8ab7edbb6c05119075b8fa))
+
 ## 0.15.0 (2026-05-21)
 
 Full Changelog: [v0.14.0...v0.15.0](https://github.com/keycardai/keycard-go/compare/v0.14.0...v0.15.0)
