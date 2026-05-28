@@ -18,6 +18,8 @@ import (
 	"github.com/keycardai/keycard-go/packages/respjson"
 )
 
+// Track the progress of install and uninstall operations.
+//
 // ZoneCatalogTaskService contains methods and other services that help with
 // interacting with the keycard-api API.
 //

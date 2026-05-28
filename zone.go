@@ -60,9 +60,12 @@ type ZoneService struct {
 	// model reference.
 	PolicySchemas ZonePolicySchemaService
 	// Policy CRUD operations
-	Policies     ZonePolicyService
-	Packages     ZonePackageService
-	Installs     ZoneInstallService
+	Policies ZonePolicyService
+	// Browse available packages and their versions.
+	Packages ZonePackageService
+	// Install packages and manage package installations.
+	Installs ZoneInstallService
+	// Track the progress of install and uninstall operations.
 	CatalogTasks ZoneCatalogTaskService
 	// Policy set CRUD and binding management
 	PolicySets ZonePolicySetService
