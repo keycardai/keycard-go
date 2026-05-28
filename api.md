@@ -247,6 +247,63 @@ Methods:
 - <code title="get /zones/{zone_id}/policies/{policy_id}/versions">client.Zones.Policies.Versions.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePolicyVersionService.List">List</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, policyID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePolicyVersionListParams">ZonePolicyVersionListParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePolicyVersionListResponse">ZonePolicyVersionListResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="delete /zones/{zone_id}/policies/{policy_id}/versions/{version_id}">client.Zones.Policies.Versions.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePolicyVersionService.Archive">Archive</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, versionID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePolicyVersionArchiveParams">ZonePolicyVersionArchiveParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PolicyVersion">PolicyVersion</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
+## Packages
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#InputState">InputState</a>
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Package">Package</a>
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PackageDraft">PackageDraft</a>
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PackageInputBinding">PackageInputBinding</a>
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PackageList">PackageList</a>
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PackageOutputBinding">PackageOutputBinding</a>
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PackageSource">PackageSource</a>
+
+Methods:
+
+- <code title="get /zones/{zone_id}/packages/{package_id}">client.Zones.Packages.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePackageService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, packageID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePackageGetParams">ZonePackageGetParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Package">Package</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /zones/{zone_id}/packages">client.Zones.Packages.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePackageService.List">List</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, zoneID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePackageListParams">ZonePackageListParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PackageList">PackageList</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /zones/{zone_id}/packages/{package_id}/draft">client.Zones.Packages.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePackageService.GetDraft">GetDraft</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, packageID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePackageGetDraftParams">ZonePackageGetDraftParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PackageDraft">PackageDraft</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+### Versions
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PackageVersion">PackageVersion</a>
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PackageVersionList">PackageVersionList</a>
+
+Methods:
+
+- <code title="get /zones/{zone_id}/packages/{package_id}/versions/{version_id}">client.Zones.Packages.Versions.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePackageVersionService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, versionID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePackageVersionGetParams">ZonePackageVersionGetParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PackageVersion">PackageVersion</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /zones/{zone_id}/packages/{package_id}/versions">client.Zones.Packages.Versions.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePackageVersionService.List">List</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, packageID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePackageVersionListParams">ZonePackageVersionListParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PackageVersionList">PackageVersionList</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+## Installs
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Install">Install</a>
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#InstallList">InstallList</a>
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#InstallStatus">InstallStatus</a>
+
+Methods:
+
+- <code title="post /zones/{zone_id}/installs">client.Zones.Installs.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneInstallService.New">New</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, zoneID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneInstallNewParams">ZoneInstallNewParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Task">Task</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /zones/{zone_id}/installs/{install_id}">client.Zones.Installs.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneInstallService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, installID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneInstallGetParams">ZoneInstallGetParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Install">Install</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /zones/{zone_id}/installs">client.Zones.Installs.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneInstallService.List">List</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, zoneID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneInstallListParams">ZoneInstallListParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#InstallList">InstallList</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="delete /zones/{zone_id}/installs/{install_id}">client.Zones.Installs.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneInstallService.Delete">Delete</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, installID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneInstallDeleteParams">ZoneInstallDeleteParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Task">Task</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+## CatalogTasks
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Task">Task</a>
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#TaskOperation">TaskOperation</a>
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#TaskStatus">TaskStatus</a>
+
+Methods:
+
+- <code title="get /zones/{zone_id}/catalog_tasks/{task_id}">client.Zones.CatalogTasks.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneCatalogTaskService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, taskID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneCatalogTaskGetParams">ZoneCatalogTaskGetParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Task">Task</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
 ## PolicySets
 
 Params Types:
