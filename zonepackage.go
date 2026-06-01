@@ -19,6 +19,8 @@ import (
 	"github.com/keycardai/keycard-go/packages/respjson"
 )
 
+// Browse available packages and their versions.
+//
 // ZonePackageService contains methods and other services that help with
 // interacting with the keycard-api API.
 //
@@ -26,7 +28,8 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewZonePackageService] method instead.
 type ZonePackageService struct {
-	Options  []option.RequestOption
+	Options []option.RequestOption
+	// Browse available packages and their versions.
 	Versions ZonePackageVersionService
 }
 
