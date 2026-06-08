@@ -245,6 +245,10 @@ type Zone struct {
 	Name string `json:"name" api:"required"`
 	// Organization that owns this zone
 	OrganizationID string `json:"organization_id" api:"required"`
+	// Who owns this zone. Platform-owned zones cannot be modified via API.
+	//
+	// Any of "platform", "customer".
+	OwnerType ZoneOwnerType `json:"owner_type" api:"required"`
 	// Protocol configuration for a zone
 	Protocols ZoneProtocols `json:"protocols" api:"required"`
 	// URL-safe identifier, unique within the zone
@@ -275,6 +279,7 @@ type Zone struct {
 		CreatedAt                      respjson.Field
 		Name                           respjson.Field
 		OrganizationID                 respjson.Field
+		OwnerType                      respjson.Field
 		Protocols                      respjson.Field
 		Slug                           respjson.Field
 		UpdatedAt                      respjson.Field
@@ -295,6 +300,14 @@ func (r Zone) RawJSON() string { return r.JSON.raw }
 func (r *Zone) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Who owns this zone. Platform-owned zones cannot be modified via API.
+type ZoneOwnerType string
+
+const (
+	ZoneOwnerTypePlatform ZoneOwnerType = "platform"
+	ZoneOwnerTypeCustomer ZoneOwnerType = "customer"
+)
 
 // Protocol configuration for a zone
 type ZoneProtocols struct {
