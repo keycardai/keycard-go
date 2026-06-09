@@ -125,6 +125,10 @@ type Provider struct {
 	Name string `json:"name" api:"required"`
 	// Organization that owns this provider
 	OrganizationID string `json:"organization_id" api:"required"`
+	// Who owns this provider. Platform-owned providers cannot be modified via API.
+	//
+	// Any of "platform", "customer".
+	OwnerType ProviderOwnerType `json:"owner_type" api:"required"`
 	// URL-safe identifier, unique within the zone
 	Slug string `json:"slug" api:"required"`
 	// Entity update timestamp
@@ -150,6 +154,7 @@ type Provider struct {
 		Identifier      respjson.Field
 		Name            respjson.Field
 		OrganizationID  respjson.Field
+		OwnerType       respjson.Field
 		Slug            respjson.Field
 		UpdatedAt       respjson.Field
 		ZoneID          respjson.Field
@@ -169,6 +174,14 @@ func (r Provider) RawJSON() string { return r.JSON.raw }
 func (r *Provider) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Who owns this provider. Platform-owned providers cannot be modified via API.
+type ProviderOwnerType string
+
+const (
+	ProviderOwnerTypePlatform ProviderOwnerType = "platform"
+	ProviderOwnerTypeCustomer ProviderOwnerType = "customer"
+)
 
 // Protocol-specific configuration
 type ProviderProtocols struct {
