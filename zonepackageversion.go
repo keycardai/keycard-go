@@ -3,24 +3,13 @@
 package keycard
 
 import (
-	"context"
-	"errors"
-	"fmt"
-	"net/http"
-	"net/url"
-	"slices"
 	"time"
 
 	"github.com/keycardai/keycard-go/internal/apijson"
-	"github.com/keycardai/keycard-go/internal/apiquery"
-	"github.com/keycardai/keycard-go/internal/requestconfig"
 	"github.com/keycardai/keycard-go/option"
-	"github.com/keycardai/keycard-go/packages/param"
 	"github.com/keycardai/keycard-go/packages/respjson"
 )
 
-// Browse available packages and their versions.
-//
 // ZonePackageVersionService contains methods and other services that help with
 // interacting with the keycard-api API.
 //
@@ -38,52 +27,6 @@ func NewZonePackageVersionService(opts ...option.RequestOption) (r ZonePackageVe
 	r = ZonePackageVersionService{}
 	r.Options = opts
 	return
-}
-
-// Get a specific zone package version
-func (r *ZonePackageVersionService) Get(ctx context.Context, versionID string, params ZonePackageVersionGetParams, opts ...option.RequestOption) (res *PackageVersion, err error) {
-	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
-	opts = append([]option.RequestOption{option.WithBaseURL("/")}, opts...)
-	if params.ZoneID == "" {
-		err = errors.New("missing required zone_id parameter")
-		return nil, err
-	}
-	if params.PackageID == "" {
-		err = errors.New("missing required package_id parameter")
-		return nil, err
-	}
-	if versionID == "" {
-		err = errors.New("missing required version_id parameter")
-		return nil, err
-	}
-	path := fmt.Sprintf("zones/%s/packages/%s/versions/%s", url.PathEscape(params.ZoneID), url.PathEscape(params.PackageID), url.PathEscape(versionID))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return res, err
-}
-
-// List zone package versions
-func (r *ZonePackageVersionService) List(ctx context.Context, packageID string, params ZonePackageVersionListParams, opts ...option.RequestOption) (res *PackageVersionList, err error) {
-	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
-	opts = append([]option.RequestOption{option.WithBaseURL("/")}, opts...)
-	if params.ZoneID == "" {
-		err = errors.New("missing required zone_id parameter")
-		return nil, err
-	}
-	if packageID == "" {
-		err = errors.New("missing required package_id parameter")
-		return nil, err
-	}
-	path := fmt.Sprintf("zones/%s/packages/%s/versions", url.PathEscape(params.ZoneID), url.PathEscape(packageID))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return res, err
 }
 
 type PackageVersion struct {
@@ -196,78 +139,4 @@ type PackageVersionLink struct {
 func (r PackageVersionLink) RawJSON() string { return r.JSON.raw }
 func (r *PackageVersionLink) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-type PackageVersionList struct {
-	Items []PackageVersion `json:"items" api:"required"`
-	// Cursor-based pagination metadata returned alongside a list of results
-	Pagination PackageVersionListPagination `json:"pagination" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Items       respjson.Field
-		Pagination  respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r PackageVersionList) RawJSON() string { return r.JSON.raw }
-func (r *PackageVersionList) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Cursor-based pagination metadata returned alongside a list of results
-type PackageVersionListPagination struct {
-	// An opaque cursor used for paginating through a list of results
-	AfterCursor string `json:"after_cursor" api:"required"`
-	// An opaque cursor used for paginating through a list of results
-	BeforeCursor string `json:"before_cursor" api:"required"`
-	// Total number of items across all pages. Only present when the request includes
-	// ?expand[]=total_count.
-	TotalCount int64 `json:"total_count"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		AfterCursor  respjson.Field
-		BeforeCursor respjson.Field
-		TotalCount   respjson.Field
-		ExtraFields  map[string]respjson.Field
-		raw          string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r PackageVersionListPagination) RawJSON() string { return r.JSON.raw }
-func (r *PackageVersionListPagination) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type ZonePackageVersionGetParams struct {
-	ZoneID           string            `path:"zone_id" api:"required" json:"-"`
-	PackageID        string            `path:"package_id" api:"required" json:"-"`
-	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	paramObj
-}
-
-type ZonePackageVersionListParams struct {
-	ZoneID string `path:"zone_id" api:"required" json:"-"`
-	// Cursor for forward pagination. Returned in `Pagination.after_cursor`. Mutually
-	// exclusive with `before`.
-	After param.Opt[string] `query:"after,omitzero" json:"-"`
-	// Cursor for backward pagination. Returned in `Pagination.before_cursor`. Mutually
-	// exclusive with `after`.
-	Before param.Opt[string] `query:"before,omitzero" json:"-"`
-	// Maximum number of items to return per page.
-	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
-	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	paramObj
-}
-
-// URLQuery serializes [ZonePackageVersionListParams]'s query parameters as
-// `url.Values`.
-func (r ZonePackageVersionListParams) URLQuery() (v url.Values, err error) {
-	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
-		NestedFormat: apiquery.NestedQueryFormatBrackets,
-	})
 }
