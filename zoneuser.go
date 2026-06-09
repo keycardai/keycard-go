@@ -67,14 +67,16 @@ func (r *ZoneUserService) Get(ctx context.Context, id string, query ZoneUserGetP
 // Use cursor pagination via `after`/`before`. Sort: comma-separated field list;
 // prefix with `-` for descending. Use `expand[]=total_count` to include the
 // matching row count, `expand[]=session_count` to include per-user session counts,
-// and `expand[]=grant_count` to include per-user delegated-grant counts. Filter by
-// exact email via `filter[email]`; search via `query[email]` / `query[subject]` /
-// `query[]` (substring match, OR'd across repeated values). `query[]` matches
-// against email and federation credential subject. Pass `filter[id]` (repeatable,
-// max 100) to restrict results to a known set of users — mutually exclusive with
-// `after`/`before` (returns 400 if combined). When `filter[id]` is set, `limit` is
-// ignored and the response contains every requested user that exists in the zone,
-// in a single page. IDs not in the zone are silently omitted.
+// `expand[]=grant_count` to include per-user delegated-grant counts, and
+// `expand[]=role-assignments` to include each user's structured role grants.
+// Filter by exact email via `filter[email]`; search via `query[email]` /
+// `query[subject]` / `query[]` (substring match, OR'd across repeated values).
+// `query[]` matches against email and federation credential subject. Pass
+// `filter[id]` (repeatable, max 100) to restrict results to a known set of users —
+// mutually exclusive with `after`/`before` (returns 400 if combined). When
+// `filter[id]` is set, `limit` is ignored and the response contains every
+// requested user that exists in the zone, in a single page. IDs not in the zone
+// are silently omitted.
 func (r *ZoneUserService) List(ctx context.Context, zoneID string, query ZoneUserListParams, opts ...option.RequestOption) (res *ZoneUserListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -116,6 +118,9 @@ type User struct {
 	// Reference to the identity provider. This field is undefined when the source
 	// identity provider is deleted but the user is not deleted.
 	ProviderID string `json:"provider_id"`
+	// Role grants for this user within the zone. Populated only when
+	// `expand[]=role-assignments` is set on the listing endpoint.
+	RoleAssignments []UserRoleAssignment `json:"role_assignments"`
 	// Session count for this user. Populated only when `expand[]=session_count` is set
 	// on the listing endpoint.
 	SessionCount int64 `json:"session_count"`
@@ -135,6 +140,7 @@ type User struct {
 		GrantCount      respjson.Field
 		Issuer          respjson.Field
 		ProviderID      respjson.Field
+		RoleAssignments respjson.Field
 		SessionCount    respjson.Field
 		Subject         respjson.Field
 		ExtraFields     map[string]respjson.Field
@@ -145,6 +151,54 @@ type User struct {
 // Returns the unmodified JSON received from the API
 func (r User) RawJSON() string { return r.JSON.raw }
 func (r *User) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A role granted to a user within a zone.
+type UserRoleAssignment struct {
+	// ID of the assigned role
+	RoleID string `json:"role_id" api:"required"`
+	// Opaque role identifier. Treated as an opaque identifier by the API and unique
+	// within a zone.
+	RoleIdentifier string `json:"role_identifier" api:"required"`
+	// The resource this grant is scoped to, or null when the grant is unscoped
+	// (applies to the owning zone itself).
+	Scope UserRoleAssignmentScope `json:"scope" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		RoleID         respjson.Field
+		RoleIdentifier respjson.Field
+		Scope          respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r UserRoleAssignment) RawJSON() string { return r.JSON.raw }
+func (r *UserRoleAssignment) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The resource this grant is scoped to, or null when the grant is unscoped
+// (applies to the owning zone itself).
+type UserRoleAssignmentScope struct {
+	// The ID of the scoped resource.
+	ID string `json:"id" api:"required"`
+	// The kind of resource this grant is scoped to (e.g. `zone`).
+	Type string `json:"type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r UserRoleAssignmentScope) RawJSON() string { return r.JSON.raw }
+func (r *UserRoleAssignmentScope) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -244,9 +298,10 @@ type ZoneUserListParamsExpandUnion struct {
 type ZoneUserListParamsExpandString string
 
 const (
-	ZoneUserListParamsExpandStringTotalCount   ZoneUserListParamsExpandString = "total_count"
-	ZoneUserListParamsExpandStringSessionCount ZoneUserListParamsExpandString = "session_count"
-	ZoneUserListParamsExpandStringGrantCount   ZoneUserListParamsExpandString = "grant_count"
+	ZoneUserListParamsExpandStringTotalCount      ZoneUserListParamsExpandString = "total_count"
+	ZoneUserListParamsExpandStringSessionCount    ZoneUserListParamsExpandString = "session_count"
+	ZoneUserListParamsExpandStringGrantCount      ZoneUserListParamsExpandString = "grant_count"
+	ZoneUserListParamsExpandStringRoleAssignments ZoneUserListParamsExpandString = "role-assignments"
 )
 
 // Only one field can be non-zero.
