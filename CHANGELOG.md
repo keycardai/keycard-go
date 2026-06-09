@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.18.0 (2026-06-09)
+
+Full Changelog: [v0.17.0...v0.18.0](https://github.com/keycardai/keycard-go/compare/v0.17.0...v0.18.0)
+
+### Features
+
+* **ACC-441:** add roles and role assignments to the management api ([67dfbd4](https://github.com/keycardai/keycard-go/commit/67dfbd43c5f70185ecb6ee72ef300d71a495f718))
+* **iam:** ACC-441 add management api role and assignment routes ([5da317a](https://github.com/keycardai/keycard-go/commit/5da317aa4e94956e048287f19f1acf75ffe0fa6d))
+* **ID-269:** Add owner_type: platform | customer to zones ([55bbff8](https://github.com/keycardai/keycard-go/commit/55bbff8fa70879281a07312ac3707d0008637cd3))
+* **ID-270:** gate owner_type and federation.keycard to platform-owned entities ([964e027](https://github.com/keycardai/keycard-go/commit/964e02770142f62b099f03732c0d3094461a10cb))
+
 ## 0.17.0 (2026-05-28)
 
 Full Changelog: [v0.16.0...v0.17.0](https://github.com/keycardai/keycard-go/compare/v0.16.0...v0.17.0)
