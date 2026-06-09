@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/keycardai/keycard-go/internal/apijson"
-	"github.com/keycardai/keycard-go/internal/apiquery"
 	"github.com/keycardai/keycard-go/internal/requestconfig"
 	"github.com/keycardai/keycard-go/option"
 	"github.com/keycardai/keycard-go/packages/param"
@@ -28,8 +27,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewZonePackageService] method instead.
 type ZonePackageService struct {
-	Options []option.RequestOption
-	// Browse available packages and their versions.
+	Options  []option.RequestOption
 	Versions ZonePackageVersionService
 }
 
@@ -60,44 +58,6 @@ func (r *ZonePackageService) Get(ctx context.Context, packageID string, params Z
 		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s/packages/%s", url.PathEscape(params.ZoneID), url.PathEscape(packageID))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return res, err
-}
-
-// List zone packages
-func (r *ZonePackageService) List(ctx context.Context, zoneID string, params ZonePackageListParams, opts ...option.RequestOption) (res *PackageList, err error) {
-	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
-	opts = append([]option.RequestOption{option.WithBaseURL("/")}, opts...)
-	if zoneID == "" {
-		err = errors.New("missing required zone_id parameter")
-		return nil, err
-	}
-	path := fmt.Sprintf("zones/%s/packages", url.PathEscape(zoneID))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return res, err
-}
-
-// Get the zone package draft
-func (r *ZonePackageService) GetDraft(ctx context.Context, packageID string, params ZonePackageGetDraftParams, opts ...option.RequestOption) (res *PackageDraft, err error) {
-	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
-	}
-	var preClientOpts = []option.RequestOption{requestconfig.WithSecurity(requestconfig.Security{})}
-	opts = slices.Concat(preClientOpts, r.Options, opts)
-	opts = append([]option.RequestOption{option.WithBaseURL("/")}, opts...)
-	if params.ZoneID == "" {
-		err = errors.New("missing required zone_id parameter")
-		return nil, err
-	}
-	if packageID == "" {
-		err = errors.New("missing required package_id parameter")
-		return nil, err
-	}
-	path := fmt.Sprintf("zones/%s/packages/%s/draft", url.PathEscape(params.ZoneID), url.PathEscape(packageID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return res, err
 }
@@ -578,50 +538,6 @@ func (r *PackageInputBindingSchema) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type PackageList struct {
-	Items []Package `json:"items" api:"required"`
-	// Cursor-based pagination metadata returned alongside a list of results
-	Pagination PackageListPagination `json:"pagination" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Items       respjson.Field
-		Pagination  respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r PackageList) RawJSON() string { return r.JSON.raw }
-func (r *PackageList) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Cursor-based pagination metadata returned alongside a list of results
-type PackageListPagination struct {
-	// An opaque cursor used for paginating through a list of results
-	AfterCursor string `json:"after_cursor" api:"required"`
-	// An opaque cursor used for paginating through a list of results
-	BeforeCursor string `json:"before_cursor" api:"required"`
-	// Total number of items across all pages. Only present when the request includes
-	// ?expand[]=total_count.
-	TotalCount int64 `json:"total_count"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		AfterCursor  respjson.Field
-		BeforeCursor respjson.Field
-		TotalCount   respjson.Field
-		ExtraFields  map[string]respjson.Field
-		raw          string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r PackageListPagination) RawJSON() string { return r.JSON.raw }
-func (r *PackageListPagination) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
 // Output binding for a package.
 //
 // `schema` describes the flat outputs surfaced on an install. `bindings` is a CEL
@@ -790,37 +706,6 @@ const (
 )
 
 type ZonePackageGetParams struct {
-	ZoneID           string            `path:"zone_id" api:"required" json:"-"`
-	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	paramObj
-}
-
-type ZonePackageListParams struct {
-	// Cursor for forward pagination. Returned in `Pagination.after_cursor`. Mutually
-	// exclusive with `before`.
-	After param.Opt[string] `query:"after,omitzero" json:"-"`
-	// Cursor for backward pagination. Returned in `Pagination.before_cursor`. Mutually
-	// exclusive with `after`.
-	Before param.Opt[string] `query:"before,omitzero" json:"-"`
-	// Filter packages by slug
-	FiltersSlug param.Opt[string] `query:"filters[slug],omitzero" json:"-"`
-	// Filter packages by kind (comma-separated)
-	Kind param.Opt[string] `query:"kind,omitzero" json:"-"`
-	// Maximum number of items to return per page.
-	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
-	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	paramObj
-}
-
-// URLQuery serializes [ZonePackageListParams]'s query parameters as `url.Values`.
-func (r ZonePackageListParams) URLQuery() (v url.Values, err error) {
-	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
-		NestedFormat: apiquery.NestedQueryFormatBrackets,
-	})
-}
-
-type ZonePackageGetDraftParams struct {
 	ZoneID           string            `path:"zone_id" api:"required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
