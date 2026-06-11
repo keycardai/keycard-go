@@ -104,6 +104,10 @@ type User struct {
 	Identifier string `json:"identifier" api:"required"`
 	// Organization that owns this user
 	OrganizationID string `json:"organization_id" api:"required"`
+	// Status of the user. Disabled users cannot authenticate.
+	//
+	// Any of "active", "disabled".
+	Status UserStatus `json:"status" api:"required"`
 	// Entity update timestamp
 	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Zone this user belongs to
@@ -134,6 +138,7 @@ type User struct {
 		EmailVerified   respjson.Field
 		Identifier      respjson.Field
 		OrganizationID  respjson.Field
+		Status          respjson.Field
 		UpdatedAt       respjson.Field
 		ZoneID          respjson.Field
 		AuthenticatedAt respjson.Field
@@ -153,6 +158,14 @@ func (r User) RawJSON() string { return r.JSON.raw }
 func (r *User) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Status of the user. Disabled users cannot authenticate.
+type UserStatus string
+
+const (
+	UserStatusActive   UserStatus = "active"
+	UserStatusDisabled UserStatus = "disabled"
+)
 
 // A role granted to a user within a zone.
 type UserRoleAssignment struct {
