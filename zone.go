@@ -60,8 +60,7 @@ type ZoneService struct {
 	// model reference.
 	PolicySchemas ZonePolicySchemaService
 	// Policy CRUD operations
-	Policies ZonePolicyService
-	// Browse available packages and their versions.
+	Policies     ZonePolicyService
 	Packages     ZonePackageService
 	Installs     ZoneInstallService
 	CatalogTasks ZoneCatalogTaskService

@@ -249,24 +249,7 @@ Methods:
 
 ## Packages
 
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#InputState">InputState</a>
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Package">Package</a>
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PackageDraft">PackageDraft</a>
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PackageInputBinding">PackageInputBinding</a>
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PackageOutputBinding">PackageOutputBinding</a>
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PackageSource">PackageSource</a>
-
-Methods:
-
-- <code title="get /zones/{zone_id}/packages/{package_id}">client.Zones.Packages.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePackageService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, packageID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePackageGetParams">ZonePackageGetParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Package">Package</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-
 ### Versions
-
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PackageVersion">PackageVersion</a>
 
 ## Installs
 

@@ -3,11 +3,7 @@
 package keycard
 
 import (
-	"time"
-
-	"github.com/keycardai/keycard-go/internal/apijson"
 	"github.com/keycardai/keycard-go/option"
-	"github.com/keycardai/keycard-go/packages/respjson"
 )
 
 // ZonePackageVersionService contains methods and other services that help with
@@ -27,116 +23,4 @@ func NewZonePackageVersionService(opts ...option.RequestOption) (r ZonePackageVe
 	r = ZonePackageVersionService{}
 	r.Options = opts
 	return
-}
-
-type PackageVersion struct {
-	ID          string    `json:"id" api:"required"`
-	CreatedAt   time.Time `json:"created_at" api:"required" format:"date-time"`
-	ManifestSha string    `json:"manifest_sha" api:"required"`
-	Name        string    `json:"name" api:"required"`
-	// Any of "platform", "customer".
-	OwnerType   PackageVersionOwnerType `json:"owner_type" api:"required"`
-	Version     int64                   `json:"version" api:"required"`
-	ArchivedAt  time.Time               `json:"archived_at" api:"nullable" format:"date-time"`
-	CreatedBy   string                  `json:"created_by"`
-	Description string                  `json:"description"`
-	IconURL     string                  `json:"icon_url"`
-	// Input binding for a package.
-	//
-	// `schema` constrains install-level inputs. `bindings` is a CEL expression that
-	// assembles the flat input map — static values are CEL literals, install-provided
-	// values are `pkg.inputs.X` references. Evaluated at provisioning time to produce
-	// the `entities.inputs` map for entity bindings.
-	Inputs PackageInputBinding  `json:"inputs"`
-	Links  []PackageVersionLink `json:"links"`
-	// Output binding for a package.
-	//
-	// `schema` describes the flat outputs surfaced on an install. `bindings` is a CEL
-	// expression — a map literal whose keys match `schema.properties` and whose values
-	// project fields out of the resolved entity graph. Evaluated after the provisioner
-	// has resolved all entities.
-	Outputs PackageOutputBinding `json:"outputs"`
-	// Vocabulary-defined metadata properties, keyed by property URN.
-	//
-	// Known properties are declared with their schemas; additional properties with
-	// custom URNs are permitted via `Record<unknown>`.
-	//
-	// Each property carries `x-subject-types` indicating which entity types it applies
-	// to. Properties with `draft/` in the URN are experimental and carry
-	// `x-internal: true`.
-	Properties map[string]any `json:"properties"`
-	Tags       []string       `json:"tags"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID          respjson.Field
-		CreatedAt   respjson.Field
-		ManifestSha respjson.Field
-		Name        respjson.Field
-		OwnerType   respjson.Field
-		Version     respjson.Field
-		ArchivedAt  respjson.Field
-		CreatedBy   respjson.Field
-		Description respjson.Field
-		IconURL     respjson.Field
-		Inputs      respjson.Field
-		Links       respjson.Field
-		Outputs     respjson.Field
-		Properties  respjson.Field
-		Tags        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r PackageVersion) RawJSON() string { return r.JSON.raw }
-func (r *PackageVersion) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type PackageVersionOwnerType string
-
-const (
-	PackageVersionOwnerTypePlatform PackageVersionOwnerType = "platform"
-	PackageVersionOwnerTypeCustomer PackageVersionOwnerType = "customer"
-)
-
-// A directed, typed relationship from one entity (the subject) to another (the
-// target).
-//
-// Follows the structure of RFC 7033 JRD link objects, adapted for intra-graph
-// entity references. The subject is the entity whose `links` array contains this
-// link.
-type PackageVersionLink struct {
-	// Target reference.
-	//
-	// Fragment URIs (`#name`) reference other entities in the same graph by their
-	// local name (the key in the entity map). Absolute paths and URLs reference
-	// external resources outside the graph.
-	Href string `json:"href" api:"required"`
-	// Link relation type.
-	Rel string `json:"rel" api:"required"`
-	// Additional metadata keyed by property name.
-	Properties map[string]any `json:"properties"`
-	// Human-readable titles keyed by BCP 47 language tag.
-	Titles map[string]string `json:"titles"`
-	// Media type of the target resource (per RFC 7033 section 4.4.4.3). Applies to
-	// external `href`s; typically omitted for intra-graph references.
-	Type string `json:"type"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Href        respjson.Field
-		Rel         respjson.Field
-		Properties  respjson.Field
-		Titles      respjson.Field
-		Type        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r PackageVersionLink) RawJSON() string { return r.JSON.raw }
-func (r *PackageVersionLink) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
 }
