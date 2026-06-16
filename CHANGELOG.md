@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.19.0 (2026-06-16)
+
+Full Changelog: [v0.18.0...v0.19.0](https://github.com/keycardai/keycard-go/compare/v0.18.0...v0.19.0)
+
+### Features
+
+* **ACC-513:** reduced scope implementation ([848aae7](https://github.com/keycardai/keycard-go/commit/848aae71109623d42d88467e1c1c573d3fbdc4bf))
+* **ID-185:** Disable Zone Users ([a8badca](https://github.com/keycardai/keycard-go/commit/a8badca96e614a4c4c188b0b010c55d76fcea58a))
+
+
+### Bug Fixes
+
+* Hide non-GA Catalog endpoints from docs and SDKs ([1ae6905](https://github.com/keycardai/keycard-go/commit/1ae6905a82827083dfa9a0526dbee77010c76ab2))
+* mark package get x-internal ([e0cb2ed](https://github.com/keycardai/keycard-go/commit/e0cb2edab903bc099938b38db3a6b2805f9b6320))
+
 ## 0.18.0 (2026-06-09)
 
 Full Changelog: [v0.17.0...v0.18.0](https://github.com/keycardai/keycard-go/compare/v0.17.0...v0.18.0)
