@@ -111,7 +111,12 @@ func (r *ZonePolicySetService) Update(ctx context.Context, policySetID string, p
 	return res, err
 }
 
-// List policy sets in a zone
+// Returns a paginated list of policy sets in the zone.
+//
+// `filter[target_type]` defaults to `zone`, hiding principal-scoped sets (e.g.
+// per-user bundle sets) unless explicitly widened. The deprecated
+// `filter[scope_type]` is honored as an equivalent and suppresses the default;
+// supplying both with different value sets returns 400.
 func (r *ZonePolicySetService) List(ctx context.Context, zoneID string, params ZonePolicySetListParams, opts ...option.RequestOption) (res *ZonePolicySetListResponse, err error) {
 	if !param.IsOmitted(params.XAPIVersion) {
 		opts = append(opts, option.WithHeader("X-API-Version", fmt.Sprintf("%v", params.XAPIVersion.Value)))
@@ -235,18 +240,25 @@ type PolicySet struct {
 	//
 	// Any of "platform", "customer".
 	OwnerType PolicySetOwnerType `json:"owner_type" api:"required"`
-	// The scope at which this policy set applies:
-	//
-	// - `"zone"` — applies to all requests in the zone.
-	// - `"resource"` — scoped to a specific resource.
-	// - `"user"` — scoped to a specific user.
-	// - `"session"` — scoped to a specific session.
+	// **Deprecated.** Use `target_type` instead. Carries the same value.
 	//
 	// Any of "zone", "resource", "user", "session".
-	ScopeType  PolicySetScopeType `json:"scope_type" api:"required"`
-	UpdatedAt  time.Time          `json:"updated_at" api:"required" format:"date-time"`
-	ZoneID     string             `json:"zone_id" api:"required"`
-	ArchivedAt time.Time          `json:"archived_at" api:"nullable" format:"date-time"`
+	//
+	// Deprecated: deprecated
+	ScopeType PolicySetScopeType `json:"scope_type" api:"required"`
+	// What this policy set targets:
+	//
+	// - `"zone"` — applies to all requests in the zone.
+	// - `"user"` — scoped to a specific user.
+	//
+	// `resource` and `session` are reserved; legacy sets with those scopes carry them
+	// in the deprecated `scope_type` field.
+	//
+	// Any of "zone", "user".
+	TargetType PolicySetTargetType `json:"target_type" api:"required"`
+	UpdatedAt  time.Time           `json:"updated_at" api:"required" format:"date-time"`
+	ZoneID     string              `json:"zone_id" api:"required"`
+	ArchivedAt time.Time           `json:"archived_at" api:"nullable" format:"date-time"`
 	// Human-readable version number of the latest version (e.g., 1, 2, 3)
 	LatestVersion   int64  `json:"latest_version" api:"nullable"`
 	LatestVersionID string `json:"latest_version_id" api:"nullable"`
@@ -259,6 +271,7 @@ type PolicySet struct {
 		Name            respjson.Field
 		OwnerType       respjson.Field
 		ScopeType       respjson.Field
+		TargetType      respjson.Field
 		UpdatedAt       respjson.Field
 		ZoneID          respjson.Field
 		ArchivedAt      respjson.Field
@@ -287,12 +300,7 @@ const (
 	PolicySetOwnerTypeCustomer PolicySetOwnerType = "customer"
 )
 
-// The scope at which this policy set applies:
-//
-// - `"zone"` — applies to all requests in the zone.
-// - `"resource"` — scoped to a specific resource.
-// - `"user"` — scoped to a specific user.
-// - `"session"` — scoped to a specific session.
+// **Deprecated.** Use `target_type` instead. Carries the same value.
 type PolicySetScopeType string
 
 const (
@@ -300,6 +308,20 @@ const (
 	PolicySetScopeTypeResource PolicySetScopeType = "resource"
 	PolicySetScopeTypeUser     PolicySetScopeType = "user"
 	PolicySetScopeTypeSession  PolicySetScopeType = "session"
+)
+
+// What this policy set targets:
+//
+// - `"zone"` — applies to all requests in the zone.
+// - `"user"` — scoped to a specific user.
+//
+// `resource` and `session` are reserved; legacy sets with those scopes carry them
+// in the deprecated `scope_type` field.
+type PolicySetTargetType string
+
+const (
+	PolicySetTargetTypeZone PolicySetTargetType = "zone"
+	PolicySetTargetTypeUser PolicySetTargetType = "user"
 )
 
 type PolicySetManifest struct {
@@ -396,12 +418,20 @@ type PolicySetWithBinding struct {
 	// Public ID of the currently active (bound) version
 	ActiveVersionID string `json:"active_version_id" api:"nullable"`
 	// Any of "active", "shadow".
-	Mode          string `json:"mode" api:"nullable"`
+	Mode string `json:"mode" api:"nullable"`
+	// **Deprecated.** Use `target_id` instead. Carries the active binding's target;
+	// null when unbound.
+	//
+	// Deprecated: deprecated
 	ScopeTargetID string `json:"scope_target_id" api:"nullable"`
 	// Human-readable version number of the shadow version
 	ShadowVersion int64 `json:"shadow_version" api:"nullable"`
 	// Public ID of the shadow (observed) version, if any
 	ShadowVersionID string `json:"shadow_version_id" api:"nullable"`
+	// Target entity ID. Equals `zone_id` for zone-targeted sets; the principal
+	// identifier for principal-scoped sets. Null only for legacy non-zone sets that
+	// predate target tracking.
+	TargetID string `json:"target_id" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Active          respjson.Field
@@ -411,6 +441,7 @@ type PolicySetWithBinding struct {
 		ScopeTargetID   respjson.Field
 		ShadowVersion   respjson.Field
 		ShadowVersionID respjson.Field
+		TargetID        respjson.Field
 		ExtraFields     map[string]respjson.Field
 		raw             string
 	} `json:"-"`
@@ -471,15 +502,18 @@ type ZonePolicySetNewParams struct {
 	Name             string            `json:"name" api:"required"`
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// The scope at which this policy set applies:
+	// **Deprecated.** Use `target_type` instead. Only `zone` is accepted; use
+	// `target_type` for `user` targets.
+	//
+	// Any of "zone".
+	ScopeType ZonePolicySetNewParamsScopeType `json:"scope_type,omitzero"`
+	// What this policy set targets:
 	//
 	// - `"zone"` — applies to all requests in the zone.
-	// - `"resource"` — scoped to a specific resource.
-	// - `"user"` — scoped to a specific user.
-	// - `"session"` — scoped to a specific session.
+	// - `"user"` — can be bound to a specific user.
 	//
-	// Any of "zone", "resource", "user", "session".
-	ScopeType ZonePolicySetNewParamsScopeType `json:"scope_type,omitzero"`
+	// Any of "zone", "user".
+	TargetType ZonePolicySetNewParamsTargetType `json:"target_type,omitzero"`
 	paramObj
 }
 
@@ -491,19 +525,23 @@ func (r *ZonePolicySetNewParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// The scope at which this policy set applies:
-//
-// - `"zone"` — applies to all requests in the zone.
-// - `"resource"` — scoped to a specific resource.
-// - `"user"` — scoped to a specific user.
-// - `"session"` — scoped to a specific session.
+// **Deprecated.** Use `target_type` instead. Only `zone` is accepted; use
+// `target_type` for `user` targets.
 type ZonePolicySetNewParamsScopeType string
 
 const (
-	ZonePolicySetNewParamsScopeTypeZone     ZonePolicySetNewParamsScopeType = "zone"
-	ZonePolicySetNewParamsScopeTypeResource ZonePolicySetNewParamsScopeType = "resource"
-	ZonePolicySetNewParamsScopeTypeUser     ZonePolicySetNewParamsScopeType = "user"
-	ZonePolicySetNewParamsScopeTypeSession  ZonePolicySetNewParamsScopeType = "session"
+	ZonePolicySetNewParamsScopeTypeZone ZonePolicySetNewParamsScopeType = "zone"
+)
+
+// What this policy set targets:
+//
+// - `"zone"` — applies to all requests in the zone.
+// - `"user"` — can be bound to a specific user.
+type ZonePolicySetNewParamsTargetType string
+
+const (
+	ZonePolicySetNewParamsTargetTypeZone ZonePolicySetNewParamsTargetType = "zone"
+	ZonePolicySetNewParamsTargetTypeUser ZonePolicySetNewParamsTargetType = "user"
 )
 
 type ZonePolicySetGetParams struct {
@@ -575,18 +613,38 @@ type ZonePolicySetListParams struct {
 	// `items.enum`) so the server can return a targeted error for the comma-AND form
 	// instead of a generic "not in allowed values" response.
 	FilterOwnerType []string `query:"filter[owner_type],omitzero" json:"-"`
+	// **Deprecated.** Use `filter[target_type]` instead.
+	//
 	// Filter on `scope_type` (policy sets only). Repeatable; repeated instances OR
 	// across values. See `FilterValues` in the shared spec for the full wire
 	// convention.
 	//
-	// Allowed values: `zone`, `resource`, `user`, `session`. Unknown values return 400
-	// with the list of allowed values. Comma-separated single values are rejected with
-	// a 400 pointing at the repeated-parameter OR form.
+	// Allowed values: `zone` only. Use `filter[target_type]` to select `user` (or
+	// future) targets. Unknown values return 400 with the list of allowed values.
+	// Comma-separated single values are rejected with a 400 pointing at the
+	// repeated-parameter OR form.
+	//
+	// Still honored for backward compatibility and suppresses the
+	// `filter[target_type]` zone default. Supplying both this and
+	// `filter[target_type]` with different value sets returns `400 Bad Request`.
+	FilterScopeType []string `query:"filter[scope_type],omitzero" json:"-"`
+	// Filter on `target_type`. Repeatable; repeated instances OR across values. See
+	// `FilterValues` in the shared spec for the full wire convention.
+	//
+	// Allowed values: `zone`, `user` (`resource` and `session` are reserved and not
+	// yet accepted). Unknown values return 400 with the list of allowed values.
+	// Comma-separated single values are rejected with a 400 pointing at the
+	// repeated-parameter OR form.
+	//
+	// **Defaults to `zone`** when omitted (and no deprecated equivalent parameter is
+	// supplied), so listings exclude principal-scoped elements unless explicitly
+	// widened. On `listPolicies` the default is skipped when `filter[id]` is present,
+	// so by-ID fetches resolve regardless of target.
 	//
 	// Note: the allowed-value enum is enforced in the handler (not as an OpenAPI
 	// `items.enum`) so the server can return a targeted error for the comma-AND form
 	// instead of a generic "not in allowed values" response.
-	FilterScopeType []string `query:"filter[scope_type],omitzero" json:"-"`
+	FilterTargetType []string `query:"filter[target_type],omitzero" json:"-"`
 	// Sort direction. Default is desc (newest first).
 	//
 	// Any of "asc", "desc".
