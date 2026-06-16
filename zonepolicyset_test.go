@@ -33,6 +33,7 @@ func TestZonePolicySetNewWithOptionalParams(t *testing.T) {
 		keycard.ZonePolicySetNewParams{
 			Name:             "name",
 			ScopeType:        keycard.ZonePolicySetNewParamsScopeTypeZone,
+			TargetType:       keycard.ZonePolicySetNewParamsTargetTypeZone,
 			XAPIVersion:      keycard.String("X-API-Version"),
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
@@ -137,6 +138,7 @@ func TestZonePolicySetListWithOptionalParams(t *testing.T) {
 			FilterActive:     keycard.Bool(true),
 			FilterOwnerType:  []string{"string"},
 			FilterScopeType:  []string{"string"},
+			FilterTargetType: []string{"string"},
 			Limit:            keycard.Int(1),
 			Order:            keycard.ZonePolicySetListParamsOrderAsc,
 			Query:            []string{"x"},
