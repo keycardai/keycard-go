@@ -292,9 +292,12 @@ const (
 type Metadata struct {
 	// Documentation URL
 	DocsURL string `json:"docs_url" format:"uri"`
+	// Icon URL
+	IconURL string `json:"icon_url" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		DocsURL     respjson.Field
+		IconURL     respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -319,6 +322,8 @@ func (r Metadata) ToParam() MetadataParam {
 type MetadataParam struct {
 	// Documentation URL
 	DocsURL param.Opt[string] `json:"docs_url,omitzero" format:"uri"`
+	// Icon URL
+	IconURL param.Opt[string] `json:"icon_url,omitzero" format:"uri"`
 	paramObj
 }
 
@@ -334,6 +339,8 @@ func (r *MetadataParam) UnmarshalJSON(data []byte) error {
 type MetadataUpdateParam struct {
 	// Documentation URL (set to null to unset)
 	DocsURL param.Opt[string] `json:"docs_url,omitzero" format:"uri"`
+	// Icon URL (set to null to unset)
+	IconURL param.Opt[string] `json:"icon_url,omitzero" format:"uri"`
 	paramObj
 }
 

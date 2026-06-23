@@ -262,6 +262,9 @@ type ProviderProtocolsOpenid struct {
 	// Additional OIDC scopes to request from this provider during authentication (e.g.
 	// "groups"). Merged with the default scopes (openid, profile, email).
 	Scopes []string `json:"scopes" api:"nullable"`
+	// When true, logging out of the zone propagates the logout to this provider's
+	// end_session_endpoint (RP-initiated logout). Defaults to false.
+	SingleLogoutEnabled bool `json:"single_logout_enabled" api:"nullable"`
 	// Name of a top-level string claim in this provider's ID Token to use as the user
 	// identifier on user creation. When not set, the user's Keycard ID is used.
 	UserIdentifierClaim string `json:"user_identifier_claim" api:"nullable"`
@@ -269,6 +272,7 @@ type ProviderProtocolsOpenid struct {
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Scopes              respjson.Field
+		SingleLogoutEnabled respjson.Field
 		UserIdentifierClaim respjson.Field
 		UserinfoEndpoint    respjson.Field
 		ExtraFields         map[string]respjson.Field
@@ -424,6 +428,9 @@ func (r *ZoneProviderNewParamsProtocolsOauth2) UnmarshalJSON(data []byte) error 
 
 // OpenID Connect protocol configuration for provider creation
 type ZoneProviderNewParamsProtocolsOpenid struct {
+	// When true, logging out of the zone propagates the logout to this provider's
+	// end_session_endpoint (RP-initiated logout). Defaults to false.
+	SingleLogoutEnabled param.Opt[bool] `json:"single_logout_enabled,omitzero"`
 	// Name of a top-level string claim in this provider's ID Token to use as the user
 	// identifier on user creation. When not set, the user's Keycard ID is used.
 	UserIdentifierClaim param.Opt[string] `json:"user_identifier_claim,omitzero"`
@@ -536,6 +543,9 @@ func (r *ZoneProviderUpdateParamsProtocolsOauth2) UnmarshalJSON(data []byte) err
 
 // OpenID Connect protocol configuration. Set to null to remove all OpenID config.
 type ZoneProviderUpdateParamsProtocolsOpenid struct {
+	// When true, logging out of the zone propagates the logout to this provider's
+	// end_session_endpoint (RP-initiated logout). Defaults to false.
+	SingleLogoutEnabled param.Opt[bool] `json:"single_logout_enabled,omitzero"`
 	// Name of a top-level string claim in this provider's ID Token to use as the user
 	// identifier on user creation. Set to null to revert to default. Changing this
 	// value does not affect existing users.
