@@ -40,6 +40,7 @@ func TestZoneResourceNewWithOptionalParams(t *testing.T) {
 			Description:               keycard.String("description"),
 			Metadata: keycard.MetadataParam{
 				DocsURL: keycard.String("https://example.com"),
+				IconURL: keycard.String("https://example.com"),
 			},
 			Prefix: keycard.Bool(true),
 			Scopes: []string{"string"},
@@ -111,6 +112,7 @@ func TestZoneResourceUpdateWithOptionalParams(t *testing.T) {
 			Identifier:                keycard.String("x"),
 			Metadata: keycard.MetadataUpdateParam{
 				DocsURL: keycard.String("https://example.com"),
+				IconURL: keycard.String("https://example.com"),
 			},
 			Name:   keycard.String("x"),
 			Prefix: keycard.Bool(true),

@@ -41,6 +41,7 @@ func TestZoneApplicationNewWithOptionalParams(t *testing.T) {
 			Description: keycard.String("description"),
 			Metadata: keycard.MetadataParam{
 				DocsURL: keycard.String("https://example.com"),
+				IconURL: keycard.String("https://example.com"),
 			},
 			Protocols: keycard.ZoneApplicationNewParamsProtocols{
 				Oauth2: keycard.ZoneApplicationNewParamsProtocolsOauth2{
@@ -113,6 +114,7 @@ func TestZoneApplicationUpdateWithOptionalParams(t *testing.T) {
 			Identifier:  keycard.String("x"),
 			Metadata: keycard.MetadataUpdateParam{
 				DocsURL: keycard.String("https://example.com"),
+				IconURL: keycard.String("https://example.com"),
 			},
 			Name: keycard.String("x"),
 			Protocols: keycard.ZoneApplicationUpdateParamsProtocols{
