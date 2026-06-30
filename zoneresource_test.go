@@ -43,7 +43,7 @@ func TestZoneResourceNewWithOptionalParams(t *testing.T) {
 				IconURL: keycard.String("https://example.com"),
 			},
 			Prefix: keycard.Bool(true),
-			Scopes: []string{"string"},
+			Scopes: []string{"x"},
 		},
 	)
 	if err != nil {
