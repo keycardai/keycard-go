@@ -57,6 +57,7 @@ func TestZoneProviderNewWithOptionalParams(t *testing.T) {
 				},
 				Openid: keycard.ZoneProviderNewParamsProtocolsOpenid{
 					Scopes:              []string{"string"},
+					SingleLogoutEnabled: keycard.Bool(true),
 					UserIdentifierClaim: keycard.String("user_identifier_claim"),
 					UserinfoEndpoint:    keycard.String("https://example.com"),
 				},
@@ -147,6 +148,7 @@ func TestZoneProviderUpdateWithOptionalParams(t *testing.T) {
 				},
 				Openid: keycard.ZoneProviderUpdateParamsProtocolsOpenid{
 					Scopes:              []string{"string"},
+					SingleLogoutEnabled: keycard.Bool(true),
 					UserIdentifierClaim: keycard.String("user_identifier_claim"),
 					UserinfoEndpoint:    keycard.String("https://example.com"),
 				},

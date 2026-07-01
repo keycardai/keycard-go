@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.20.0 (2026-06-30)
+
+Full Changelog: [v0.19.0...v0.20.0](https://github.com/keycardai/keycard-go/compare/v0.19.0...v0.20.0)
+
+### Features
+
+* **ID-328:** add single_logout_enabled provider config ([d67e67a](https://github.com/keycardai/keycard-go/commit/d67e67a4b86c990d26aaabf41fadfcb747cfd142))
+
+
+### Bug Fixes
+
+* align create/update schema validations ([24a06c0](https://github.com/keycardai/keycard-go/commit/24a06c0ffecf4c043fa2eced6c66ddf738fc7816))
+
 ## 0.19.0 (2026-06-16)
 
 Full Changelog: [v0.18.0...v0.19.0](https://github.com/keycardai/keycard-go/compare/v0.18.0...v0.19.0)
