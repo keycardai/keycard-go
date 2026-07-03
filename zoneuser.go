@@ -56,27 +56,26 @@ func (r *ZoneUserService) Get(ctx context.Context, id string, query ZoneUserGetP
 
 // Returns a list of users in the specified zone.
 //
-// **Rollout note:** the paginated/searchable/sortable behavior described below is
-// gated behind the `user-pagination` feature flag and is currently disabled for
-// most zones. While the flag is off, the response returns every user in the zone
-// (capped at 100) in `items` and a fixed pagination envelope where `after_cursor`
-// and `before_cursor` are `null` and `total_count` is `0`. The query parameters
-// below are accepted but ignored. The flag is rolled out per-zone in Datadog and
-// will become the default once Console adopts the paginated contract.
+// Note: cursor pagination, search, and sort are not yet enabled for all zones.
+// Where they are not enabled, the response returns all users in the zone (capped
+// at 100) in `items`, with `after_cursor` and `before_cursor` set to `null` and
+// `total_count` of `0`; `filter[email]` and `filter[identifier]` are still
+// applied, while the pagination, search, and sort parameters below are accepted
+// but ignored.
 //
 // Use cursor pagination via `after`/`before`. Sort: comma-separated field list;
 // prefix with `-` for descending. Use `expand[]=total_count` to include the
 // matching row count, `expand[]=session_count` to include per-user session counts,
 // `expand[]=grant_count` to include per-user delegated-grant counts, and
 // `expand[]=role-assignments` to include each user's structured role grants.
-// Filter by exact email via `filter[email]`; search via `query[email]` /
-// `query[subject]` / `query[]` (substring match, OR'd across repeated values).
-// `query[]` matches against email and federation credential subject. Pass
-// `filter[id]` (repeatable, max 100) to restrict results to a known set of users —
-// mutually exclusive with `after`/`before` (returns 400 if combined). When
-// `filter[id]` is set, `limit` is ignored and the response contains every
-// requested user that exists in the zone, in a single page. IDs not in the zone
-// are silently omitted.
+// Filter by exact email via `filter[email]` and by exact identifier via
+// `filter[identifier]`; search via `query[email]` / `query[subject]` / `query[]`
+// (substring match, OR'd across repeated values). `query[]` matches against email
+// and federation credential subject. Pass `filter[id]` (repeatable, max 100) to
+// restrict results to a known set of users — mutually exclusive with
+// `after`/`before` (returns 400 if combined). When `filter[id]` is set, `limit` is
+// ignored and the response contains every requested user that exists in the zone,
+// in a single page. IDs not in the zone are silently omitted.
 func (r *ZoneUserService) List(ctx context.Context, zoneID string, query ZoneUserListParams, opts ...option.RequestOption) (res *ZoneUserListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -280,6 +279,8 @@ type ZoneUserListParams struct {
 	// Restrict results to users with this publicId. Repeatable, max 100. Mutually
 	// exclusive with after/before.
 	FilterID ZoneUserListParamsFilterIDUnion `query:"filter[id],omitzero" json:"-"`
+	// Filter by exact user identifier
+	FilterIdentifier ZoneUserListParamsFilterIdentifierUnion `query:"filter[identifier],omitzero" json:"-"`
 	// Search across email and credential subject (substring match)
 	Query ZoneUserListParamsQueryUnion `query:"query[],omitzero" json:"-"`
 	// Search by email (substring match)
@@ -330,6 +331,15 @@ type ZoneUserListParamsFilterEmailUnion struct {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type ZoneUserListParamsFilterIDUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneUserListParamsFilterIdentifierUnion struct {
 	OfString      param.Opt[string] `query:",omitzero,inline"`
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
