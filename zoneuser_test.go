@@ -72,6 +72,9 @@ func TestZoneUserListWithOptionalParams(t *testing.T) {
 			FilterID: keycard.ZoneUserListParamsFilterIDUnion{
 				OfString: keycard.String("string"),
 			},
+			FilterIdentifier: keycard.ZoneUserListParamsFilterIdentifierUnion{
+				OfString: keycard.String("string"),
+			},
 			Limit: keycard.Int(1),
 			Query: keycard.ZoneUserListParamsQueryUnion{
 				OfString: keycard.String("x"),
