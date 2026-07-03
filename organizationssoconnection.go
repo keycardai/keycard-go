@@ -176,6 +176,9 @@ func (r SSOConnectionProtocol) ToParam() SSOConnectionProtocolParam {
 type SSOConnectionProtocolOauth2 struct {
 	// OAuth 2.0 authorization endpoint
 	AuthorizationEndpoint string `json:"authorization_endpoint" api:"nullable" format:"uri"`
+	// Custom query parameters appended to authorization redirect URLs. Use for
+	// non-standard providers (e.g. Google prompt=consent, access_type=offline).
+	AuthorizationParameters map[string]string `json:"authorization_parameters" api:"nullable"`
 	// Supported PKCE code challenge methods
 	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported" api:"nullable"`
 	// JSON Web Key Set endpoint
@@ -189,6 +192,7 @@ type SSOConnectionProtocolOauth2 struct {
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AuthorizationEndpoint         respjson.Field
+		AuthorizationParameters       respjson.Field
 		CodeChallengeMethodsSupported respjson.Field
 		JwksUri                       respjson.Field
 		RegistrationEndpoint          respjson.Field
@@ -207,13 +211,21 @@ func (r *SSOConnectionProtocolOauth2) UnmarshalJSON(data []byte) error {
 
 // OpenID Connect protocol configuration for SSO connection
 type SSOConnectionProtocolOpenid struct {
+	// Additional OIDC scopes to request from this provider during authentication (e.g.
+	// "groups"). Merged with the default scopes (openid, profile, email).
+	Scopes []string `json:"scopes" api:"nullable"`
+	// Name of a top-level string claim in the provider's ID Token to use as the user
+	// identifier on user creation. When not set, the user's Keycard ID is used.
+	UserIdentifierClaim string `json:"user_identifier_claim" api:"nullable"`
 	// OpenID Connect UserInfo endpoint
 	UserinfoEndpoint string `json:"userinfo_endpoint" api:"nullable" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		UserinfoEndpoint respjson.Field
-		ExtraFields      map[string]respjson.Field
-		raw              string
+		Scopes              respjson.Field
+		UserIdentifierClaim respjson.Field
+		UserinfoEndpoint    respjson.Field
+		ExtraFields         map[string]respjson.Field
+		raw                 string
 	} `json:"-"`
 }
 
@@ -250,6 +262,9 @@ type SSOConnectionProtocolOauth2Param struct {
 	RegistrationEndpoint param.Opt[string] `json:"registration_endpoint,omitzero" format:"uri"`
 	// OAuth 2.0 token endpoint
 	TokenEndpoint param.Opt[string] `json:"token_endpoint,omitzero" format:"uri"`
+	// Custom query parameters appended to authorization redirect URLs. Use for
+	// non-standard providers (e.g. Google prompt=consent, access_type=offline).
+	AuthorizationParameters map[string]string `json:"authorization_parameters,omitzero"`
 	// Supported PKCE code challenge methods
 	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported,omitzero"`
 	// Supported OAuth 2.0 scopes
@@ -267,8 +282,14 @@ func (r *SSOConnectionProtocolOauth2Param) UnmarshalJSON(data []byte) error {
 
 // OpenID Connect protocol configuration for SSO connection
 type SSOConnectionProtocolOpenidParam struct {
+	// Name of a top-level string claim in the provider's ID Token to use as the user
+	// identifier on user creation. When not set, the user's Keycard ID is used.
+	UserIdentifierClaim param.Opt[string] `json:"user_identifier_claim,omitzero"`
 	// OpenID Connect UserInfo endpoint
 	UserinfoEndpoint param.Opt[string] `json:"userinfo_endpoint,omitzero" format:"uri"`
+	// Additional OIDC scopes to request from this provider during authentication (e.g.
+	// "groups"). Merged with the default scopes (openid, profile, email).
+	Scopes []string `json:"scopes,omitzero"`
 	paramObj
 }
 
@@ -310,8 +331,9 @@ type OrganizationSSOConnectionUpdateParams struct {
 	// SSO provider identifier (e.g., issuer URL)
 	Identifier       param.Opt[string] `json:"identifier,omitzero"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// Protocol configuration for SSO connection
-	Protocols SSOConnectionProtocolParam `json:"protocols,omitzero"`
+	// Protocol configuration for an SSO connection update. Omit a protocol to leave it
+	// unchanged.
+	Protocols OrganizationSSOConnectionUpdateParamsProtocols `json:"protocols,omitzero"`
 	paramObj
 }
 
@@ -320,6 +342,79 @@ func (r OrganizationSSOConnectionUpdateParams) MarshalJSON() (data []byte, err e
 	return param.MarshalObject(r, (*shadow)(&r))
 }
 func (r *OrganizationSSOConnectionUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Protocol configuration for an SSO connection update. Omit a protocol to leave it
+// unchanged.
+type OrganizationSSOConnectionUpdateParamsProtocols struct {
+	// OAuth 2.0 protocol configuration for an SSO connection update. Each field is
+	// tri-state, omit to leave unchanged, send null to clear, send a value to set.
+	Oauth2 OrganizationSSOConnectionUpdateParamsProtocolsOauth2 `json:"oauth2,omitzero"`
+	// OpenID Connect protocol configuration for an SSO connection update. Each field
+	// is tri-state, omit to leave unchanged, send null to clear, send a value to set.
+	Openid OrganizationSSOConnectionUpdateParamsProtocolsOpenid `json:"openid,omitzero"`
+	paramObj
+}
+
+func (r OrganizationSSOConnectionUpdateParamsProtocols) MarshalJSON() (data []byte, err error) {
+	type shadow OrganizationSSOConnectionUpdateParamsProtocols
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *OrganizationSSOConnectionUpdateParamsProtocols) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// OAuth 2.0 protocol configuration for an SSO connection update. Each field is
+// tri-state, omit to leave unchanged, send null to clear, send a value to set.
+type OrganizationSSOConnectionUpdateParamsProtocolsOauth2 struct {
+	// OAuth 2.0 authorization endpoint. Set to null to clear.
+	AuthorizationEndpoint param.Opt[string] `json:"authorization_endpoint,omitzero" format:"uri"`
+	// JSON Web Key Set endpoint. Set to null to clear.
+	JwksUri param.Opt[string] `json:"jwks_uri,omitzero" format:"uri"`
+	// OAuth 2.0 registration endpoint. Set to null to clear.
+	RegistrationEndpoint param.Opt[string] `json:"registration_endpoint,omitzero" format:"uri"`
+	// OAuth 2.0 token endpoint. Set to null to clear.
+	TokenEndpoint param.Opt[string] `json:"token_endpoint,omitzero" format:"uri"`
+	// Custom query parameters appended to authorization redirect URLs. Use for
+	// non-standard providers (e.g. Google prompt=consent, access_type=offline). Set to
+	// null to clear.
+	AuthorizationParameters map[string]string `json:"authorization_parameters,omitzero"`
+	// Supported PKCE code challenge methods. Set to null to clear.
+	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported,omitzero"`
+	// Supported OAuth 2.0 scopes. Set to null to clear.
+	ScopesSupported []string `json:"scopes_supported,omitzero"`
+	paramObj
+}
+
+func (r OrganizationSSOConnectionUpdateParamsProtocolsOauth2) MarshalJSON() (data []byte, err error) {
+	type shadow OrganizationSSOConnectionUpdateParamsProtocolsOauth2
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *OrganizationSSOConnectionUpdateParamsProtocolsOauth2) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// OpenID Connect protocol configuration for an SSO connection update. Each field
+// is tri-state, omit to leave unchanged, send null to clear, send a value to set.
+type OrganizationSSOConnectionUpdateParamsProtocolsOpenid struct {
+	// Name of a top-level string claim in the provider's ID Token to use as the user
+	// identifier on user creation. Set to null to clear.
+	UserIdentifierClaim param.Opt[string] `json:"user_identifier_claim,omitzero"`
+	// OpenID Connect UserInfo endpoint. Set to null to clear.
+	UserinfoEndpoint param.Opt[string] `json:"userinfo_endpoint,omitzero" format:"uri"`
+	// Additional OIDC scopes to request from this provider during authentication (e.g.
+	// "groups"). Merged with the default scopes (openid, profile, email). Set to null
+	// to clear.
+	Scopes []string `json:"scopes,omitzero"`
+	paramObj
+}
+
+func (r OrganizationSSOConnectionUpdateParamsProtocolsOpenid) MarshalJSON() (data []byte, err error) {
+	type shadow OrganizationSSOConnectionUpdateParamsProtocolsOpenid
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *OrganizationSSOConnectionUpdateParamsProtocolsOpenid) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
