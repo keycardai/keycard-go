@@ -24,6 +24,7 @@ func TestZoneResourceNewWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -66,6 +67,7 @@ func TestZoneResourceGet(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -96,6 +98,7 @@ func TestZoneResourceUpdateWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -139,6 +142,7 @@ func TestZoneResourceListWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -180,6 +184,7 @@ func TestZoneResourceDelete(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)

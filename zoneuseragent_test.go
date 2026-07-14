@@ -24,6 +24,7 @@ func TestZoneUserAgentGet(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -54,6 +55,7 @@ func TestZoneUserAgentListWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)

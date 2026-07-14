@@ -24,6 +24,7 @@ func TestZoneApplicationNewWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -71,6 +72,7 @@ func TestZoneApplicationGet(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -101,6 +103,7 @@ func TestZoneApplicationUpdateWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -145,6 +148,7 @@ func TestZoneApplicationListWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -203,6 +207,7 @@ func TestZoneApplicationDelete(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -233,6 +238,7 @@ func TestZoneApplicationListCredentialsWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -270,6 +276,7 @@ func TestZoneApplicationListResourcesWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)

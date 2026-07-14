@@ -178,7 +178,8 @@ func NewRequestConfig(ctx context.Context, method string, u string, body any, ds
 	}
 	cfg.ResponseBodyInto = dst
 	cfg.Security = Security{
-		OAuth2: true,
+		BearerAuth: true,
+		OAuth2:     true,
 	}
 	err = cfg.Apply(opts...)
 	if err != nil {
@@ -665,7 +666,8 @@ func WithDefaultBaseURL(baseURL string) RequestOption {
 }
 
 type Security struct {
-	OAuth2 bool
+	BearerAuth bool
+	OAuth2     bool
 }
 
 func WithSecurity(security Security) RequestOption {
@@ -675,17 +677,32 @@ func WithSecurity(security Security) RequestOption {
 	})
 }
 
+// WithBearerAuthSecurity() should only be used within a method, not provided to at
+// the client-level.
+func WithBearerAuthSecurity() RequestOption {
+	return RequestOptionFunc(func(r *RequestConfig) error {
+		r.Security = Security{
+			BearerAuth: true,
+			OAuth2:     false,
+		}
+		return nil
+	})
+}
+
 // WithOAuth2Security() should only be used within a method, not provided to at the
 // client-level.
 func WithOAuth2Security() RequestOption {
 	return RequestOptionFunc(func(r *RequestConfig) error {
 		r.Security = Security{
-			OAuth2: true,
+			BearerAuth: false,
+			OAuth2:     true,
 		}
 		return nil
 	})
 }
 
 func ApplySecurity(r RequestConfig) {
-
+	if r.Security.BearerAuth && r.APIKey != "" && r.Request.Header.Get("Authorization") == "" {
+		r.Request.Header.Set("authorization", fmt.Sprintf("Bearer %s", r.APIKey))
+	}
 }

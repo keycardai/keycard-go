@@ -24,6 +24,7 @@ func TestOrganizationUserGetWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -56,6 +57,7 @@ func TestOrganizationUserUpdateWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -89,6 +91,7 @@ func TestOrganizationUserListWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -124,6 +127,7 @@ func TestOrganizationUserDeleteWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)

@@ -24,6 +24,7 @@ func TestZonePolicySetVersionNewWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -64,6 +65,7 @@ func TestZonePolicySetVersionGetWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -97,6 +99,7 @@ func TestZonePolicySetVersionUpdateWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -131,6 +134,7 @@ func TestZonePolicySetVersionListWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -169,6 +173,7 @@ func TestZonePolicySetVersionArchiveWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -202,6 +207,7 @@ func TestZonePolicySetVersionListPoliciesWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
