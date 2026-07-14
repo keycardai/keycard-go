@@ -247,14 +247,6 @@ Methods:
 - <code title="get /zones/{zone_id}/policies/{policy_id}/versions">client.Zones.Policies.Versions.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePolicyVersionService.List">List</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, policyID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePolicyVersionListParams">ZonePolicyVersionListParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePolicyVersionListResponse">ZonePolicyVersionListResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="delete /zones/{zone_id}/policies/{policy_id}/versions/{version_id}">client.Zones.Policies.Versions.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePolicyVersionService.Archive">Archive</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, versionID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZonePolicyVersionArchiveParams">ZonePolicyVersionArchiveParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PolicyVersion">PolicyVersion</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
-## Packages
-
-### Versions
-
-## Installs
-
-## CatalogTasks
-
 ## PolicySets
 
 Params Types:

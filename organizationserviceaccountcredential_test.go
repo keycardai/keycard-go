@@ -24,6 +24,7 @@ func TestOrganizationServiceAccountCredentialNewWithOptionalParams(t *testing.T)
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -57,6 +58,7 @@ func TestOrganizationServiceAccountCredentialGetWithOptionalParams(t *testing.T)
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -90,6 +92,7 @@ func TestOrganizationServiceAccountCredentialUpdateWithOptionalParams(t *testing
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -124,6 +127,7 @@ func TestOrganizationServiceAccountCredentialListWithOptionalParams(t *testing.T
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -159,6 +163,7 @@ func TestOrganizationServiceAccountCredentialDeleteWithOptionalParams(t *testing
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
