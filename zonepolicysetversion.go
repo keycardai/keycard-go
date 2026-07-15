@@ -208,10 +208,16 @@ type PolicySetVersion struct {
 	// used for evaluation when activated.
 	SchemaVersion string `json:"schema_version" api:"required"`
 	Version       int64  `json:"version" api:"required"`
-	// Whether this policy set version is currently bound with mode='active'
-	Active     bool      `json:"active"`
+	// Whether this policy set version is currently bound with mode='active'. Always
+	// populated in responses; clients must treat absence as unknown rather than
+	// inferring 'not bound'.
+	Active bool `json:"active"`
+	// Timestamp when the version was archived. Non-null only for archived versions;
+	// null or absent means not archived.
 	ArchivedAt time.Time `json:"archived_at" api:"nullable" format:"date-time"`
-	ArchivedBy string    `json:"archived_by" api:"nullable"`
+	// Identifier of the actor that archived the version. Null or absent means not
+	// archived.
+	ArchivedBy string `json:"archived_by" api:"nullable"`
 	// Decoded content of an Attestation JWS payload. Describes the exact policy set
 	// version composition at attestation time. This schema defines what consumers see
 	// after base64url-decoding the Attestation.payload field.
