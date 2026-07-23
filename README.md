@@ -28,7 +28,7 @@ Or to pin the version:
 <!-- x-release-please-start-version -->
 
 ```sh
-go get -u 'github.com/keycardai/keycard-go@v0.20.0'
+go get -u 'github.com/keycardai/keycard-go@v0.21.0'
 ```
 
 <!-- x-release-please-end -->
@@ -49,10 +49,13 @@ import (
 	"fmt"
 
 	"github.com/keycardai/keycard-go"
+	"github.com/keycardai/keycard-go/option"
 )
 
 func main() {
-	client := keycard.NewClient()
+	client := keycard.NewClient(
+		option.WithAPIKey("My API Key"), // defaults to os.LookupEnv("KEYCARD_API_API_KEY")
+	)
 	zones, err := client.Zones.List(context.TODO(), keycard.ZoneListParams{})
 	if err != nil {
 		panic(err.Error())

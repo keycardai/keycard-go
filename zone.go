@@ -51,8 +51,9 @@ type ZoneService struct {
 	//     `"public-key"`, `"url"`, `"public"`
 	//   - **Keycard::Resource** — `id` (String), `name` (String), `scopes` (Set of
 	//     String)
-	//   - **Keycard::Claims** — `email` (String), `groups` (Set of String), plus
-	//     arbitrary additional fields
+	//   - **Keycard::Claims** — `email` (String), `groups` (Set of String),
+	//     `issuer_claims` (issuer-specific claims record), plus arbitrary additional
+	//     fields
 	//
 	// Enum-like attributes use Cedar enum entity types (schema version `2026-03-16`+).
 	// In policies, reference values as `RegistrationMethod::"managed"` or
@@ -60,10 +61,7 @@ type ZoneService struct {
 	// model reference.
 	PolicySchemas ZonePolicySchemaService
 	// Policy CRUD operations
-	Policies     ZonePolicyService
-	Packages     ZonePackageService
-	Installs     ZoneInstallService
-	CatalogTasks ZoneCatalogTaskService
+	Policies ZonePolicyService
 	// Policy set CRUD and binding management
 	PolicySets ZonePolicySetService
 }
@@ -86,9 +84,6 @@ func NewZoneService(opts ...option.RequestOption) (r ZoneService) {
 	r.Secrets = NewZoneSecretService(opts...)
 	r.PolicySchemas = NewZonePolicySchemaService(opts...)
 	r.Policies = NewZonePolicyService(opts...)
-	r.Packages = NewZonePackageService(opts...)
-	r.Installs = NewZoneInstallService(opts...)
-	r.CatalogTasks = NewZoneCatalogTaskService(opts...)
 	r.PolicySets = NewZonePolicySetService(opts...)
 	return
 }

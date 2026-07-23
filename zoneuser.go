@@ -4,6 +4,7 @@ package keycard
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -56,27 +57,29 @@ func (r *ZoneUserService) Get(ctx context.Context, id string, query ZoneUserGetP
 
 // Returns a list of users in the specified zone.
 //
-// **Rollout note:** the paginated/searchable/sortable behavior described below is
-// gated behind the `user-pagination` feature flag and is currently disabled for
-// most zones. While the flag is off, the response returns every user in the zone
-// (capped at 100) in `items` and a fixed pagination envelope where `after_cursor`
-// and `before_cursor` are `null` and `total_count` is `0`. The query parameters
-// below are accepted but ignored. The flag is rolled out per-zone in Datadog and
-// will become the default once Console adopts the paginated contract.
+// Note: cursor pagination, search, and sort are not yet enabled for all zones.
+// Where they are not enabled, the response returns all users in the zone (capped
+// at 100) in `items`, with `after_cursor` and `before_cursor` set to `null` and
+// `total_count` of `0`; `filter[email]` and `filter[identifier]` are still
+// applied, while the pagination, search, and sort parameters below are accepted
+// but ignored.
 //
 // Use cursor pagination via `after`/`before`. Sort: comma-separated field list;
 // prefix with `-` for descending. Use `expand[]=total_count` to include the
 // matching row count, `expand[]=session_count` to include per-user session counts,
-// `expand[]=grant_count` to include per-user delegated-grant counts, and
-// `expand[]=role-assignments` to include each user's structured role grants.
-// Filter by exact email via `filter[email]`; search via `query[email]` /
-// `query[subject]` / `query[]` (substring match, OR'd across repeated values).
-// `query[]` matches against email and federation credential subject. Pass
-// `filter[id]` (repeatable, max 100) to restrict results to a known set of users —
-// mutually exclusive with `after`/`before` (returns 400 if combined). When
-// `filter[id]` is set, `limit` is ignored and the response contains every
-// requested user that exists in the zone, in a single page. IDs not in the zone
-// are silently omitted.
+// `expand[]=grant_count` to include per-user delegated-grant counts,
+// `expand[]=role-assignments` to include each user's structured role grants,
+// `expand[]=credentials` to include each user's authentication credentials (each
+// with its `provider_id`), and `expand[]=credentials.provider` to additionally
+// inline the full identity provider on each federation credential. Filter by exact
+// email via `filter[email]` and by exact identifier via `filter[identifier]`;
+// search via `query[email]` / `query[subject]` / `query[]` (substring match, OR'd
+// across repeated values). `query[]` matches against email and federation
+// credential subject. Pass `filter[id]` (repeatable, max 100) to restrict results
+// to a known set of users — mutually exclusive with `after`/`before` (returns 400
+// if combined). When `filter[id]` is set, `limit` is ignored and the response
+// contains every requested user that exists in the zone, in a single page. IDs not
+// in the zone are silently omitted.
 func (r *ZoneUserService) List(ctx context.Context, zoneID string, query ZoneUserListParams, opts ...option.RequestOption) (res *ZoneUserListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -114,6 +117,10 @@ type User struct {
 	ZoneID string `json:"zone_id" api:"required"`
 	// Date when the user was last authenticated
 	AuthenticatedAt string `json:"authenticated_at"`
+	// Authentication credentials for this user, each carrying its identity provider
+	// for federation credentials. Populated only when `expand[]=credentials` is set on
+	// the listing endpoint.
+	Credentials []UserCredentialUnion `json:"credentials"`
 	// Delegated-grant count for this user. Populated only when `expand[]=grant_count`
 	// is set on the listing endpoint.
 	GrantCount int64 `json:"grant_count"`
@@ -142,6 +149,7 @@ type User struct {
 		UpdatedAt       respjson.Field
 		ZoneID          respjson.Field
 		AuthenticatedAt respjson.Field
+		Credentials     respjson.Field
 		GrantCount      respjson.Field
 		Issuer          respjson.Field
 		ProviderID      respjson.Field
@@ -166,6 +174,115 @@ const (
 	UserStatusActive   UserStatus = "active"
 	UserStatusDisabled UserStatus = "disabled"
 )
+
+// UserCredentialUnion contains all possible properties and values from
+// [UserCredentialUserCredentialFederation],
+// [UserCredentialUserCredentialPassword].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type UserCredentialUnion struct {
+	CreatedAt time.Time `json:"created_at"`
+	// This field is from variant [UserCredentialUserCredentialFederation].
+	ProviderID string    `json:"provider_id"`
+	Type       string    `json:"type"`
+	UpdatedAt  time.Time `json:"updated_at"`
+	// This field is from variant [UserCredentialUserCredentialFederation].
+	Issuer string `json:"issuer"`
+	// This field is from variant [UserCredentialUserCredentialFederation].
+	Provider Provider `json:"provider"`
+	// This field is from variant [UserCredentialUserCredentialFederation].
+	Subject string `json:"subject"`
+	JSON    struct {
+		CreatedAt  respjson.Field
+		ProviderID respjson.Field
+		Type       respjson.Field
+		UpdatedAt  respjson.Field
+		Issuer     respjson.Field
+		Provider   respjson.Field
+		Subject    respjson.Field
+		raw        string
+	} `json:"-"`
+}
+
+func (u UserCredentialUnion) AsUserCredentialFederation() (v UserCredentialUserCredentialFederation) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u UserCredentialUnion) AsUserCredentialPassword() (v UserCredentialUserCredentialPassword) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u UserCredentialUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *UserCredentialUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Federation credential: the user authenticates through an identity provider.
+type UserCredentialUserCredentialFederation struct {
+	// Entity creation timestamp
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
+	// ID of the identity provider backing this credential. `null` when the source
+	// provider has been deleted.
+	ProviderID string `json:"provider_id" api:"required"`
+	// Any of "federation".
+	Type string `json:"type" api:"required"`
+	// Entity update timestamp
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
+	// Issuer identifier of the identity provider.
+	Issuer string `json:"issuer"`
+	// A Provider is a system that supplies access to Resources and allows actors
+	// (Users or Applications) to authenticate.
+	Provider Provider `json:"provider"`
+	// Subject identifier from the identity provider.
+	Subject string `json:"subject"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		CreatedAt   respjson.Field
+		ProviderID  respjson.Field
+		Type        respjson.Field
+		UpdatedAt   respjson.Field
+		Issuer      respjson.Field
+		Provider    respjson.Field
+		Subject     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r UserCredentialUserCredentialFederation) RawJSON() string { return r.JSON.raw }
+func (r *UserCredentialUserCredentialFederation) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Password credential: the user authenticates with email and password. The email
+// lives on the user.
+type UserCredentialUserCredentialPassword struct {
+	// Entity creation timestamp
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
+	// Any of "password".
+	Type string `json:"type" api:"required"`
+	// Entity update timestamp
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		CreatedAt   respjson.Field
+		Type        respjson.Field
+		UpdatedAt   respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r UserCredentialUserCredentialPassword) RawJSON() string { return r.JSON.raw }
+func (r *UserCredentialUserCredentialPassword) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // A role granted to a user within a zone.
 type UserRoleAssignment struct {
@@ -280,6 +397,8 @@ type ZoneUserListParams struct {
 	// Restrict results to users with this publicId. Repeatable, max 100. Mutually
 	// exclusive with after/before.
 	FilterID ZoneUserListParamsFilterIDUnion `query:"filter[id],omitzero" json:"-"`
+	// Filter by exact user identifier
+	FilterIdentifier ZoneUserListParamsFilterIdentifierUnion `query:"filter[identifier],omitzero" json:"-"`
 	// Search across email and credential subject (substring match)
 	Query ZoneUserListParamsQueryUnion `query:"query[],omitzero" json:"-"`
 	// Search by email (substring match)
@@ -311,10 +430,12 @@ type ZoneUserListParamsExpandUnion struct {
 type ZoneUserListParamsExpandString string
 
 const (
-	ZoneUserListParamsExpandStringTotalCount      ZoneUserListParamsExpandString = "total_count"
-	ZoneUserListParamsExpandStringSessionCount    ZoneUserListParamsExpandString = "session_count"
-	ZoneUserListParamsExpandStringGrantCount      ZoneUserListParamsExpandString = "grant_count"
-	ZoneUserListParamsExpandStringRoleAssignments ZoneUserListParamsExpandString = "role-assignments"
+	ZoneUserListParamsExpandStringTotalCount          ZoneUserListParamsExpandString = "total_count"
+	ZoneUserListParamsExpandStringSessionCount        ZoneUserListParamsExpandString = "session_count"
+	ZoneUserListParamsExpandStringGrantCount          ZoneUserListParamsExpandString = "grant_count"
+	ZoneUserListParamsExpandStringRoleAssignments     ZoneUserListParamsExpandString = "role-assignments"
+	ZoneUserListParamsExpandStringCredentials         ZoneUserListParamsExpandString = "credentials"
+	ZoneUserListParamsExpandStringCredentialsProvider ZoneUserListParamsExpandString = "credentials.provider"
 )
 
 // Only one field can be non-zero.
@@ -330,6 +451,15 @@ type ZoneUserListParamsFilterEmailUnion struct {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type ZoneUserListParamsFilterIDUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneUserListParamsFilterIdentifierUnion struct {
 	OfString      param.Opt[string] `query:",omitzero,inline"`
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion

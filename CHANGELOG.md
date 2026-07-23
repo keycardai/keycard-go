@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.21.0 (2026-07-22)
+
+Full Changelog: [v0.20.0...v0.21.0](https://github.com/keycardai/keycard-go/compare/v0.20.0...v0.21.0)
+
+### Features
+
+* **applications:** allow unified-gateway and mcp-server traits (ECO-128) ([7c443ca](https://github.com/keycardai/keycard-go/commit/7c443ca9928dd5e9d386f9149688f8bcc264d7f1))
+* filter users by identifier in management list ([84244f6](https://github.com/keycardai/keycard-go/commit/84244f60bc781c1186fd34173e709a35fdacffb1))
+* **ID-365:** support additional SSO provider configuration options ([0165b4f](https://github.com/keycardai/keycard-go/commit/0165b4fb2068ce1b88a5b41ee56db7d62ba12ebf))
+* **stlc:** configurable CI runner and private-production-repo support in workflow templates ([793f781](https://github.com/keycardai/keycard-go/commit/793f781c960f0bebebee1bad717c076c7e2f4bc4))
+
+
+### Bug Fixes
+
+* **ACC-613:** preserve source order of policies in draft/convert cedar_json ([f46f0a8](https://github.com/keycardai/keycard-go/commit/f46f0a86ca227f148e912ee4af49b456595a772c))
+* **ci:** resolve Stainless error diagnostics and enforce fail_on: error ([1dd0b7a](https://github.com/keycardai/keycard-go/commit/1dd0b7a08e560001b55459203a3953713a83600f))
+* exact-match identifier filter on resources management list ([8c855ac](https://github.com/keycardai/keycard-go/commit/8c855acdf8f1ce2b2df3092691bb84875e60fa0a))
+
+
+### Chores
+
+* de-dup and align types across API specs ([7be9704](https://github.com/keycardai/keycard-go/commit/7be9704a0a3d22bc37c4d7c35281f06d7b552574))
+* Fixes found during Terraform work ([cbcb4dd](https://github.com/keycardai/keycard-go/commit/cbcb4ddb6dd295f2cb24540a35e6724993e3db9e))
+
 ## 0.20.0 (2026-06-30)
 
 Full Changelog: [v0.19.0...v0.20.0](https://github.com/keycardai/keycard-go/compare/v0.19.0...v0.20.0)

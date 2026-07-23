@@ -158,7 +158,8 @@ type PolicyVersion struct {
 	ArchivedBy string    `json:"archived_by" api:"nullable"`
 	// Cedar policy in JSON representation. Populated by default and when `format=json`
 	// is passed; null when `format=cedar` narrows the response to the text
-	// representation only.
+	// representation only. Serialized verbatim from the stored Cedar so the order of
+	// `staticPolicies` matches the source policy order (ACC-613).
 	CedarJson any `json:"cedar_json" api:"nullable"`
 	// Cedar policy in human-readable syntax. Populated by default and when
 	// `format=cedar` is passed; null when `format=json` narrows the response to the

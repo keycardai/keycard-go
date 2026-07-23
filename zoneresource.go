@@ -82,7 +82,10 @@ func (r *ZoneResourceService) Update(ctx context.Context, id string, params Zone
 	return res, err
 }
 
-// Returns a list of resources in the specified zone
+// Returns a list of resources in the specified zone. Filter by exact identifier
+// via `filter[identifier]` (repeatable, OR'd). Matching is exact: identifiers are
+// unique per zone, so a filter returns at most one resource per value and never
+// performs URL prefix resolution.
 func (r *ZoneResourceService) List(ctx context.Context, zoneID string, query ZoneResourceListParams, opts ...option.RequestOption) (res *ZoneResourceListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -278,6 +281,8 @@ type ZoneResourceListParams struct {
 	Limit  param.Opt[int64]                  `query:"limit,omitzero" json:"-"`
 	Slug   param.Opt[string]                 `query:"slug,omitzero" json:"-"`
 	Expand ZoneResourceListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Filter by exact resource identifier
+	FilterIdentifier ZoneResourceListParamsFilterIdentifierUnion `query:"filter[identifier],omitzero" json:"-"`
 	paramObj
 }
 
@@ -305,6 +310,15 @@ type ZoneResourceListParamsExpandString string
 const (
 	ZoneResourceListParamsExpandStringTotalCount ZoneResourceListParamsExpandString = "total_count"
 )
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneResourceListParamsFilterIdentifierUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
 
 type ZoneResourceDeleteParams struct {
 	ZoneID string `path:"zoneId" api:"required" json:"-"`

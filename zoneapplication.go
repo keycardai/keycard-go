@@ -284,8 +284,10 @@ func (r *ApplicationProtocolsOauth2) UnmarshalJSON(data []byte) error {
 type ApplicationTrait string
 
 const (
-	ApplicationTraitGateway     ApplicationTrait = "gateway"
-	ApplicationTraitMcpProvider ApplicationTrait = "mcp-provider"
+	ApplicationTraitGateway        ApplicationTrait = "gateway"
+	ApplicationTraitMcpProvider    ApplicationTrait = "mcp-provider"
+	ApplicationTraitUnifiedGateway ApplicationTrait = "unified-gateway"
+	ApplicationTraitMcpServer      ApplicationTrait = "mcp-server"
 )
 
 // Entity metadata

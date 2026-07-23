@@ -24,6 +24,7 @@ func TestZoneUserGet(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -54,6 +55,7 @@ func TestZoneUserListWithOptionalParams(t *testing.T) {
 	}
 	client := keycard.NewClient(
 		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
@@ -70,6 +72,9 @@ func TestZoneUserListWithOptionalParams(t *testing.T) {
 				OfString: keycard.String("dev@stainless.com"),
 			},
 			FilterID: keycard.ZoneUserListParamsFilterIDUnion{
+				OfString: keycard.String("string"),
+			},
+			FilterIdentifier: keycard.ZoneUserListParamsFilterIdentifierUnion{
 				OfString: keycard.String("string"),
 			},
 			Limit: keycard.Int(1),
