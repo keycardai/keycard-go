@@ -288,9 +288,16 @@ func (r *UserCredentialUserCredentialPassword) UnmarshalJSON(data []byte) error 
 type UserRoleAssignment struct {
 	// ID of the assigned role
 	RoleID string `json:"role_id" api:"required"`
-	// Opaque role identifier. Treated as an opaque identifier by the API and unique
-	// within a zone.
+	// Role identifier: a lowercase slug (letters and digits separated by single
+	// hyphens or underscores), unique per owner type within a zone. Role identifiers
+	// surface in policy evaluation, so the slug restriction keeps them unambiguous in
+	// policy text.
 	RoleIdentifier string `json:"role_identifier" api:"required"`
+	// Owner type of the granted role. Disambiguates roles that share an identifier
+	// across owner types.
+	//
+	// Any of "platform", "customer".
+	RoleOwnerType string `json:"role_owner_type" api:"required"`
 	// The resource this grant is scoped to, or null when the grant is unscoped
 	// (applies to the owning zone itself).
 	Scope UserRoleAssignmentScope `json:"scope" api:"required"`
@@ -298,6 +305,7 @@ type UserRoleAssignment struct {
 	JSON struct {
 		RoleID         respjson.Field
 		RoleIdentifier respjson.Field
+		RoleOwnerType  respjson.Field
 		Scope          respjson.Field
 		ExtraFields    map[string]respjson.Field
 		raw            string
