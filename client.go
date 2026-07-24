@@ -21,6 +21,27 @@ type Client struct {
 	Zones         ZoneService
 	Organizations OrganizationService
 	Invitations   InvitationService
+	// Per-user Policy Bundle resource. Allows clients (typically the Keycard CLI) to
+	// GET, PUT, and DELETE the effective Policy Set for the calling user on a zone.
+	// The bundle is encoded with a content-negotiated codec (currently only
+	// `application/vnd.keycard.policy-bundle.v1+tar+gzip`).
+	//
+	// ## Archive layout
+	//
+	// The bundle is a gzip-compressed tar archive with this logical layout:
+	//
+	// | Entry                        | Required on PUT | Notes                                                                                                                                                                                  |
+	// | ---------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+	// | `manifest.json`              | **Yes**         | See `PolicyBundleManifest`. The only source of the authoritative `schema.version`.                                                                                                     |
+	// | `schema.cedarschema`         | No              | Convenience snapshot of the Cedar schema. **Ignored on PUT** — the server validates policies against its own attested schema for `manifest.schema.version`. **Always present on GET.** |
+	// | `policies/<public_id>.cedar` | —               | One Cedar policy per file; the filename stem is the policy's public ID.                                                                                                                |
+	//
+	// Decode rules: duplicate entries and unrecognized/nested entries are rejected
+	// (`bundle_invalid`). On PUT the manifest's `sha` fields and `policies[]` list are
+	// advisory — the server recomputes every digest from the archived bytes and
+	// derives the policy set from the `policies/` files. On GET every digest is
+	// authoritative.
+	PolicyBundle PolicyBundleService
 }
 
 // DefaultClientOptions read from the environment (KEYCARD_API_API_KEY,
@@ -64,6 +85,7 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 	r.Zones = NewZoneService(opts...)
 	r.Organizations = NewOrganizationService(opts...)
 	r.Invitations = NewInvitationService(opts...)
+	r.PolicyBundle = NewPolicyBundleService(opts...)
 
 	return
 }
