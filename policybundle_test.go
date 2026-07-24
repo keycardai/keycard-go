@@ -69,11 +69,14 @@ func TestPolicyBundleUpdateWithOptionalParams(t *testing.T) {
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
-	resp, err := client.PolicyBundle.Update(context.TODO(), keycard.PolicyBundleUpdateParams{
-		Body:             io.Reader(bytes.NewBuffer([]byte("Example data"))),
-		IfMatch:          keycard.String("If-Match"),
-		XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-	})
+	resp, err := client.PolicyBundle.Update(
+		context.TODO(),
+		io.Reader(bytes.NewBuffer([]byte("Example data"))),
+		keycard.PolicyBundleUpdateParams{
+			IfMatch:          keycard.String("If-Match"),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		},
+	)
 	if err != nil {
 		var apierr *keycard.Error
 		if errors.As(err, &apierr) {

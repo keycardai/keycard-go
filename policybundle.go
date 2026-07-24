@@ -77,7 +77,7 @@ func (r *PolicyBundleService) Get(ctx context.Context, query PolicyBundleGetPara
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
-	opts = append([]option.RequestOption{option.WithHeader("Accept", "application/vnd.keycard.policy-bundle.v1+tar+gzip")}, opts...)
+	opts = append([]option.RequestOption{option.WithHeader("Accept", "application/octet-stream")}, opts...)
 	path := "policy/bundle"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return res, err
@@ -101,7 +101,7 @@ func (r *PolicyBundleService) Get(ctx context.Context, query PolicyBundleGetPara
 //
 // On success the server returns the materialized bundle (in the same codec) and
 // its new `ETag`.
-func (r *PolicyBundleService) Update(ctx context.Context, params PolicyBundleUpdateParams, opts ...option.RequestOption) (res *http.Response, err error) {
+func (r *PolicyBundleService) Update(ctx context.Context, body io.Reader, params PolicyBundleUpdateParams, opts ...option.RequestOption) (res *http.Response, err error) {
 	if !param.IsOmitted(params.IfMatch) {
 		opts = append(opts, option.WithHeader("If-Match", fmt.Sprintf("%v", params.IfMatch.Value)))
 	}
@@ -110,9 +110,9 @@ func (r *PolicyBundleService) Update(ctx context.Context, params PolicyBundleUpd
 	}
 	var preClientOpts = []option.RequestOption{requestconfig.WithBearerAuthSecurity()}
 	opts = slices.Concat(preClientOpts, r.Options, opts)
-	opts = append([]option.RequestOption{option.WithHeader("Accept", "application/vnd.keycard.policy-bundle.v1+tar+gzip")}, opts...)
+	opts = append([]option.RequestOption{option.WithRequestBody("application/octet-stream", body), option.WithHeader("Accept", "application/octet-stream")}, opts...)
 	path := "policy/bundle"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, params, &res, opts...)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPut, path, nil, &res, opts...)
 	return res, err
 }
 
@@ -138,16 +138,6 @@ type PolicyBundleGetParams struct {
 }
 
 type PolicyBundleUpdateParams struct {
-	// tar+gzip Policy Bundle archive. `manifest.json` is **required** (see
-	// `PolicyBundleManifest`); `schema.cedarschema` is **optional and ignored** — the
-	// server validates against its attested schema for `manifest.schema.version`. The
-	// manifest's `policies[]` list is authoritative for the resulting set: each entry
-	// must have a matching `policies/<public_id>.cedar` (or, for a `new_policy` entry,
-	// `policies/<new_policy>.cedar`) member, and a member with no manifest entry is
-	// dropped. Only the `sha` fields are advisory and recomputed server-side.
-	// Duplicate or unrecognized entries are rejected with `bundle_invalid`. See the
-	// **PolicyBundle** tag for the layout.
-	Body             io.Reader
 	IfMatch          param.Opt[string] `header:"If-Match,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
@@ -156,7 +146,7 @@ type PolicyBundleUpdateParams struct {
 func (r PolicyBundleUpdateParams) MarshalMultipart() (data []byte, contentType string, err error) {
 	buf := bytes.NewBuffer(nil)
 	writer := multipart.NewWriter(buf)
-	err = apiform.MarshalRoot(r.Body, writer)
+	err = apiform.MarshalRoot(r, writer)
 	if err == nil {
 		err = apiform.WriteExtras(writer, r.ExtraFields())
 	}
