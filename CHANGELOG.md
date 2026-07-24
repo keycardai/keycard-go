@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.22.0 (2026-07-24)
+
+Full Changelog: [v0.21.0...v0.22.0](https://github.com/keycardai/keycard-go/compare/v0.21.0...v0.22.0)
+
+### Features
+
+* **ACC-709:** application assignees + expose role assignments ([fec2d39](https://github.com/keycardai/keycard-go/commit/fec2d39b0404b3b56a7c65a348b5d66ca768c222))
+* **sdk:** generate a client for the existing /policy/bundle endpoint ([bfe5f63](https://github.com/keycardai/keycard-go/commit/bfe5f63d11edfbe8a21a5b39bcc909f1eeca1d41))
+
+
+### Bug Fixes
+
+* **sdk:** generate /policy/bundle body as raw binary, not multipart ([77b2e7f](https://github.com/keycardai/keycard-go/commit/77b2e7f102169d085fd6d495c7bea470090774f7))
+
 ## 0.21.0 (2026-07-22)
 
 Full Changelog: [v0.20.0...v0.21.0](https://github.com/keycardai/keycard-go/compare/v0.20.0...v0.21.0)
