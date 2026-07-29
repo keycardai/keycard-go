@@ -85,7 +85,8 @@ func (r *ZoneResourceService) Update(ctx context.Context, id string, params Zone
 // Returns a list of resources in the specified zone. Filter by exact identifier
 // via `filter[identifier]` (repeatable, OR'd). Matching is exact: identifiers are
 // unique per zone, so a filter returns at most one resource per value and never
-// performs URL prefix resolution.
+// performs URL prefix resolution. Filter by trait via `traits[all]` (AND — has all
+// listed traits) or `traits[]` (OR — has any), each repeatable.
 func (r *ZoneResourceService) List(ctx context.Context, zoneID string, query ZoneResourceListParams, opts ...option.RequestOption) (res *ZoneResourceListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -283,6 +284,16 @@ type ZoneResourceListParams struct {
 	Expand ZoneResourceListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Filter by exact resource identifier
 	FilterIdentifier ZoneResourceListParamsFilterIdentifierUnion `query:"filter[identifier],omitzero" json:"-"`
+	// Filter by traits (OR matching - returns resources with any of the specified
+	// traits)
+	//
+	// Any of "external", "proxy", "mcp-server".
+	Traits []string `query:"traits,omitzero" json:"-"`
+	// Filter by traits (AND matching - returns resources with all of the specified
+	// traits)
+	//
+	// Any of "external", "proxy", "mcp-server".
+	TraitsAll []string `query:"traits[all],omitzero" json:"-"`
 	paramObj
 }
 
