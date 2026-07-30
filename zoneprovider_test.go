@@ -37,7 +37,9 @@ func TestZoneProviderNewWithOptionalParams(t *testing.T) {
 			ClientID:     keycard.String("client_id"),
 			ClientSecret: keycard.String("client_secret"),
 			Description:  keycard.String("description"),
-			Metadata:     map[string]any{},
+			Metadata: keycard.ZoneProviderNewParamsMetadata{
+				IconURL: keycard.String("https://example.com"),
+			},
 			Protocols: keycard.ZoneProviderNewParamsProtocols{
 				Oauth2: keycard.ZoneProviderNewParamsProtocolsOauth2{
 					AuthorizationEndpoint: keycard.String("https://example.com"),
@@ -129,8 +131,10 @@ func TestZoneProviderUpdateWithOptionalParams(t *testing.T) {
 			ClientSecret: keycard.String("client_secret"),
 			Description:  keycard.String("description"),
 			Identifier:   keycard.String("x"),
-			Metadata:     map[string]any{},
-			Name:         keycard.String("x"),
+			Metadata: keycard.ZoneProviderUpdateParamsMetadata{
+				IconURL: keycard.String("https://example.com"),
+			},
+			Name: keycard.String("x"),
 			Protocols: keycard.ZoneProviderUpdateParamsProtocols{
 				Oauth2: keycard.ZoneProviderUpdateParamsProtocolsOauth2{
 					AuthorizationEndpoint: keycard.String("https://example.com"),
