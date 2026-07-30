@@ -142,7 +142,7 @@ type Provider struct {
 	// Human-readable description
 	Description string `json:"description" api:"nullable"`
 	// Provider metadata
-	Metadata any `json:"metadata" api:"nullable"`
+	Metadata ProviderMetadata `json:"metadata" api:"nullable"`
 	// Protocol-specific configuration
 	Protocols ProviderProtocols `json:"protocols" api:"nullable"`
 	// Any of "external", "keycard-vault", "keycard-sts".
@@ -182,6 +182,24 @@ const (
 	ProviderOwnerTypePlatform ProviderOwnerType = "platform"
 	ProviderOwnerTypeCustomer ProviderOwnerType = "customer"
 )
+
+// Provider metadata
+type ProviderMetadata struct {
+	// Icon URL
+	IconURL string `json:"icon_url" format:"uri"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		IconURL     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ProviderMetadata) RawJSON() string { return r.JSON.raw }
+func (r *ProviderMetadata) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Protocol-specific configuration
 type ProviderProtocols struct {
@@ -356,7 +374,7 @@ type ZoneProviderNewParams struct {
 	// OAuth 2.0 client secret (will be encrypted and stored securely)
 	ClientSecret param.Opt[string] `json:"client_secret,omitzero"`
 	// Provider metadata
-	Metadata any `json:"metadata,omitzero"`
+	Metadata ZoneProviderNewParamsMetadata `json:"metadata,omitzero"`
 	// Protocol-specific configuration for provider creation
 	Protocols ZoneProviderNewParamsProtocols `json:"protocols,omitzero"`
 	paramObj
@@ -367,6 +385,21 @@ func (r ZoneProviderNewParams) MarshalJSON() (data []byte, err error) {
 	return param.MarshalObject(r, (*shadow)(&r))
 }
 func (r *ZoneProviderNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Provider metadata
+type ZoneProviderNewParamsMetadata struct {
+	// Icon URL
+	IconURL param.Opt[string] `json:"icon_url,omitzero" format:"uri"`
+	paramObj
+}
+
+func (r ZoneProviderNewParamsMetadata) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneProviderNewParamsMetadata
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZoneProviderNewParamsMetadata) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -471,7 +504,7 @@ type ZoneProviderUpdateParams struct {
 	// control characters.
 	Name param.Opt[string] `json:"name,omitzero" format:"safe-text"`
 	// Provider metadata. Set to null to remove all metadata.
-	Metadata any `json:"metadata,omitzero"`
+	Metadata ZoneProviderUpdateParamsMetadata `json:"metadata,omitzero"`
 	// Protocol-specific configuration. Set to null to remove all protocols.
 	Protocols ZoneProviderUpdateParamsProtocols `json:"protocols,omitzero"`
 	paramObj
@@ -482,6 +515,21 @@ func (r ZoneProviderUpdateParams) MarshalJSON() (data []byte, err error) {
 	return param.MarshalObject(r, (*shadow)(&r))
 }
 func (r *ZoneProviderUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Provider metadata. Set to null to remove all metadata.
+type ZoneProviderUpdateParamsMetadata struct {
+	// Icon URL (set to null to unset)
+	IconURL param.Opt[string] `json:"icon_url,omitzero" format:"uri"`
+	paramObj
+}
+
+func (r ZoneProviderUpdateParamsMetadata) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneProviderUpdateParamsMetadata
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZoneProviderUpdateParamsMetadata) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
