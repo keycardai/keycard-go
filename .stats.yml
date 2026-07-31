@@ -1,4 +1,4 @@
 configured_endpoints: 109
-openapi_spec_url: https://storage.googleapis.com/stainless-sdk-openapi-specs/keycard/keycard-api-ed365d97ef6f70e9f7f2ed056eb671218c3d3d3f0907a88007e767fbc8f3a079.yml
-openapi_spec_hash: 9c9489015550669567f3a4ec09dc62df
+openapi_spec_url: https://storage.googleapis.com/stainless-sdk-openapi-specs/keycard/keycard-api-21546d2b402d50a154ac3c5bbc21b8496e486572e9d9f6a9812b12481f49c553.yml
+openapi_spec_hash: 7eadbaf386045605c921e36fdadffa7a
 config_hash: 22d144a33ba2901c82cc1f387a83f9a7
