@@ -287,6 +287,10 @@ type ZoneResourceListParams struct {
 	Expand ZoneResourceListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Filter by exact resource identifier
 	FilterIdentifier ZoneResourceListParamsFilterIdentifierUnion `query:"filter[identifier],omitzero" json:"-"`
+	// Filter by owner type: `platform` (Keycard-managed) or `customer` (org-created).
+	//
+	// Any of "platform", "customer".
+	FilterOwnerType ZoneResourceListParamsFilterOwnerType `query:"filter[owner_type],omitzero" json:"-"`
 	// Filter by traits (OR matching — returns resources with any of the specified
 	// traits)
 	//
@@ -333,6 +337,14 @@ type ZoneResourceListParamsFilterIdentifierUnion struct {
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
+
+// Filter by owner type: `platform` (Keycard-managed) or `customer` (org-created).
+type ZoneResourceListParamsFilterOwnerType string
+
+const (
+	ZoneResourceListParamsFilterOwnerTypePlatform ZoneResourceListParamsFilterOwnerType = "platform"
+	ZoneResourceListParamsFilterOwnerTypeCustomer ZoneResourceListParamsFilterOwnerType = "customer"
+)
 
 type ZoneResourceDeleteParams struct {
 	ZoneID string `path:"zoneId" api:"required" json:"-"`
