@@ -82,11 +82,13 @@ func (r *ZoneResourceService) Update(ctx context.Context, id string, params Zone
 	return res, err
 }
 
-// Returns a list of resources in the specified zone. Filter by exact identifier
-// via `filter[identifier]` (repeatable, OR'd). Matching is exact: identifiers are
-// unique per zone, so a filter returns at most one resource per value and never
-// performs URL prefix resolution. Filter by trait via `traits[all]` (AND — has all
-// listed traits) or `traits[]` (OR — has any), each repeatable.
+// Returns a paginated list of resources in the specified zone. Use cursor
+// pagination via `after`/`before`, and `expand[]=total_count` to include the
+// matching row count. Filter by exact identifier via `filter[identifier]`. Filter
+// by trait via `traits[all]` (AND, all listed) or `traits[]` (OR, any), each
+// repeatable. The scalar `identifier` query parameter is a backward-compatible
+// alias for `filter[identifier]`: exact match on a single value, folded into the
+// same exact-match identifier filter.
 func (r *ZoneResourceService) List(ctx context.Context, zoneID string, query ZoneResourceListParams, opts ...option.RequestOption) (res *ZoneResourceListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -276,7 +278,8 @@ type ZoneResourceListParams struct {
 	Before param.Opt[string] `query:"before,omitzero" json:"-"`
 	// Filter resources by credential provider ID
 	CredentialProviderID param.Opt[string] `query:"credentialProviderId,omitzero" json:"-"`
-	// Filter resources by identifier
+	// Backward-compatible alias for `filter[identifier]`: exact match on a single
+	// resource identifier.
 	Identifier param.Opt[string] `query:"identifier,omitzero" json:"-"`
 	// Maximum number of items to return
 	Limit  param.Opt[int64]                  `query:"limit,omitzero" json:"-"`
@@ -284,7 +287,7 @@ type ZoneResourceListParams struct {
 	Expand ZoneResourceListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Filter by exact resource identifier
 	FilterIdentifier ZoneResourceListParamsFilterIdentifierUnion `query:"filter[identifier],omitzero" json:"-"`
-	// Filter by traits (OR matching - returns resources with any of the specified
+	// Filter by traits (OR matching — returns resources with any of the specified
 	// traits)
 	//
 	// Any of "external", "proxy", "mcp-server".
