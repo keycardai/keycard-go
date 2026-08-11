@@ -396,8 +396,8 @@ type ZoneUserListParams struct {
 	Before param.Opt[string] `query:"before,omitzero" json:"-"`
 	// Maximum number of items to return
 	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
-	// Comma-separated sort fields. Prefix with - for descending. Allowed: email,
-	// authenticated_at
+	// Comma-separated sort fields. Prefix with - for descending. Allowed: created_at,
+	// email, authenticated_at
 	Sort   param.Opt[string]             `query:"sort,omitzero" json:"-"`
 	Expand ZoneUserListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Filter by exact email address
