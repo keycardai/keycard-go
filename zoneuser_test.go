@@ -87,7 +87,7 @@ func TestZoneUserListWithOptionalParams(t *testing.T) {
 			QuerySubject: keycard.ZoneUserListParamsQuerySubjectUnion{
 				OfString: keycard.String("x"),
 			},
-			Sort: keycard.String("-authenticated_at,\t\r\r \tauthenticated_at,\n\f\t\f\ncreated_at"),
+			Sort: keycard.String("-authenticated_at,\t\r\r \tauthenticated_at,\n\f\t\f\nemail"),
 		},
 	)
 	if err != nil {
