@@ -671,8 +671,8 @@ type ZoneApplicationListParams struct {
 	// Maximum number of items to return
 	Limit param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	Slug  param.Opt[string] `query:"slug,omitzero" json:"-"`
-	// Comma-separated sort fields. Prefix with - for descending. Allowed: created_at,
-	// name, identifier
+	// Comma-separated sort fields. Prefix with - for descending. Allowed: name,
+	// identifier
 	Sort   param.Opt[string]                    `query:"sort,omitzero" json:"-"`
 	Expand ZoneApplicationListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Restrict results to applications with this publicId. Repeatable, max 100.
