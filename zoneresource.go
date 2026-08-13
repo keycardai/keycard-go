@@ -291,6 +291,9 @@ type ZoneResourceListParams struct {
 	//
 	// Any of "platform", "customer".
 	FilterOwnerType ZoneResourceListParamsFilterOwnerType `query:"filter[owner_type],omitzero" json:"-"`
+	// Filter by trait. Comma-separated values (`a,b`) are AND'd; repeated params are
+	// OR'd. Preferred over `traits[]`/`traits[all]`.
+	FilterTraits ZoneResourceListParamsFilterTraitsUnion `query:"filter[traits],omitzero" json:"-"`
 	// Filter by traits (OR matching — returns resources with any of the specified
 	// traits)
 	//
@@ -345,6 +348,15 @@ const (
 	ZoneResourceListParamsFilterOwnerTypePlatform ZoneResourceListParamsFilterOwnerType = "platform"
 	ZoneResourceListParamsFilterOwnerTypeCustomer ZoneResourceListParamsFilterOwnerType = "customer"
 )
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneResourceListParamsFilterTraitsUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
 
 type ZoneResourceDeleteParams struct {
 	ZoneID string `path:"zoneId" api:"required" json:"-"`

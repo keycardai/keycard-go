@@ -160,11 +160,14 @@ func TestZoneResourceListWithOptionalParams(t *testing.T) {
 				OfString: keycard.String("string"),
 			},
 			FilterOwnerType: keycard.ZoneResourceListParamsFilterOwnerTypePlatform,
-			Identifier:      keycard.String("identifier"),
-			Limit:           keycard.Int(1),
-			Slug:            keycard.String("slug"),
-			Traits:          []string{"external"},
-			TraitsAll:       []string{"external"},
+			FilterTraits: keycard.ZoneResourceListParamsFilterTraitsUnion{
+				OfString: keycard.String("string"),
+			},
+			Identifier: keycard.String("identifier"),
+			Limit:      keycard.Int(1),
+			Slug:       keycard.String("slug"),
+			Traits:     []string{"external"},
+			TraitsAll:  []string{"external"},
 		},
 	)
 	if err != nil {
