@@ -166,8 +166,6 @@ func TestZoneResourceListWithOptionalParams(t *testing.T) {
 			Identifier: keycard.String("identifier"),
 			Limit:      keycard.Int(1),
 			Slug:       keycard.String("slug"),
-			Traits:     []string{"external"},
-			TraitsAll:  []string{"external"},
 		},
 	)
 	if err != nil {

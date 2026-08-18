@@ -85,10 +85,10 @@ func (r *ZoneResourceService) Update(ctx context.Context, id string, params Zone
 // Returns a paginated list of resources in the specified zone. Use cursor
 // pagination via `after`/`before`, and `expand[]=total_count` to include the
 // matching row count. Filter by exact identifier via `filter[identifier]`. Filter
-// by trait via `traits[all]` (AND, all listed) or `traits[]` (OR, any), each
-// repeatable. The scalar `identifier` query parameter is a backward-compatible
-// alias for `filter[identifier]`: exact match on a single value, folded into the
-// same exact-match identifier filter.
+// by trait via `filter[traits]`: comma-separated values are AND'd, repeated params
+// are OR'd. The scalar `identifier` query parameter is a backward-compatible alias
+// for `filter[identifier]`: exact match on a single value, folded into the same
+// exact-match identifier filter.
 func (r *ZoneResourceService) List(ctx context.Context, zoneID string, query ZoneResourceListParams, opts ...option.RequestOption) (res *ZoneResourceListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -292,18 +292,8 @@ type ZoneResourceListParams struct {
 	// Any of "platform", "customer".
 	FilterOwnerType ZoneResourceListParamsFilterOwnerType `query:"filter[owner_type],omitzero" json:"-"`
 	// Filter by trait. Comma-separated values (`a,b`) are AND'd; repeated params are
-	// OR'd. Preferred over `traits[]`/`traits[all]`.
+	// OR'd.
 	FilterTraits ZoneResourceListParamsFilterTraitsUnion `query:"filter[traits],omitzero" json:"-"`
-	// Filter by traits (OR matching — returns resources with any of the specified
-	// traits)
-	//
-	// Any of "external", "proxy", "mcp-server".
-	Traits []string `query:"traits,omitzero" json:"-"`
-	// Filter by traits (AND matching - returns resources with all of the specified
-	// traits)
-	//
-	// Any of "external", "proxy", "mcp-server".
-	TraitsAll []string `query:"traits[all],omitzero" json:"-"`
 	paramObj
 }
 
