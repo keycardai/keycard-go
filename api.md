@@ -23,7 +23,6 @@ Methods:
 
 Params Types:
 
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ApplicationTrait">ApplicationTrait</a>
 - <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#MetadataParam">MetadataParam</a>
 - <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#MetadataUpdateParam">MetadataUpdateParam</a>
 
