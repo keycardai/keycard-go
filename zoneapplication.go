@@ -452,15 +452,15 @@ func (r *ZoneApplicationListCredentialsResponsePagination) UnmarshalJSON(data []
 
 type ZoneApplicationListResourcesResponse struct {
 	Items []Resource `json:"items" api:"required"`
-	// Pagination information
-	PageInfo PageInfoPagination `json:"page_info" api:"required"`
 	// Cursor-based pagination metadata
 	Pagination ZoneApplicationListResourcesResponsePagination `json:"pagination" api:"required"`
+	// Pagination information
+	PageInfo PageInfoPagination `json:"page_info"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
-		PageInfo    respjson.Field
 		Pagination  respjson.Field
+		PageInfo    respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
