@@ -277,6 +277,10 @@ func (r *ProviderProtocolsOauth2) UnmarshalJSON(data []byte) error {
 
 // OpenID Connect protocol configuration
 type ProviderProtocolsOpenid struct {
+	// Name of the OIDC claim carrying the stable external id used to correlate logins
+	// with externally provisioned (SCIM) users. Defaults to "sub". Set to "oid" for
+	// Entra, whose pairwise "sub" differs from the SCIM externalId.
+	ExternalIDClaim string `json:"external_id_claim" api:"nullable"`
 	// Additional OIDC scopes to request from this provider during authentication (e.g.
 	// "groups"). Merged with the default scopes (openid, profile, email).
 	Scopes []string `json:"scopes" api:"nullable"`
@@ -289,6 +293,7 @@ type ProviderProtocolsOpenid struct {
 	UserinfoEndpoint    string `json:"userinfo_endpoint" api:"nullable" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		ExternalIDClaim     respjson.Field
 		Scopes              respjson.Field
 		SingleLogoutEnabled respjson.Field
 		UserIdentifierClaim respjson.Field
@@ -461,6 +466,10 @@ func (r *ZoneProviderNewParamsProtocolsOauth2) UnmarshalJSON(data []byte) error 
 
 // OpenID Connect protocol configuration for provider creation
 type ZoneProviderNewParamsProtocolsOpenid struct {
+	// Name of the OIDC claim carrying the stable external id used to correlate logins
+	// with externally provisioned (SCIM) users. Defaults to "sub". Set to "oid" for
+	// Entra, whose pairwise "sub" differs from the SCIM externalId.
+	ExternalIDClaim param.Opt[string] `json:"external_id_claim,omitzero"`
 	// When true, logging out of the zone propagates the logout to this provider's
 	// end_session_endpoint (RP-initiated logout). Defaults to false.
 	SingleLogoutEnabled param.Opt[bool] `json:"single_logout_enabled,omitzero"`
@@ -591,6 +600,11 @@ func (r *ZoneProviderUpdateParamsProtocolsOauth2) UnmarshalJSON(data []byte) err
 
 // OpenID Connect protocol configuration. Set to null to remove all OpenID config.
 type ZoneProviderUpdateParamsProtocolsOpenid struct {
+	// Name of the OIDC claim carrying the stable external id used to correlate logins
+	// with externally provisioned (SCIM) users. Defaults to "sub". Set to "oid" for
+	// Entra, whose pairwise "sub" differs from the SCIM externalId. Set to null to
+	// revert to default.
+	ExternalIDClaim param.Opt[string] `json:"external_id_claim,omitzero"`
 	// When true, logging out of the zone propagates the logout to this provider's
 	// end_session_endpoint (RP-initiated logout). Defaults to false.
 	SingleLogoutEnabled param.Opt[bool] `json:"single_logout_enabled,omitzero"`
