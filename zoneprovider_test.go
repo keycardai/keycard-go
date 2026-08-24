@@ -198,6 +198,9 @@ func TestZoneProviderListWithOptionalParams(t *testing.T) {
 			Expand: keycard.ZoneProviderListParamsExpandUnion{
 				OfZoneProviderListsExpandString: keycard.String("total_count"),
 			},
+			FilterID: keycard.ZoneProviderListParamsFilterIDUnion{
+				OfString: keycard.String("string"),
+			},
 			Identifier: keycard.String("identifier"),
 			Limit:      keycard.Int(1),
 			Slug:       keycard.String("slug"),

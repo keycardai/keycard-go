@@ -83,7 +83,9 @@ func (r *ZoneProviderService) Update(ctx context.Context, id string, params Zone
 	return res, err
 }
 
-// Returns a list of providers in the specified zone
+// Returns a list of providers in the specified zone. Pass `filter[id]`
+// (repeatable, max 100) to restrict results to a known set of provider IDs;
+// unknown or malformed IDs are silently omitted.
 func (r *ZoneProviderService) List(ctx context.Context, zoneID string, query ZoneProviderListParams, opts ...option.RequestOption) (res *ZoneProviderListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -639,6 +641,8 @@ type ZoneProviderListParams struct {
 	Limit  param.Opt[int64]                  `query:"limit,omitzero" json:"-"`
 	Slug   param.Opt[string]                 `query:"slug,omitzero" json:"-"`
 	Expand ZoneProviderListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Restrict results to providers with this ID. Repeatable, max 100.
+	FilterID ZoneProviderListParamsFilterIDUnion `query:"filter[id],omitzero" json:"-"`
 	// Any of "external", "keycard-vault", "keycard-sts".
 	Type ZoneProviderListParamsType `query:"type,omitzero" json:"-"`
 	paramObj
@@ -668,6 +672,15 @@ type ZoneProviderListParamsExpandString string
 const (
 	ZoneProviderListParamsExpandStringTotalCount ZoneProviderListParamsExpandString = "total_count"
 )
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneProviderListParamsFilterIDUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
 
 type ZoneProviderListParamsType string
 
