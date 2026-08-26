@@ -13,7 +13,7 @@ import (
 	"github.com/keycardai/keycard-go/option"
 )
 
-func TestZoneUserGetWithOptionalParams(t *testing.T) {
+func TestZoneRoleNewWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -28,107 +28,14 @@ func TestZoneUserGetWithOptionalParams(t *testing.T) {
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
-	_, err := client.Zones.Users.Get(
-		context.TODO(),
-		"id",
-		keycard.ZoneUserGetParams{
-			ZoneID: "zoneId",
-			Expand: keycard.ZoneUserGetParamsExpandUnion{
-				OfZoneUserGetsExpandString: keycard.String("role-assignments"),
-			},
-			RoleSource: keycard.ZoneUserGetParamsRoleSourceUser,
-		},
-	)
-	if err != nil {
-		var apierr *keycard.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestZoneUserUpdateWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := keycard.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithClientID("My Client ID"),
-		option.WithClientSecret("My Client Secret"),
-	)
-	_, err := client.Zones.Users.Update(
-		context.TODO(),
-		"id",
-		keycard.ZoneUserUpdateParams{
-			ZoneID:     "zoneId",
-			Identifier: keycard.String("x"),
-			Status:     keycard.ZoneUserUpdateParamsStatusActive,
-		},
-	)
-	if err != nil {
-		var apierr *keycard.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestZoneUserListWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := keycard.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithClientID("My Client ID"),
-		option.WithClientSecret("My Client Secret"),
-	)
-	_, err := client.Zones.Users.List(
+	_, err := client.Zones.Roles.New(
 		context.TODO(),
 		"zoneId",
-		keycard.ZoneUserListParams{
-			After:  keycard.String("x"),
-			Before: keycard.String("x"),
-			Expand: keycard.ZoneUserListParamsExpandUnion{
-				OfZoneUserListsExpandString: keycard.String("total_count"),
+		keycard.ZoneRoleNewParams{
+			RoleCreate: keycard.RoleCreateParam{
+				Identifier:  "identifier",
+				Description: keycard.String("description"),
 			},
-			FilterEmail: keycard.ZoneUserListParamsFilterEmailUnion{
-				OfString: keycard.String("dev@stainless.com"),
-			},
-			FilterGroups: keycard.ZoneUserListParamsFilterGroupsUnion{
-				OfString: keycard.String("string"),
-			},
-			FilterID: keycard.ZoneUserListParamsFilterIDUnion{
-				OfString: keycard.String("string"),
-			},
-			FilterIdentifier: keycard.ZoneUserListParamsFilterIdentifierUnion{
-				OfString: keycard.String("string"),
-			},
-			Limit: keycard.Int(1),
-			Query: keycard.ZoneUserListParamsQueryUnion{
-				OfString: keycard.String("x"),
-			},
-			QueryEmail: keycard.ZoneUserListParamsQueryEmailUnion{
-				OfString: keycard.String("x"),
-			},
-			QuerySubject: keycard.ZoneUserListParamsQuerySubjectUnion{
-				OfString: keycard.String("x"),
-			},
-			RoleSource: keycard.ZoneUserListParamsRoleSourceUser,
-			Sort:       keycard.String("-authenticated_at,\t\r\r \tauthenticated_at,\n\f\t\f\ncreated_at"),
 		},
 	)
 	if err != nil {
@@ -140,7 +47,7 @@ func TestZoneUserListWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestZoneUserDelete(t *testing.T) {
+func TestZoneRoleGet(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -155,10 +62,112 @@ func TestZoneUserDelete(t *testing.T) {
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
-	err := client.Zones.Users.Delete(
+	_, err := client.Zones.Roles.Get(
 		context.TODO(),
-		"id",
-		keycard.ZoneUserDeleteParams{
+		"roleId",
+		keycard.ZoneRoleGetParams{
+			ZoneID: "zoneId",
+		},
+	)
+	if err != nil {
+		var apierr *keycard.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestZoneRoleUpdateWithOptionalParams(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := keycard.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
+	)
+	_, err := client.Zones.Roles.Update(
+		context.TODO(),
+		"roleId",
+		keycard.ZoneRoleUpdateParams{
+			ZoneID: "zoneId",
+			RoleUpdate: keycard.RoleUpdateParam{
+				Description: keycard.String("description"),
+			},
+		},
+	)
+	if err != nil {
+		var apierr *keycard.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestZoneRoleListWithOptionalParams(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := keycard.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
+	)
+	_, err := client.Zones.Roles.List(
+		context.TODO(),
+		"zoneId",
+		keycard.ZoneRoleListParams{
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Expand: keycard.ZoneRoleListParamsExpandUnion{
+				OfZoneRoleListsExpandString: keycard.String("total_count"),
+			},
+			Identifier: keycard.String("identifier"),
+			Limit:      keycard.Int(1),
+		},
+	)
+	if err != nil {
+		var apierr *keycard.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestZoneRoleDelete(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := keycard.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
+	)
+	err := client.Zones.Roles.Delete(
+		context.TODO(),
+		"roleId",
+		keycard.ZoneRoleDeleteParams{
 			ZoneID: "zoneId",
 		},
 	)
