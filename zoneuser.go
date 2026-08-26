@@ -28,6 +28,7 @@ import (
 // the [NewZoneUserService] method instead.
 type ZoneUserService struct {
 	Options []option.RequestOption
+	Roles   ZoneUserRoleService
 }
 
 // NewZoneUserService generates a new service that applies the given options to
@@ -36,6 +37,7 @@ type ZoneUserService struct {
 func NewZoneUserService(opts ...option.RequestOption) (r ZoneUserService) {
 	r = ZoneUserService{}
 	r.Options = opts
+	r.Roles = NewZoneUserRoleService(opts...)
 	return
 }
 
@@ -55,6 +57,22 @@ func (r *ZoneUserService) Get(ctx context.Context, id string, params ZoneUserGet
 	}
 	path := fmt.Sprintf("zones/%s/users/%s", url.PathEscape(params.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
+	return res, err
+}
+
+// Update a user
+func (r *ZoneUserService) Update(ctx context.Context, id string, params ZoneUserUpdateParams, opts ...option.RequestOption) (res *User, err error) {
+	opts = slices.Concat(r.Options, opts)
+	if params.ZoneID == "" {
+		err = errors.New("missing required zoneId parameter")
+		return nil, err
+	}
+	if id == "" {
+		err = errors.New("missing required id parameter")
+		return nil, err
+	}
+	path := fmt.Sprintf("zones/%s/users/%s", url.PathEscape(params.ZoneID), url.PathEscape(id))
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
 	return res, err
 }
 
@@ -95,6 +113,23 @@ func (r *ZoneUserService) List(ctx context.Context, zoneID string, query ZoneUse
 	path := fmt.Sprintf("zones/%s/users", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
+}
+
+// Delete a user
+func (r *ZoneUserService) Delete(ctx context.Context, id string, body ZoneUserDeleteParams, opts ...option.RequestOption) (err error) {
+	opts = slices.Concat(r.Options, opts)
+	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
+	if body.ZoneID == "" {
+		err = errors.New("missing required zoneId parameter")
+		return err
+	}
+	if id == "" {
+		err = errors.New("missing required id parameter")
+		return err
+	}
+	path := fmt.Sprintf("zones/%s/users/%s", url.PathEscape(body.ZoneID), url.PathEscape(id))
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
+	return err
 }
 
 // An authenticated user entity
@@ -477,6 +512,35 @@ const (
 	ZoneUserGetParamsRoleSourceAll   ZoneUserGetParamsRoleSource = "all"
 )
 
+type ZoneUserUpdateParams struct {
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
+	// Zone-scoped user identifier
+	Identifier param.Opt[string] `json:"identifier,omitzero" format:"safe-text"`
+	// Status of the user. Set to `disabled` to prevent the user from authenticating
+	// and revoke their active sessions, or `active` to re-enable.
+	//
+	// Any of "active", "disabled".
+	Status ZoneUserUpdateParamsStatus `json:"status,omitzero"`
+	paramObj
+}
+
+func (r ZoneUserUpdateParams) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneUserUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZoneUserUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Status of the user. Set to `disabled` to prevent the user from authenticating
+// and revoke their active sessions, or `active` to re-enable.
+type ZoneUserUpdateParamsStatus string
+
+const (
+	ZoneUserUpdateParamsStatusActive   ZoneUserUpdateParamsStatus = "active"
+	ZoneUserUpdateParamsStatusDisabled ZoneUserUpdateParamsStatus = "disabled"
+)
+
 type ZoneUserListParams struct {
 	// Cursor for forward pagination
 	After param.Opt[string] `query:"after,omitzero" json:"-"`
@@ -616,3 +680,8 @@ const (
 	ZoneUserListParamsRoleSourceGroup ZoneUserListParamsRoleSource = "group"
 	ZoneUserListParamsRoleSourceAll   ZoneUserListParamsRoleSource = "all"
 )
+
+type ZoneUserDeleteParams struct {
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
+	paramObj
+}
