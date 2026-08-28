@@ -82,10 +82,13 @@ func (r *ZoneResourceService) Update(ctx context.Context, id string, params Zone
 	return res, err
 }
 
-// Returns a list of resources in the specified zone. Filter by exact identifier
-// via `filter[identifier]` (repeatable, OR'd). Matching is exact: identifiers are
-// unique per zone, so a filter returns at most one resource per value and never
-// performs URL prefix resolution.
+// Returns a paginated list of resources in the specified zone. Use cursor
+// pagination via `after`/`before`, and `expand[]=total_count` to include the
+// matching row count. Filter by exact identifier via `filter[identifier]`. Filter
+// by trait via `filter[traits]`: comma-separated values are AND'd, repeated params
+// are OR'd. The scalar `identifier` query parameter is a backward-compatible alias
+// for `filter[identifier]`: exact match on a single value, folded into the same
+// exact-match identifier filter.
 func (r *ZoneResourceService) List(ctx context.Context, zoneID string, query ZoneResourceListParams, opts ...option.RequestOption) (res *ZoneResourceListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -275,7 +278,8 @@ type ZoneResourceListParams struct {
 	Before param.Opt[string] `query:"before,omitzero" json:"-"`
 	// Filter resources by credential provider ID
 	CredentialProviderID param.Opt[string] `query:"credentialProviderId,omitzero" json:"-"`
-	// Filter resources by identifier
+	// Backward-compatible alias for `filter[identifier]`: exact match on a single
+	// resource identifier.
 	Identifier param.Opt[string] `query:"identifier,omitzero" json:"-"`
 	// Maximum number of items to return
 	Limit  param.Opt[int64]                  `query:"limit,omitzero" json:"-"`
@@ -283,6 +287,13 @@ type ZoneResourceListParams struct {
 	Expand ZoneResourceListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Filter by exact resource identifier
 	FilterIdentifier ZoneResourceListParamsFilterIdentifierUnion `query:"filter[identifier],omitzero" json:"-"`
+	// Filter by owner type: `platform` (Keycard-managed) or `customer` (org-created).
+	//
+	// Any of "platform", "customer".
+	FilterOwnerType ZoneResourceListParamsFilterOwnerType `query:"filter[owner_type],omitzero" json:"-"`
+	// Filter by trait. Comma-separated values (`a,b`) are AND'd; repeated params are
+	// OR'd.
+	FilterTraits ZoneResourceListParamsFilterTraitsUnion `query:"filter[traits],omitzero" json:"-"`
 	paramObj
 }
 
@@ -315,6 +326,23 @@ const (
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type ZoneResourceListParamsFilterIdentifierUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Filter by owner type: `platform` (Keycard-managed) or `customer` (org-created).
+type ZoneResourceListParamsFilterOwnerType string
+
+const (
+	ZoneResourceListParamsFilterOwnerTypePlatform ZoneResourceListParamsFilterOwnerType = "platform"
+	ZoneResourceListParamsFilterOwnerTypeCustomer ZoneResourceListParamsFilterOwnerType = "customer"
+)
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneResourceListParamsFilterTraitsUnion struct {
 	OfString      param.Opt[string] `query:",omitzero,inline"`
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
