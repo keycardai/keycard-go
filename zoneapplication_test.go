@@ -181,10 +181,8 @@ func TestZoneApplicationListWithOptionalParams(t *testing.T) {
 			QueryName: keycard.ZoneApplicationListParamsQueryNameUnion{
 				OfString: keycard.String("x"),
 			},
-			Slug:      keycard.String("slug"),
-			Sort:      keycard.String("-identifier,\t\r\r \tidentifier,\n\f\t\f\ncreated_at"),
-			Traits:    []keycard.ApplicationTrait{keycard.ApplicationTraitGateway},
-			TraitsAll: []keycard.ApplicationTrait{keycard.ApplicationTraitGateway},
+			Slug: keycard.String("slug"),
+			Sort: keycard.String("-identifier,\t\r\r \tidentifier,\n\f\t\f\ncreated_at"),
 		},
 	)
 	if err != nil {
