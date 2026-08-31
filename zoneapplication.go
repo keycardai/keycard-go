@@ -279,17 +279,6 @@ func (r *ApplicationProtocolsOauth2) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Traits ascribe behaviors and characteristics to an application, which may
-// activate trait-specific user experiences, workflows, or other system behaviors
-type ApplicationTrait string
-
-const (
-	ApplicationTraitGateway        ApplicationTrait = "gateway"
-	ApplicationTraitMcpProvider    ApplicationTrait = "mcp-provider"
-	ApplicationTraitUnifiedGateway ApplicationTrait = "unified-gateway"
-	ApplicationTraitMcpServer      ApplicationTrait = "mcp-server"
-)
-
 // Entity metadata
 type Metadata struct {
 	// Documentation URL
@@ -452,15 +441,15 @@ func (r *ZoneApplicationListCredentialsResponsePagination) UnmarshalJSON(data []
 
 type ZoneApplicationListResourcesResponse struct {
 	Items []Resource `json:"items" api:"required"`
-	// Pagination information
-	PageInfo PageInfoPagination `json:"page_info" api:"required"`
 	// Cursor-based pagination metadata
 	Pagination ZoneApplicationListResourcesResponsePagination `json:"pagination" api:"required"`
+	// Pagination information
+	PageInfo PageInfoPagination `json:"page_info"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
-		PageInfo    respjson.Field
 		Pagination  respjson.Field
+		PageInfo    respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -688,12 +677,6 @@ type ZoneApplicationListParams struct {
 	QueryIdentifier ZoneApplicationListParamsQueryIdentifierUnion `query:"query[identifier],omitzero" json:"-"`
 	// Search by name (substring match)
 	QueryName ZoneApplicationListParamsQueryNameUnion `query:"query[name],omitzero" json:"-"`
-	// Filter by traits (OR matching - returns applications with any of the specified
-	// traits)
-	Traits []ApplicationTrait `query:"traits,omitzero" json:"-"`
-	// Filter by traits (AND matching - returns applications with all of the specified
-	// traits)
-	TraitsAll []ApplicationTrait `query:"traits[all],omitzero" json:"-"`
 	paramObj
 }
 

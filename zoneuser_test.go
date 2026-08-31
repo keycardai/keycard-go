@@ -13,7 +13,7 @@ import (
 	"github.com/keycardai/keycard-go/option"
 )
 
-func TestZoneUserGet(t *testing.T) {
+func TestZoneUserGetWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -33,6 +33,10 @@ func TestZoneUserGet(t *testing.T) {
 		"id",
 		keycard.ZoneUserGetParams{
 			ZoneID: "zoneId",
+			Expand: keycard.ZoneUserGetParamsExpandUnion{
+				OfZoneUserGetsExpandString: keycard.String("role-assignments"),
+			},
+			RoleSource: keycard.ZoneUserGetParamsRoleSourceUser,
 		},
 	)
 	if err != nil {
@@ -71,6 +75,9 @@ func TestZoneUserListWithOptionalParams(t *testing.T) {
 			FilterEmail: keycard.ZoneUserListParamsFilterEmailUnion{
 				OfString: keycard.String("dev@stainless.com"),
 			},
+			FilterGroups: keycard.ZoneUserListParamsFilterGroupsUnion{
+				OfString: keycard.String("string"),
+			},
 			FilterID: keycard.ZoneUserListParamsFilterIDUnion{
 				OfString: keycard.String("string"),
 			},
@@ -87,7 +94,8 @@ func TestZoneUserListWithOptionalParams(t *testing.T) {
 			QuerySubject: keycard.ZoneUserListParamsQuerySubjectUnion{
 				OfString: keycard.String("x"),
 			},
-			Sort: keycard.String("-authenticated_at,\t\r\r \tauthenticated_at,\n\f\t\f\ncreated_at"),
+			RoleSource: keycard.ZoneUserListParamsRoleSourceUser,
+			Sort:       keycard.String("-authenticated_at,\t\r\r \tauthenticated_at,\n\f\t\f\ncreated_at"),
 		},
 	)
 	if err != nil {
