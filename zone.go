@@ -37,6 +37,8 @@ type ZoneService struct {
 	UserAgents             ZoneUserAgentService
 	Users                  ZoneUserService
 	Members                ZoneMemberService
+	Roles                  ZoneRoleService
+	Groups                 ZoneGroupService
 	Secrets                ZoneSecretService
 	// Zone-scoped Cedar schema management.
 	//
@@ -81,6 +83,8 @@ func NewZoneService(opts ...option.RequestOption) (r ZoneService) {
 	r.UserAgents = NewZoneUserAgentService(opts...)
 	r.Users = NewZoneUserService(opts...)
 	r.Members = NewZoneMemberService(opts...)
+	r.Roles = NewZoneRoleService(opts...)
+	r.Groups = NewZoneGroupService(opts...)
 	r.Secrets = NewZoneSecretService(opts...)
 	r.PolicySchemas = NewZonePolicySchemaService(opts...)
 	r.Policies = NewZonePolicyService(opts...)

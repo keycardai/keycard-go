@@ -37,7 +37,9 @@ func TestZoneProviderNewWithOptionalParams(t *testing.T) {
 			ClientID:     keycard.String("client_id"),
 			ClientSecret: keycard.String("client_secret"),
 			Description:  keycard.String("description"),
-			Metadata:     map[string]any{},
+			Metadata: keycard.ZoneProviderNewParamsMetadata{
+				IconURL: keycard.String("https://example.com"),
+			},
 			Protocols: keycard.ZoneProviderNewParamsProtocols{
 				Oauth2: keycard.ZoneProviderNewParamsProtocolsOauth2{
 					AuthorizationEndpoint: keycard.String("https://example.com"),
@@ -57,6 +59,7 @@ func TestZoneProviderNewWithOptionalParams(t *testing.T) {
 					TokenResponseAccessTokenPointer: keycard.String("token_response_access_token_pointer"),
 				},
 				Openid: keycard.ZoneProviderNewParamsProtocolsOpenid{
+					ExternalIDClaim:     keycard.String("external_id_claim"),
 					Scopes:              []string{"string"},
 					SingleLogoutEnabled: keycard.Bool(true),
 					UserIdentifierClaim: keycard.String("user_identifier_claim"),
@@ -129,8 +132,10 @@ func TestZoneProviderUpdateWithOptionalParams(t *testing.T) {
 			ClientSecret: keycard.String("client_secret"),
 			Description:  keycard.String("description"),
 			Identifier:   keycard.String("x"),
-			Metadata:     map[string]any{},
-			Name:         keycard.String("x"),
+			Metadata: keycard.ZoneProviderUpdateParamsMetadata{
+				IconURL: keycard.String("https://example.com"),
+			},
+			Name: keycard.String("x"),
 			Protocols: keycard.ZoneProviderUpdateParamsProtocols{
 				Oauth2: keycard.ZoneProviderUpdateParamsProtocolsOauth2{
 					AuthorizationEndpoint: keycard.String("https://example.com"),
@@ -150,6 +155,7 @@ func TestZoneProviderUpdateWithOptionalParams(t *testing.T) {
 					TokenResponseAccessTokenPointer: keycard.String("token_response_access_token_pointer"),
 				},
 				Openid: keycard.ZoneProviderUpdateParamsProtocolsOpenid{
+					ExternalIDClaim:     keycard.String("external_id_claim"),
 					Scopes:              []string{"string"},
 					SingleLogoutEnabled: keycard.Bool(true),
 					UserIdentifierClaim: keycard.String("user_identifier_claim"),
@@ -192,6 +198,9 @@ func TestZoneProviderListWithOptionalParams(t *testing.T) {
 			Expand: keycard.ZoneProviderListParamsExpandUnion{
 				OfZoneProviderListsExpandString: keycard.String("total_count"),
 			},
+			FilterID: keycard.ZoneProviderListParamsFilterIDUnion{
+				OfString: keycard.String("string"),
+			},
 			Identifier: keycard.String("identifier"),
 			Limit:      keycard.Int(1),
 			Slug:       keycard.String("slug"),
@@ -226,6 +235,37 @@ func TestZoneProviderDelete(t *testing.T) {
 		context.TODO(),
 		"id",
 		keycard.ZoneProviderDeleteParams{
+			ZoneID: "zoneId",
+		},
+	)
+	if err != nil {
+		var apierr *keycard.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestZoneProviderValidate(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := keycard.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
+	)
+	_, err := client.Zones.Providers.Validate(
+		context.TODO(),
+		"id",
+		keycard.ZoneProviderValidateParams{
 			ZoneID: "zoneId",
 		},
 	)

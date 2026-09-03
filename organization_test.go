@@ -136,7 +136,7 @@ func TestOrganizationListWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestOrganizationExchangeTokenWithOptionalParams(t *testing.T) {
+func TestOrganizationDeleteWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -151,10 +151,10 @@ func TestOrganizationExchangeTokenWithOptionalParams(t *testing.T) {
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
-	_, err := client.Organizations.ExchangeToken(
+	err := client.Organizations.Delete(
 		context.TODO(),
 		"x",
-		keycard.OrganizationExchangeTokenParams{
+		keycard.OrganizationDeleteParams{
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)

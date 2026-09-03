@@ -28,6 +28,7 @@ import (
 // the [NewZoneUserService] method instead.
 type ZoneUserService struct {
 	Options []option.RequestOption
+	Roles   ZoneUserRoleService
 }
 
 // NewZoneUserService generates a new service that applies the given options to
@@ -36,13 +37,17 @@ type ZoneUserService struct {
 func NewZoneUserService(opts ...option.RequestOption) (r ZoneUserService) {
 	r = ZoneUserService{}
 	r.Options = opts
+	r.Roles = NewZoneUserRoleService(opts...)
 	return
 }
 
-// Returns details of a specific user by user ID
-func (r *ZoneUserService) Get(ctx context.Context, id string, query ZoneUserGetParams, opts ...option.RequestOption) (res *User, err error) {
+// Returns details of a specific user by user ID. Use `expand[]=role-assignments`
+// for the user's structured role grants and `expand[]=groups` for the user's group
+// memberships. Role grants are direct only by default, each tagged with `source`;
+// use `role_source=all` to also include group-inherited.
+func (r *ZoneUserService) Get(ctx context.Context, id string, params ZoneUserGetParams, opts ...option.RequestOption) (res *User, err error) {
 	opts = slices.Concat(r.Options, opts)
-	if query.ZoneID == "" {
+	if params.ZoneID == "" {
 		err = errors.New("missing required zoneId parameter")
 		return nil, err
 	}
@@ -50,8 +55,24 @@ func (r *ZoneUserService) Get(ctx context.Context, id string, query ZoneUserGetP
 		err = errors.New("missing required id parameter")
 		return nil, err
 	}
-	path := fmt.Sprintf("zones/%s/users/%s", url.PathEscape(query.ZoneID), url.PathEscape(id))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
+	path := fmt.Sprintf("zones/%s/users/%s", url.PathEscape(params.ZoneID), url.PathEscape(id))
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
+	return res, err
+}
+
+// Update a user
+func (r *ZoneUserService) Update(ctx context.Context, id string, params ZoneUserUpdateParams, opts ...option.RequestOption) (res *User, err error) {
+	opts = slices.Concat(r.Options, opts)
+	if params.ZoneID == "" {
+		err = errors.New("missing required zoneId parameter")
+		return nil, err
+	}
+	if id == "" {
+		err = errors.New("missing required id parameter")
+		return nil, err
+	}
+	path := fmt.Sprintf("zones/%s/users/%s", url.PathEscape(params.ZoneID), url.PathEscape(id))
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
 	return res, err
 }
 
@@ -68,18 +89,21 @@ func (r *ZoneUserService) Get(ctx context.Context, id string, query ZoneUserGetP
 // prefix with `-` for descending. Use `expand[]=total_count` to include the
 // matching row count, `expand[]=session_count` to include per-user session counts,
 // `expand[]=grant_count` to include per-user delegated-grant counts,
-// `expand[]=role-assignments` to include each user's structured role grants,
-// `expand[]=credentials` to include each user's authentication credentials (each
-// with its `provider_id`), and `expand[]=credentials.provider` to additionally
-// inline the full identity provider on each federation credential. Filter by exact
-// email via `filter[email]` and by exact identifier via `filter[identifier]`;
-// search via `query[email]` / `query[subject]` / `query[]` (substring match, OR'd
-// across repeated values). `query[]` matches against email and federation
-// credential subject. Pass `filter[id]` (repeatable, max 100) to restrict results
-// to a known set of users — mutually exclusive with `after`/`before` (returns 400
-// if combined). When `filter[id]` is set, `limit` is ignored and the response
-// contains every requested user that exists in the zone, in a single page. IDs not
-// in the zone are silently omitted.
+// `expand[]=role-assignments` to include each user's structured role grants
+// (direct grants only by default, each tagged with `source`; use `role_source=all`
+// to also include group-inherited), `expand[]=groups` to include each user's group
+// memberships, `expand[]=credentials` to include each user's authentication
+// credentials (each with its `provider_id`), and `expand[]=credentials.provider`
+// to additionally inline the full identity provider on each federation credential.
+// Filter by exact email via `filter[email]` and by exact identifier via
+// `filter[identifier]`; restrict to members of a group via `filter[groups]`
+// (repeatable, OR'd across values); search via `query[email]` / `query[subject]` /
+// `query[]` (substring match, OR'd across repeated values). `query[]` matches
+// against email and federation credential subject. Pass `filter[id]` (repeatable,
+// max 100) to restrict results to a known set of users — mutually exclusive with
+// `after`/`before` (returns 400 if combined). When `filter[id]` is set, `limit` is
+// ignored and the response contains every requested user that exists in the zone,
+// in a single page. IDs not in the zone are silently omitted.
 func (r *ZoneUserService) List(ctx context.Context, zoneID string, query ZoneUserListParams, opts ...option.RequestOption) (res *ZoneUserListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -89,6 +113,23 @@ func (r *ZoneUserService) List(ctx context.Context, zoneID string, query ZoneUse
 	path := fmt.Sprintf("zones/%s/users", url.PathEscape(zoneID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
+}
+
+// Delete a user
+func (r *ZoneUserService) Delete(ctx context.Context, id string, body ZoneUserDeleteParams, opts ...option.RequestOption) (err error) {
+	opts = slices.Concat(r.Options, opts)
+	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
+	if body.ZoneID == "" {
+		err = errors.New("missing required zoneId parameter")
+		return err
+	}
+	if id == "" {
+		err = errors.New("missing required id parameter")
+		return err
+	}
+	path := fmt.Sprintf("zones/%s/users/%s", url.PathEscape(body.ZoneID), url.PathEscape(id))
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
+	return err
 }
 
 // An authenticated user entity
@@ -124,6 +165,9 @@ type User struct {
 	// Delegated-grant count for this user. Populated only when `expand[]=grant_count`
 	// is set on the listing endpoint.
 	GrantCount int64 `json:"grant_count"`
+	// Groups this user belongs to within the zone. Populated only when
+	// `expand[]=groups` is set on the listing endpoint.
+	Groups []UserGroup `json:"groups"`
 	// Issuer identifier of the identity provider
 	Issuer string `json:"issuer"`
 	// Reference to the identity provider. This field is undefined when the source
@@ -151,6 +195,7 @@ type User struct {
 		AuthenticatedAt respjson.Field
 		Credentials     respjson.Field
 		GrantCount      respjson.Field
+		Groups          respjson.Field
 		Issuer          respjson.Field
 		ProviderID      respjson.Field
 		RoleAssignments respjson.Field
@@ -284,6 +329,30 @@ func (r *UserCredentialUserCredentialPassword) UnmarshalJSON(data []byte) error 
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// A group a user belongs to within a zone.
+type UserGroup struct {
+	// Unique identifier of the group
+	ID string `json:"id" api:"required"`
+	// Zone-unique slug that policy rules match on.
+	Identifier string `json:"identifier" api:"required"`
+	// Human-readable group name
+	Name string `json:"name" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Identifier  respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r UserGroup) RawJSON() string { return r.JSON.raw }
+func (r *UserGroup) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // A role granted to a user within a zone.
 type UserRoleAssignment struct {
 	// ID of the assigned role
@@ -301,12 +370,22 @@ type UserRoleAssignment struct {
 	// The resource this grant is scoped to, or null when the grant is unscoped
 	// (applies to the owning zone itself).
 	Scope UserRoleAssignmentScope `json:"scope" api:"required"`
+	// The principal that holds this grant: `user` when assigned directly to the user,
+	// or `group` when inherited through group membership.
+	//
+	// Any of "user", "group".
+	Source string `json:"source" api:"required"`
+	// ID of the group this grant is inherited from. Present only when `source` is
+	// `group`.
+	GroupID string `json:"group_id"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		RoleID         respjson.Field
 		RoleIdentifier respjson.Field
 		RoleOwnerType  respjson.Field
 		Scope          respjson.Field
+		Source         respjson.Field
+		GroupID        respjson.Field
 		ExtraFields    map[string]respjson.Field
 		raw            string
 	} `json:"-"`
@@ -385,9 +464,82 @@ func (r *ZoneUserListResponsePagination) UnmarshalJSON(data []byte) error {
 }
 
 type ZoneUserGetParams struct {
-	ZoneID string `path:"zoneId" api:"required" json:"-"`
+	ZoneID string                       `path:"zoneId" api:"required" json:"-"`
+	Expand ZoneUserGetParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Selects which grants `expand[]=role-assignments` returns, tagging each with
+	// `source`: `user` (direct only, the default), `group` (group-inherited only), or
+	// `all` (both direct and group-inherited). Requires `expand[]=role-assignments`.
+	//
+	// Any of "user", "group", "all".
+	RoleSource ZoneUserGetParamsRoleSource `query:"role_source,omitzero" json:"-"`
 	paramObj
 }
+
+// URLQuery serializes [ZoneUserGetParams]'s query parameters as `url.Values`.
+func (r ZoneUserGetParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneUserGetParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneUserGetsExpandString)
+	OfZoneUserGetsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneUserGetsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type ZoneUserGetParamsExpandString string
+
+const (
+	ZoneUserGetParamsExpandStringRoleAssignments ZoneUserGetParamsExpandString = "role-assignments"
+	ZoneUserGetParamsExpandStringGroups          ZoneUserGetParamsExpandString = "groups"
+)
+
+// Selects which grants `expand[]=role-assignments` returns, tagging each with
+// `source`: `user` (direct only, the default), `group` (group-inherited only), or
+// `all` (both direct and group-inherited). Requires `expand[]=role-assignments`.
+type ZoneUserGetParamsRoleSource string
+
+const (
+	ZoneUserGetParamsRoleSourceUser  ZoneUserGetParamsRoleSource = "user"
+	ZoneUserGetParamsRoleSourceGroup ZoneUserGetParamsRoleSource = "group"
+	ZoneUserGetParamsRoleSourceAll   ZoneUserGetParamsRoleSource = "all"
+)
+
+type ZoneUserUpdateParams struct {
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
+	// Zone-scoped user identifier
+	Identifier param.Opt[string] `json:"identifier,omitzero" format:"safe-text"`
+	// Status of the user. Set to `disabled` to prevent the user from authenticating
+	// and revoke their active sessions, or `active` to re-enable.
+	//
+	// Any of "active", "disabled".
+	Status ZoneUserUpdateParamsStatus `json:"status,omitzero"`
+	paramObj
+}
+
+func (r ZoneUserUpdateParams) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneUserUpdateParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZoneUserUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Status of the user. Set to `disabled` to prevent the user from authenticating
+// and revoke their active sessions, or `active` to re-enable.
+type ZoneUserUpdateParamsStatus string
+
+const (
+	ZoneUserUpdateParamsStatusActive   ZoneUserUpdateParamsStatus = "active"
+	ZoneUserUpdateParamsStatusDisabled ZoneUserUpdateParamsStatus = "disabled"
+)
 
 type ZoneUserListParams struct {
 	// Cursor for forward pagination
@@ -402,6 +554,8 @@ type ZoneUserListParams struct {
 	Expand ZoneUserListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Filter by exact email address
 	FilterEmail ZoneUserListParamsFilterEmailUnion `query:"filter[email],omitzero" format:"email" json:"-"`
+	// Restrict to members of this group (by group ID). Repeatable; OR'd across values.
+	FilterGroups ZoneUserListParamsFilterGroupsUnion `query:"filter[groups],omitzero" json:"-"`
 	// Restrict results to users with this publicId. Repeatable, max 100. Mutually
 	// exclusive with after/before.
 	FilterID ZoneUserListParamsFilterIDUnion `query:"filter[id],omitzero" json:"-"`
@@ -413,6 +567,12 @@ type ZoneUserListParams struct {
 	QueryEmail ZoneUserListParamsQueryEmailUnion `query:"query[email],omitzero" json:"-"`
 	// Search by federated credential subject (substring match)
 	QuerySubject ZoneUserListParamsQuerySubjectUnion `query:"query[subject],omitzero" json:"-"`
+	// Selects which grants `expand[]=role-assignments` returns, tagging each with
+	// `source`: `user` (direct only, the default), `group` (group-inherited only), or
+	// `all` (both direct and group-inherited). Requires `expand[]=role-assignments`.
+	//
+	// Any of "user", "group", "all".
+	RoleSource ZoneUserListParamsRoleSource `query:"role_source,omitzero" json:"-"`
 	paramObj
 }
 
@@ -442,6 +602,7 @@ const (
 	ZoneUserListParamsExpandStringSessionCount        ZoneUserListParamsExpandString = "session_count"
 	ZoneUserListParamsExpandStringGrantCount          ZoneUserListParamsExpandString = "grant_count"
 	ZoneUserListParamsExpandStringRoleAssignments     ZoneUserListParamsExpandString = "role-assignments"
+	ZoneUserListParamsExpandStringGroups              ZoneUserListParamsExpandString = "groups"
 	ZoneUserListParamsExpandStringCredentials         ZoneUserListParamsExpandString = "credentials"
 	ZoneUserListParamsExpandStringCredentialsProvider ZoneUserListParamsExpandString = "credentials.provider"
 )
@@ -450,6 +611,15 @@ const (
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type ZoneUserListParamsFilterEmailUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneUserListParamsFilterGroupsUnion struct {
 	OfString      param.Opt[string] `query:",omitzero,inline"`
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
@@ -498,4 +668,20 @@ type ZoneUserListParamsQuerySubjectUnion struct {
 	OfString      param.Opt[string] `query:",omitzero,inline"`
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
+}
+
+// Selects which grants `expand[]=role-assignments` returns, tagging each with
+// `source`: `user` (direct only, the default), `group` (group-inherited only), or
+// `all` (both direct and group-inherited). Requires `expand[]=role-assignments`.
+type ZoneUserListParamsRoleSource string
+
+const (
+	ZoneUserListParamsRoleSourceUser  ZoneUserListParamsRoleSource = "user"
+	ZoneUserListParamsRoleSourceGroup ZoneUserListParamsRoleSource = "group"
+	ZoneUserListParamsRoleSourceAll   ZoneUserListParamsRoleSource = "all"
+)
+
+type ZoneUserDeleteParams struct {
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
+	paramObj
 }

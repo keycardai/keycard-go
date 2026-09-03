@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.23.0 (2026-08-26)
+
+Full Changelog: [v0.22.0...v0.23.0](https://github.com/keycardai/keycard-go/compare/v0.22.0...v0.23.0)
+
+### ⚠ BREAKING CHANGES
+
+* retire POST /organizations/{id}/token
+
+### Features
+
+* add external_id_claim to provider openid protocol ([6cd8bea](https://github.com/keycardai/keycard-go/commit/6cd8bea3b4da3001dbf93eef8db8d1a797349740))
+* **CX-782:** paginate + search application dependencies ([c1f49ee](https://github.com/keycardai/keycard-go/commit/c1f49eedffc1210c3b3f1f6baa59fbddfb6f6c91))
+* **CX-860:** paginate application provided-resources endpoint ([6f0e41d](https://github.com/keycardai/keycard-go/commit/6f0e41d1e970f419d35577f4bcee56727e5823d3))
+* **CX-862:** remove legacy traits[]/traits[all] aliases ([245939e](https://github.com/keycardai/keycard-go/commit/245939e7501282a83dee6cd3184407f04299691e))
+* **ID-456:** groups API create + get ([9a472f3](https://github.com/keycardai/keycard-go/commit/9a472f36c0d4dbb8b03bf7b881f83bd64c4cdf38))
+* **ID-478:** zones.external_sync_enabled column and update API ([6d4bd4c](https://github.com/keycardai/keycard-go/commit/6d4bd4c7ce2aff3936c5bbdb604fff2f0d6c543d))
+* **ID-480:** external_sync_tokens table and management APIs ([6d5aef6](https://github.com/keycardai/keycard-go/commit/6d5aef63c8770a34d32db505f1a4b06516b7dc86))
+* **providers:** add filter[id] to list endpoint (ID-547) ([e6c6ca5](https://github.com/keycardai/keycard-go/commit/e6c6ca59d8ed25b33802a1c01a40f3efa2ff5c2e))
+* **providers:** store brand icon_url in provider metadata ([48b5ef7](https://github.com/keycardai/keycard-go/commit/48b5ef77ccfa019fc630bd62f142c2eaa52336d6))
+* **resources:** add filter[owner_type] to the resource list (ECO-225) ([26942af](https://github.com/keycardai/keycard-go/commit/26942af646f14e194e3249b3b6b1c97172a87ef1))
+* **resources:** add search, sort, and filter[id] to the paginated resource list ([9d4d810](https://github.com/keycardai/keycard-go/commit/9d4d810b80802ddf91ac6f2247e9f0730c2f3e8f))
+* **resources:** filter the resource list by trait ([e7a929c](https://github.com/keycardai/keycard-go/commit/e7a929c3e824c1a3aff43d0a1d01a95d486f2bf9))
+* retire POST /organizations/{id}/token ([372221b](https://github.com/keycardai/keycard-go/commit/372221bbf8f1661e606801867307b28c51146463))
+* **sdk:** expose zone roles, groups, and role assignments in Stainless config ([859d879](https://github.com/keycardai/keycard-go/commit/859d879953f3f1ea94c18ca3b6e15eaf7cbf7ef4))
+
+
+### Bug Fixes
+
+* **deps:** close critical Dependabot alerts ([3dbd069](https://github.com/keycardai/keycard-go/commit/3dbd069505cebee5a0d982fd87da0fc2109de23a))
+* **ID-448:** keyset cursor drops same-millisecond rows (precision mismatch) ([d0c92fe](https://github.com/keycardai/keycard-go/commit/d0c92fedcc3ed034206f2764420fefcbb98d5fc8))
+
 ## 0.22.0 (2026-07-24)
 
 Full Changelog: [v0.21.0...v0.22.0](https://github.com/keycardai/keycard-go/compare/v0.21.0...v0.22.0)

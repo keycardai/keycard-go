@@ -83,7 +83,9 @@ func (r *ZoneProviderService) Update(ctx context.Context, id string, params Zone
 	return res, err
 }
 
-// Returns a list of providers in the specified zone
+// Returns a list of providers in the specified zone. Pass `filter[id]`
+// (repeatable, max 100) to restrict results to a known set of provider IDs;
+// unknown or malformed IDs are silently omitted.
 func (r *ZoneProviderService) List(ctx context.Context, zoneID string, query ZoneProviderListParams, opts ...option.RequestOption) (res *ZoneProviderListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -110,6 +112,25 @@ func (r *ZoneProviderService) Delete(ctx context.Context, id string, body ZonePr
 	path := fmt.Sprintf("zones/%s/providers/%s", url.PathEscape(body.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
 	return err
+}
+
+// Runs on-demand OIDC connection checks (issuer reachability, metadata retrieval,
+// endpoint consistency, authorization endpoint reachability, and a demonstration
+// client_credentials exchange) against the provider and returns a per-check
+// result. Results are not persisted.
+func (r *ZoneProviderService) Validate(ctx context.Context, id string, body ZoneProviderValidateParams, opts ...option.RequestOption) (res *ValidationResult, err error) {
+	opts = slices.Concat(r.Options, opts)
+	if body.ZoneID == "" {
+		err = errors.New("missing required zoneId parameter")
+		return nil, err
+	}
+	if id == "" {
+		err = errors.New("missing required id parameter")
+		return nil, err
+	}
+	path := fmt.Sprintf("zones/%s/providers/%s/validate", url.PathEscape(body.ZoneID), url.PathEscape(id))
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
+	return res, err
 }
 
 // A Provider is a system that supplies access to Resources and allows actors
@@ -142,7 +163,7 @@ type Provider struct {
 	// Human-readable description
 	Description string `json:"description" api:"nullable"`
 	// Provider metadata
-	Metadata any `json:"metadata" api:"nullable"`
+	Metadata ProviderMetadata `json:"metadata" api:"nullable"`
 	// Protocol-specific configuration
 	Protocols ProviderProtocols `json:"protocols" api:"nullable"`
 	// Any of "external", "keycard-vault", "keycard-sts".
@@ -182,6 +203,24 @@ const (
 	ProviderOwnerTypePlatform ProviderOwnerType = "platform"
 	ProviderOwnerTypeCustomer ProviderOwnerType = "customer"
 )
+
+// Provider metadata
+type ProviderMetadata struct {
+	// Icon URL
+	IconURL string `json:"icon_url" format:"uri"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		IconURL     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ProviderMetadata) RawJSON() string { return r.JSON.raw }
+func (r *ProviderMetadata) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Protocol-specific configuration
 type ProviderProtocols struct {
@@ -259,6 +298,10 @@ func (r *ProviderProtocolsOauth2) UnmarshalJSON(data []byte) error {
 
 // OpenID Connect protocol configuration
 type ProviderProtocolsOpenid struct {
+	// Name of the OIDC claim carrying the stable external id used to correlate logins
+	// with externally provisioned (SCIM) users. Defaults to "sub". Set to "oid" for
+	// Entra, whose pairwise "sub" differs from the SCIM externalId.
+	ExternalIDClaim string `json:"external_id_claim" api:"nullable"`
 	// Additional OIDC scopes to request from this provider during authentication (e.g.
 	// "groups"). Merged with the default scopes (openid, profile, email).
 	Scopes []string `json:"scopes" api:"nullable"`
@@ -271,6 +314,7 @@ type ProviderProtocolsOpenid struct {
 	UserinfoEndpoint    string `json:"userinfo_endpoint" api:"nullable" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		ExternalIDClaim     respjson.Field
 		Scopes              respjson.Field
 		SingleLogoutEnabled respjson.Field
 		UserIdentifierClaim respjson.Field
@@ -292,6 +336,81 @@ const (
 	ProviderTypeExternal     ProviderType = "external"
 	ProviderTypeKeycardVault ProviderType = "keycard-vault"
 	ProviderTypeKeycardSts   ProviderType = "keycard-sts"
+)
+
+// Result of running the provider OIDC connection checks on demand. Not persisted.
+type ValidationResult struct {
+	// Per-check results, in execution order
+	Checks []ValidationResultCheck `json:"checks" api:"required"`
+	// Provider that was validated
+	ProviderID string `json:"provider_id" api:"required"`
+	// Overall outcome. `fail` when any individual check failed; skipped checks do not
+	// fail the run.
+	//
+	// Any of "pass", "fail".
+	Status ValidationResultStatus `json:"status" api:"required"`
+	// When the validation run completed
+	ValidatedAt time.Time `json:"validated_at" api:"required" format:"date-time"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Checks      respjson.Field
+		ProviderID  respjson.Field
+		Status      respjson.Field
+		ValidatedAt respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ValidationResult) RawJSON() string { return r.JSON.raw }
+func (r *ValidationResult) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Result of a single provider validation check
+type ValidationResultCheck struct {
+	// Identifier of an individual provider validation check
+	//
+	// Any of "issuer_reachability", "metadata_retrieval", "endpoint_consistency",
+	// "authorization_endpoint_reachability", "credential_exchange".
+	Check string `json:"check" api:"required"`
+	// Outcome of a single check. `pass`/`fail` mean the check ran.
+	// `skipped_with_reason` means it could not run because a prerequisite is missing
+	// on our side (e.g. no credential stored). `not_applicable` means the check does
+	// not apply to this provider class (e.g. a login-flow-only provider that does not
+	// advertise the `client_credentials` grant) — render as a neutral state, distinct
+	// from a failure. Neither `skipped_with_reason` nor `not_applicable` fails the
+	// overall run.
+	//
+	// Any of "pass", "fail", "skipped_with_reason", "not_applicable".
+	Status string `json:"status" api:"required"`
+	// Human-readable explanation, present on `fail`, `skipped_with_reason`, and
+	// `not_applicable`.
+	Detail string `json:"detail"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Check       respjson.Field
+		Status      respjson.Field
+		Detail      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ValidationResultCheck) RawJSON() string { return r.JSON.raw }
+func (r *ValidationResultCheck) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Overall outcome. `fail` when any individual check failed; skipped checks do not
+// fail the run.
+type ValidationResultStatus string
+
+const (
+	ValidationResultStatusPass ValidationResultStatus = "pass"
+	ValidationResultStatusFail ValidationResultStatus = "fail"
 )
 
 type ZoneProviderListResponse struct {
@@ -356,7 +475,7 @@ type ZoneProviderNewParams struct {
 	// OAuth 2.0 client secret (will be encrypted and stored securely)
 	ClientSecret param.Opt[string] `json:"client_secret,omitzero"`
 	// Provider metadata
-	Metadata any `json:"metadata,omitzero"`
+	Metadata ZoneProviderNewParamsMetadata `json:"metadata,omitzero"`
 	// Protocol-specific configuration for provider creation
 	Protocols ZoneProviderNewParamsProtocols `json:"protocols,omitzero"`
 	paramObj
@@ -367,6 +486,21 @@ func (r ZoneProviderNewParams) MarshalJSON() (data []byte, err error) {
 	return param.MarshalObject(r, (*shadow)(&r))
 }
 func (r *ZoneProviderNewParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Provider metadata
+type ZoneProviderNewParamsMetadata struct {
+	// Icon URL
+	IconURL param.Opt[string] `json:"icon_url,omitzero" format:"uri"`
+	paramObj
+}
+
+func (r ZoneProviderNewParamsMetadata) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneProviderNewParamsMetadata
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZoneProviderNewParamsMetadata) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -428,6 +562,10 @@ func (r *ZoneProviderNewParamsProtocolsOauth2) UnmarshalJSON(data []byte) error 
 
 // OpenID Connect protocol configuration for provider creation
 type ZoneProviderNewParamsProtocolsOpenid struct {
+	// Name of the OIDC claim carrying the stable external id used to correlate logins
+	// with externally provisioned (SCIM) users. Defaults to "sub". Set to "oid" for
+	// Entra, whose pairwise "sub" differs from the SCIM externalId.
+	ExternalIDClaim param.Opt[string] `json:"external_id_claim,omitzero"`
 	// When true, logging out of the zone propagates the logout to this provider's
 	// end_session_endpoint (RP-initiated logout). Defaults to false.
 	SingleLogoutEnabled param.Opt[bool] `json:"single_logout_enabled,omitzero"`
@@ -471,7 +609,7 @@ type ZoneProviderUpdateParams struct {
 	// control characters.
 	Name param.Opt[string] `json:"name,omitzero" format:"safe-text"`
 	// Provider metadata. Set to null to remove all metadata.
-	Metadata any `json:"metadata,omitzero"`
+	Metadata ZoneProviderUpdateParamsMetadata `json:"metadata,omitzero"`
 	// Protocol-specific configuration. Set to null to remove all protocols.
 	Protocols ZoneProviderUpdateParamsProtocols `json:"protocols,omitzero"`
 	paramObj
@@ -482,6 +620,21 @@ func (r ZoneProviderUpdateParams) MarshalJSON() (data []byte, err error) {
 	return param.MarshalObject(r, (*shadow)(&r))
 }
 func (r *ZoneProviderUpdateParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Provider metadata. Set to null to remove all metadata.
+type ZoneProviderUpdateParamsMetadata struct {
+	// Icon URL (set to null to unset)
+	IconURL param.Opt[string] `json:"icon_url,omitzero" format:"uri"`
+	paramObj
+}
+
+func (r ZoneProviderUpdateParamsMetadata) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneProviderUpdateParamsMetadata
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZoneProviderUpdateParamsMetadata) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -543,6 +696,11 @@ func (r *ZoneProviderUpdateParamsProtocolsOauth2) UnmarshalJSON(data []byte) err
 
 // OpenID Connect protocol configuration. Set to null to remove all OpenID config.
 type ZoneProviderUpdateParamsProtocolsOpenid struct {
+	// Name of the OIDC claim carrying the stable external id used to correlate logins
+	// with externally provisioned (SCIM) users. Defaults to "sub". Set to "oid" for
+	// Entra, whose pairwise "sub" differs from the SCIM externalId. Set to null to
+	// revert to default.
+	ExternalIDClaim param.Opt[string] `json:"external_id_claim,omitzero"`
 	// When true, logging out of the zone propagates the logout to this provider's
 	// end_session_endpoint (RP-initiated logout). Defaults to false.
 	SingleLogoutEnabled param.Opt[bool] `json:"single_logout_enabled,omitzero"`
@@ -577,6 +735,8 @@ type ZoneProviderListParams struct {
 	Limit  param.Opt[int64]                  `query:"limit,omitzero" json:"-"`
 	Slug   param.Opt[string]                 `query:"slug,omitzero" json:"-"`
 	Expand ZoneProviderListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Restrict results to providers with this ID. Repeatable, max 100.
+	FilterID ZoneProviderListParamsFilterIDUnion `query:"filter[id],omitzero" json:"-"`
 	// Any of "external", "keycard-vault", "keycard-sts".
 	Type ZoneProviderListParamsType `query:"type,omitzero" json:"-"`
 	paramObj
@@ -607,6 +767,15 @@ const (
 	ZoneProviderListParamsExpandStringTotalCount ZoneProviderListParamsExpandString = "total_count"
 )
 
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneProviderListParamsFilterIDUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
 type ZoneProviderListParamsType string
 
 const (
@@ -616,6 +785,11 @@ const (
 )
 
 type ZoneProviderDeleteParams struct {
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
+	paramObj
+}
+
+type ZoneProviderValidateParams struct {
 	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }

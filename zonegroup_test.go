@@ -13,7 +13,7 @@ import (
 	"github.com/keycardai/keycard-go/option"
 )
 
-func TestZoneResourceNewWithOptionalParams(t *testing.T) {
+func TestZoneGroupNewWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -28,23 +28,14 @@ func TestZoneResourceNewWithOptionalParams(t *testing.T) {
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
-	_, err := client.Zones.Resources.New(
+	_, err := client.Zones.Groups.New(
 		context.TODO(),
 		"zoneId",
-		keycard.ZoneResourceNewParams{
-			Identifier:                "x",
-			Name:                      "x",
-			ApplicationID:             keycard.String("application_id"),
-			ApplicationType:           keycard.ZoneResourceNewParamsApplicationTypeNative,
-			CredentialLifetimeSeconds: keycard.Int(60),
-			CredentialProviderID:      keycard.String("credential_provider_id"),
-			Description:               keycard.String("description"),
-			Metadata: keycard.MetadataParam{
-				DocsURL: keycard.String("https://example.com"),
-				IconURL: keycard.String("https://example.com"),
+		keycard.ZoneGroupNewParams{
+			GroupCreate: keycard.GroupCreateParam{
+				Name:       "x",
+				Identifier: keycard.String("x"),
 			},
-			Prefix: keycard.Bool(true),
-			Scopes: []string{"x"},
 		},
 	)
 	if err != nil {
@@ -56,7 +47,7 @@ func TestZoneResourceNewWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestZoneResourceGet(t *testing.T) {
+func TestZoneGroupGetWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -71,55 +62,14 @@ func TestZoneResourceGet(t *testing.T) {
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
-	_, err := client.Zones.Resources.Get(
+	_, err := client.Zones.Groups.Get(
 		context.TODO(),
-		"id",
-		keycard.ZoneResourceGetParams{
+		"groupId",
+		keycard.ZoneGroupGetParams{
 			ZoneID: "zoneId",
-		},
-	)
-	if err != nil {
-		var apierr *keycard.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestZoneResourceUpdateWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := keycard.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithClientID("My Client ID"),
-		option.WithClientSecret("My Client Secret"),
-	)
-	_, err := client.Zones.Resources.Update(
-		context.TODO(),
-		"id",
-		keycard.ZoneResourceUpdateParams{
-			ZoneID:                    "zoneId",
-			ApplicationID:             keycard.String("application_id"),
-			ApplicationType:           keycard.ZoneResourceUpdateParamsApplicationTypeNative,
-			CredentialLifetimeSeconds: keycard.Int(60),
-			CredentialProviderID:      keycard.String("credential_provider_id"),
-			Description:               keycard.String("description"),
-			Identifier:                keycard.String("x"),
-			Metadata: keycard.MetadataUpdateParam{
-				DocsURL: keycard.String("https://example.com"),
-				IconURL: keycard.String("https://example.com"),
+			Expand: keycard.ZoneGroupGetParamsExpandUnion{
+				OfZoneGroupGetsExpandString: keycard.String("member_count"),
 			},
-			Name:   keycard.String("x"),
-			Prefix: keycard.Bool(true),
-			Scopes: []string{"x"},
 		},
 	)
 	if err != nil {
@@ -131,7 +81,7 @@ func TestZoneResourceUpdateWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestZoneResourceListWithOptionalParams(t *testing.T) {
+func TestZoneGroupUpdateWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -146,26 +96,61 @@ func TestZoneResourceListWithOptionalParams(t *testing.T) {
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
-	_, err := client.Zones.Resources.List(
+	_, err := client.Zones.Groups.Update(
+		context.TODO(),
+		"groupId",
+		keycard.ZoneGroupUpdateParams{
+			ZoneID: "zoneId",
+			GroupUpdate: keycard.GroupUpdateParam{
+				Identifier: keycard.String("x"),
+				Name:       keycard.String("x"),
+			},
+		},
+	)
+	if err != nil {
+		var apierr *keycard.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestZoneGroupListWithOptionalParams(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := keycard.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
+	)
+	_, err := client.Zones.Groups.List(
 		context.TODO(),
 		"zoneId",
-		keycard.ZoneResourceListParams{
-			After:                keycard.String("x"),
-			Before:               keycard.String("x"),
-			CredentialProviderID: keycard.String("credentialProviderId"),
-			Expand: keycard.ZoneResourceListParamsExpandUnion{
-				OfZoneResourceListsExpandString: keycard.String("total_count"),
+		keycard.ZoneGroupListParams{
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Expand: keycard.ZoneGroupListParamsExpandUnion{
+				OfZoneGroupListsExpandString: keycard.String("total_count"),
 			},
-			FilterIdentifier: keycard.ZoneResourceListParamsFilterIdentifierUnion{
+			FilterID: keycard.ZoneGroupListParamsFilterIDUnion{
 				OfString: keycard.String("string"),
 			},
-			FilterOwnerType: keycard.ZoneResourceListParamsFilterOwnerTypePlatform,
-			FilterTraits: keycard.ZoneResourceListParamsFilterTraitsUnion{
+			FilterIdentifier: keycard.ZoneGroupListParamsFilterIdentifierUnion{
 				OfString: keycard.String("string"),
 			},
-			Identifier: keycard.String("identifier"),
-			Limit:      keycard.Int(1),
-			Slug:       keycard.String("slug"),
+			Limit: keycard.Int(1),
+			Query: keycard.ZoneGroupListParamsQueryUnion{
+				OfString: keycard.String("x"),
+			},
+			Sort: keycard.String("-identifier,\t\r\r \tidentifier,\n\f\t\f\ncreated_at"),
 		},
 	)
 	if err != nil {
@@ -177,7 +162,7 @@ func TestZoneResourceListWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestZoneResourceDelete(t *testing.T) {
+func TestZoneGroupDelete(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -192,10 +177,10 @@ func TestZoneResourceDelete(t *testing.T) {
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
-	err := client.Zones.Resources.Delete(
+	err := client.Zones.Groups.Delete(
 		context.TODO(),
-		"id",
-		keycard.ZoneResourceDeleteParams{
+		"groupId",
+		keycard.ZoneGroupDeleteParams{
 			ZoneID: "zoneId",
 		},
 	)

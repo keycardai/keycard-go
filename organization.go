@@ -97,19 +97,20 @@ func (r *OrganizationService) List(ctx context.Context, params OrganizationListP
 	return res, err
 }
 
-// Exchange user token for organization-scoped M2M token
-func (r *OrganizationService) ExchangeToken(ctx context.Context, organizationID string, body OrganizationExchangeTokenParams, opts ...option.RequestOption) (res *TokenResponse, err error) {
+// Deletes the organization and all zones.
+func (r *OrganizationService) Delete(ctx context.Context, organizationID string, body OrganizationDeleteParams, opts ...option.RequestOption) (err error) {
 	if !param.IsOmitted(body.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", body.XClientRequestID.Value)))
 	}
 	opts = slices.Concat(r.Options, opts)
+	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if organizationID == "" {
 		err = errors.New("missing required organization_id parameter")
-		return nil, err
+		return err
 	}
-	path := fmt.Sprintf("organizations/%s/token", url.PathEscape(organizationID))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
-	return res, err
+	path := fmt.Sprintf("organizations/%s", url.PathEscape(organizationID))
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
+	return err
 }
 
 // List unified view of users and invitations in an organization
@@ -225,30 +226,6 @@ const (
 	RoleScopeOrganization RoleScope = "organization"
 	RoleScopeZone         RoleScope = "zone"
 )
-
-// OAuth2-style token response for M2M tokens
-type TokenResponse struct {
-	// The M2M access token
-	AccessToken string `json:"access_token" api:"required"`
-	// Token type (always "Bearer")
-	TokenType string `json:"token_type" api:"required"`
-	// Token expiration time in seconds
-	ExpiresIn int64 `json:"expires_in"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		AccessToken respjson.Field
-		TokenType   respjson.Field
-		ExpiresIn   respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r TokenResponse) RawJSON() string { return r.JSON.raw }
-func (r *TokenResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
 
 type OrganizationListResponse struct {
 	Items []Organization `json:"items" api:"required"`
@@ -525,7 +502,7 @@ func (r OrganizationListParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
-type OrganizationExchangeTokenParams struct {
+type OrganizationDeleteParams struct {
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
