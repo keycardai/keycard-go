@@ -97,22 +97,6 @@ func (r *OrganizationService) List(ctx context.Context, params OrganizationListP
 	return res, err
 }
 
-// Deletes the organization and all zones.
-func (r *OrganizationService) Delete(ctx context.Context, organizationID string, body OrganizationDeleteParams, opts ...option.RequestOption) (err error) {
-	if !param.IsOmitted(body.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", body.XClientRequestID.Value)))
-	}
-	opts = slices.Concat(r.Options, opts)
-	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
-	if organizationID == "" {
-		err = errors.New("missing required organization_id parameter")
-		return err
-	}
-	path := fmt.Sprintf("organizations/%s", url.PathEscape(organizationID))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return err
-}
-
 // List unified view of users and invitations in an organization
 func (r *OrganizationService) ListIdentities(ctx context.Context, organizationID string, params OrganizationListIdentitiesParams, opts ...option.RequestOption) (res *OrganizationListIdentitiesResponse, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
@@ -500,11 +484,6 @@ func (r OrganizationListParams) URLQuery() (v url.Values, err error) {
 		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
-}
-
-type OrganizationDeleteParams struct {
-	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	paramObj
 }
 
 type OrganizationListIdentitiesParams struct {
