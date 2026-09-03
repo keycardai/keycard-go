@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.23.1 (2026-09-03)
+
+Full Changelog: [v0.23.0...v0.23.1](https://github.com/keycardai/keycard-go/compare/v0.23.0...v0.23.1)
+
 ## 0.23.0 (2026-08-26)
 
 Full Changelog: [v0.22.0...v0.23.0](https://github.com/keycardai/keycard-go/compare/v0.22.0...v0.23.0)
