@@ -390,9 +390,7 @@ type ZoneSecretNewParams struct {
 	Name string `json:"name" api:"required"`
 	// A description of the entity
 	Description param.Opt[string] `json:"description,omitzero"`
-	// Optional zone ID. This field is provided for API compatibility but is ignored
-	// during processing. The zone ID is derived from the path parameter
-	// (/zones/{zone_id}/secrets) and takes precedence.
+	// A globally unique opaque identifier
 	ZoneID           param.Opt[string] `json:"zone_id,omitzero"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// A JSON object containing arbitrary metadata. Metadata will not be encrypted.
