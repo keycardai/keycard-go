@@ -26,8 +26,17 @@ jobs:
   prepare:
     runs-on: ubuntu-latest
     steps:
+      - id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.SDK_RELEASE_APP_ID }}
+          private-key: ${{ secrets.SDK_RELEASE_PRIVATE_KEY }}
+          owner: keycardai
+          repositories: |
+            keycard-go
       - uses: googleapis/release-please-action@v4
         with:
+          token: ${{ steps.app-token.outputs.token }}
           target-branch: next-stlc
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
