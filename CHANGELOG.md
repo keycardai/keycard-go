@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.23.1](https://github.com/keycardai/keycard-go/compare/v0.23.0...v0.23.1) (2026-09-03)
+
+
+### Bug Fixes
+
+* github workflow string interpolation ([006f736](https://github.com/keycardai/keycard-go/commit/006f7366bb6ffad3ef9f1f7598f668d33cde38ac))
+* use Github App token in release-please ([#29](https://github.com/keycardai/keycard-go/issues/29)) ([f76d52c](https://github.com/keycardai/keycard-go/commit/f76d52c071de2e5ccbf98187246bb01f134d6ef3))
+
 ## 0.23.0 (2026-08-26)
 
 Full Changelog: [v0.22.0...v0.23.0](https://github.com/keycardai/keycard-go/compare/v0.22.0...v0.23.0)
