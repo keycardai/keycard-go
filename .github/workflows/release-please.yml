@@ -1,0 +1,34 @@
+# When the OpenAPI schema changes in `keycard-api`, it rebuilds a new version
+# of each downstream SDK. Those changes are pushed to the `next-stlc` branch in each
+# respective repo.
+#
+# When new code is pushed to `next-stlc`, it will trigger this workflow. This
+# workflow will use `release-please` to create a PR, including changes from
+# that codegen run above, CHANGELOG updates, and version bumps.
+#
+# Each downstream repo (keycard-python, keycard-go, and keycard-ts) will have
+# this same workflow to manage merging changes into `main` and releasing those
+# changes to their corresponding package manager.
+#
+name: Release Please
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - next-stlc
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          target-branch: next-stlc
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
