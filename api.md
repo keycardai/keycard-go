@@ -163,24 +163,6 @@ Methods:
 
 ## Members
 
-Params Types:
-
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneRole">ZoneRole</a>
-
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMember">ZoneMember</a>
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneRole">ZoneRole</a>
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMemberListResponse">ZoneMemberListResponse</a>
-
-Methods:
-
-- <code title="get /zones/{zoneId}/members/{organizationUserId}">client.Zones.Members.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMemberService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, organizationUserID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMemberGetParams">ZoneMemberGetParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMember">ZoneMember</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="patch /zones/{zoneId}/members/{organizationUserId}">client.Zones.Members.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMemberService.Update">Update</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, organizationUserID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMemberUpdateParams">ZoneMemberUpdateParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMember">ZoneMember</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="get /zones/{zoneId}/members">client.Zones.Members.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMemberService.List">List</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, zoneID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMemberListParams">ZoneMemberListParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMemberListResponse">ZoneMemberListResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="delete /zones/{zoneId}/members/{organizationUserId}">client.Zones.Members.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMemberService.Delete">Delete</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, organizationUserID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMemberDeleteParams">ZoneMemberDeleteParams</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
-- <code title="post /zones/{zoneId}/members">client.Zones.Members.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMemberService.Add">Add</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, zoneID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMemberAddParams">ZoneMemberAddParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#ZoneMember">ZoneMember</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-
 ## Secrets
 
 Params Types:
@@ -289,18 +271,11 @@ Methods:
 
 # Organizations
 
-Params Types:
-
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#RoleScope">RoleScope</a>
-
 Response Types:
 
 - <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Organization">Organization</a>
 - <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#PageInfoCursor">PageInfoCursor</a>
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#RoleScope">RoleScope</a>
 - <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationListResponse">OrganizationListResponse</a>
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationListIdentitiesResponse">OrganizationListIdentitiesResponse</a>
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationListRolesResponse">OrganizationListRolesResponse</a>
 
 Methods:
 
@@ -308,29 +283,16 @@ Methods:
 - <code title="get /organizations/{organization_id}">client.Organizations.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, organizationID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationGetParams">OrganizationGetParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Organization">Organization</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="patch /organizations/{organization_id}">client.Organizations.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationService.Update">Update</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, organizationID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationUpdateParams">OrganizationUpdateParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Organization">Organization</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /organizations">client.Organizations.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationService.List">List</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationListParams">OrganizationListParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationListResponse">OrganizationListResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="get /organizations/{organization_id}/identities">client.Organizations.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationService.ListIdentities">ListIdentities</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, organizationID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationListIdentitiesParams">OrganizationListIdentitiesParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationListIdentitiesResponse">OrganizationListIdentitiesResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="get /organizations/{organization_id}/roles">client.Organizations.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationService.ListRoles">ListRoles</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, organizationID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationListRolesParams">OrganizationListRolesParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationListRolesResponse">OrganizationListRolesResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 ## Users
 
 Params Types:
 
 - <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationRole">OrganizationRole</a>
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationStatus">OrganizationStatus</a>
 
 Response Types:
 
 - <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationRole">OrganizationRole</a>
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationStatus">OrganizationStatus</a>
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationUser">OrganizationUser</a>
-- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationUserListResponse">OrganizationUserListResponse</a>
-
-Methods:
-
-- <code title="get /organizations/{organization_id}/users/{user_id}">client.Organizations.Users.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationUserService.Get">Get</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, userID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationUserGetParams">OrganizationUserGetParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationUser">OrganizationUser</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="patch /organizations/{organization_id}/users/{user_id}">client.Organizations.Users.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationUserService.Update">Update</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, userID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationUserUpdateParams">OrganizationUserUpdateParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationUser">OrganizationUser</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="get /organizations/{organization_id}/users">client.Organizations.Users.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationUserService.List">List</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, organizationID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationUserListParams">OrganizationUserListParams</a>) (\*<a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationUserListResponse">OrganizationUserListResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="delete /organizations/{organization_id}/users/{user_id}">client.Organizations.Users.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationUserService.Delete">Delete</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, userID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#OrganizationUserDeleteParams">OrganizationUserDeleteParams</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
 
 ## Invitations
 
