@@ -487,7 +487,14 @@ type ZoneSecretListParams struct {
 	// The entity to list all secrets for
 	EntityID         param.Opt[string] `query:"entity_id,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// The type of secrets to list
+	// Filter by secret ownership. Services can select either owner type; other
+	// principals can select only customer-owned secrets. If omitted, services see both
+	// owner types and other principals see customer-owned secrets. Requires type=token
+	// or type=password when specified.
+	//
+	// Any of "platform", "customer".
+	OwnerType ZoneSecretListParamsOwnerType `query:"owner_type,omitzero" json:"-"`
+	// The type of secrets to list. Required when owner_type is specified.
 	//
 	// Any of "token", "password".
 	Type ZoneSecretListParamsType `query:"type,omitzero" json:"-"`
@@ -502,7 +509,18 @@ func (r ZoneSecretListParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
-// The type of secrets to list
+// Filter by secret ownership. Services can select either owner type; other
+// principals can select only customer-owned secrets. If omitted, services see both
+// owner types and other principals see customer-owned secrets. Requires type=token
+// or type=password when specified.
+type ZoneSecretListParamsOwnerType string
+
+const (
+	ZoneSecretListParamsOwnerTypePlatform ZoneSecretListParamsOwnerType = "platform"
+	ZoneSecretListParamsOwnerTypeCustomer ZoneSecretListParamsOwnerType = "customer"
+)
+
+// The type of secrets to list. Required when owner_type is specified.
 type ZoneSecretListParamsType string
 
 const (
