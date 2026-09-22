@@ -48,39 +48,6 @@ func TestZoneUserGetWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestZoneUserUpdateWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := keycard.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithClientID("My Client ID"),
-		option.WithClientSecret("My Client Secret"),
-	)
-	_, err := client.Zones.Users.Update(
-		context.TODO(),
-		"id",
-		keycard.ZoneUserUpdateParams{
-			ZoneID:     "zoneId",
-			Identifier: keycard.String("x"),
-			Status:     keycard.ZoneUserUpdateParamsStatusActive,
-		},
-	)
-	if err != nil {
-		var apierr *keycard.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
 func TestZoneUserListWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
@@ -129,37 +96,6 @@ func TestZoneUserListWithOptionalParams(t *testing.T) {
 			},
 			RoleSource: keycard.ZoneUserListParamsRoleSourceUser,
 			Sort:       keycard.String("-authenticated_at,\t\r\r \tauthenticated_at,\n\f\t\f\ncreated_at"),
-		},
-	)
-	if err != nil {
-		var apierr *keycard.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestZoneUserDelete(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := keycard.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithClientID("My Client ID"),
-		option.WithClientSecret("My Client Secret"),
-	)
-	err := client.Zones.Users.Delete(
-		context.TODO(),
-		"id",
-		keycard.ZoneUserDeleteParams{
-			ZoneID: "zoneId",
 		},
 	)
 	if err != nil {
