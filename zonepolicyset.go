@@ -44,8 +44,8 @@ func NewZonePolicySetService(opts ...option.RequestOption) (r ZonePolicySetServi
 	return
 }
 
-// Creates an unbound policy set. Use updatePolicySet to bind after creating a
-// version.
+// Creates an unbound policy set. Bind it by activating a policy set version or via
+// setPolicyBinding.
 func (r *ZonePolicySetService) New(ctx context.Context, zoneID string, params ZonePolicySetNewParams, opts ...option.RequestOption) (res *PolicySetWithBinding, err error) {
 	if !param.IsOmitted(params.XAPIVersion) {
 		opts = append(opts, option.WithHeader("X-API-Version", fmt.Sprintf("%v", params.XAPIVersion.Value)))
@@ -81,12 +81,12 @@ func (r *ZonePolicySetService) Get(ctx context.Context, policySetID string, para
 		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s/policy-sets/%s", url.PathEscape(params.ZoneID), url.PathEscape(policySetID))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
 	return res, err
 }
 
-// Update metadata or manage binding. Set active=true to bind, active=false to
-// unbind.
+// Update policy set metadata (name). Binding is managed by activating a policy set
+// version or via the policy-bindings API.
 func (r *ZonePolicySetService) Update(ctx context.Context, policySetID string, params ZonePolicySetUpdateParams, opts ...option.RequestOption) (res *PolicySetWithBinding, err error) {
 	if !param.IsOmitted(params.IfMatch) {
 		opts = append(opts, option.WithHeader("If-Match", fmt.Sprintf("%v", params.IfMatch.Value)))
@@ -259,10 +259,16 @@ type PolicySet struct {
 	UpdatedAt  time.Time           `json:"updated_at" api:"required" format:"date-time"`
 	ZoneID     string              `json:"zone_id" api:"required"`
 	ArchivedAt time.Time           `json:"archived_at" api:"nullable" format:"date-time"`
+	// The organization user behind a `created_by`, `updated_by` or `archived_by`
+	// value. Returned only when `expand[]=user` is requested.
+	CreatedByUser PolicySetCreatedByUser `json:"created_by_user"`
 	// Human-readable version number of the latest version (e.g., 1, 2, 3)
 	LatestVersion   int64  `json:"latest_version" api:"nullable"`
 	LatestVersionID string `json:"latest_version_id" api:"nullable"`
 	UpdatedBy       string `json:"updated_by" api:"nullable"`
+	// The organization user behind a `created_by`, `updated_by` or `archived_by`
+	// value. Returned only when `expand[]=user` is requested.
+	UpdatedByUser PolicySetUpdatedByUser `json:"updated_by_user"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID              respjson.Field
@@ -275,9 +281,11 @@ type PolicySet struct {
 		UpdatedAt       respjson.Field
 		ZoneID          respjson.Field
 		ArchivedAt      respjson.Field
+		CreatedByUser   respjson.Field
 		LatestVersion   respjson.Field
 		LatestVersionID respjson.Field
 		UpdatedBy       respjson.Field
+		UpdatedByUser   respjson.Field
 		ExtraFields     map[string]respjson.Field
 		raw             string
 	} `json:"-"`
@@ -323,6 +331,60 @@ const (
 	PolicySetTargetTypeZone PolicySetTargetType = "zone"
 	PolicySetTargetTypeUser PolicySetTargetType = "user"
 )
+
+// The organization user behind a `created_by`, `updated_by` or `archived_by`
+// value. Returned only when `expand[]=user` is requested.
+type PolicySetCreatedByUser struct {
+	// Public ID of the user in the organization's platform zone. This is not the same
+	// value as the `*_by` field it expands; use it to link to
+	// `/zones/{zone_id}/users/{id}`.
+	ID string `json:"id" api:"required"`
+	// The user's email address, or null when not known.
+	Email string `json:"email" api:"required"`
+	// Public ID of the organization's platform zone the user belongs to.
+	ZoneID string `json:"zone_id" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Email       respjson.Field
+		ZoneID      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PolicySetCreatedByUser) RawJSON() string { return r.JSON.raw }
+func (r *PolicySetCreatedByUser) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The organization user behind a `created_by`, `updated_by` or `archived_by`
+// value. Returned only when `expand[]=user` is requested.
+type PolicySetUpdatedByUser struct {
+	// Public ID of the user in the organization's platform zone. This is not the same
+	// value as the `*_by` field it expands; use it to link to
+	// `/zones/{zone_id}/users/{id}`.
+	ID string `json:"id" api:"required"`
+	// The user's email address, or null when not known.
+	Email string `json:"email" api:"required"`
+	// Public ID of the organization's platform zone the user belongs to.
+	ZoneID string `json:"zone_id" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Email       respjson.Field
+		ZoneID      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PolicySetUpdatedByUser) RawJSON() string { return r.JSON.raw }
+func (r *PolicySetUpdatedByUser) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type PolicySetManifest struct {
 	Entries []PolicySetManifestEntry `json:"entries" api:"required"`
@@ -548,7 +610,19 @@ type ZonePolicySetGetParams struct {
 	ZoneID           string            `path:"zone_id" api:"required" json:"-"`
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
+	// Opt-in to additional response fields on a single resource (`user`). Repeatable.
+	//
+	// Any of "user".
+	Expand []string `query:"expand,omitzero" json:"-"`
 	paramObj
+}
+
+// URLQuery serializes [ZonePolicySetGetParams]'s query parameters as `url.Values`.
+func (r ZonePolicySetGetParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
 }
 
 type ZonePolicySetUpdateParams struct {
@@ -598,7 +672,7 @@ type ZonePolicySetListParams struct {
 	// supplying both `expand` and `expand[]` with disagreeing values returns
 	// `400 Bad Request`.
 	//
-	// Any of "total_count".
+	// Any of "total_count", "user".
 	Expand []string `query:"expand,omitzero" json:"-"`
 	// Filter on `owner_type`. Repeatable; repeated instances OR across values (e.g.
 	// `?filter[owner_type]=platform&filter[owner_type]=customer` matches either). See
