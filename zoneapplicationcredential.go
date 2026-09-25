@@ -85,8 +85,9 @@ func (r *ZoneApplicationCredentialService) Update(ctx context.Context, id string
 
 // Returns a paginated list of application credentials in the specified zone. Use
 // cursor pagination via `after`/`before`. Use `expand[]=total_count` to include
-// the matching row count. Search by identifier via `query[identifier]` (substring
-// match, OR'd across repeated values).
+// the matching row count. Search via `query[identifier]`, `query[provider_name]`,
+// or `query[]` (identifier or provider name); all are substring matches, OR'd
+// across repeated values.
 func (r *ZoneApplicationCredentialService) List(ctx context.Context, zoneID string, query ZoneApplicationCredentialListParams, opts ...option.RequestOption) (res *ZoneApplicationCredentialListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
