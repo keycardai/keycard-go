@@ -148,6 +148,7 @@ func TestZoneSecretListWithOptionalParams(t *testing.T) {
 		"x",
 		keycard.ZoneSecretListParams{
 			EntityID:         keycard.String("entity_id"),
+			OwnerType:        keycard.ZoneSecretListParamsOwnerTypePlatform,
 			Type:             keycard.ZoneSecretListParamsTypeToken,
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
