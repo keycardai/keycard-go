@@ -58,14 +58,7 @@ func (r *ZoneUserService) Get(ctx context.Context, id string, params ZoneUserGet
 	return res, err
 }
 
-// Returns a list of users in the specified zone.
-//
-// Note: cursor pagination, search, and sort are not yet enabled for all zones.
-// Where they are not enabled, the response returns all users in the zone (capped
-// at 100) in `items`, with `after_cursor` and `before_cursor` set to `null` and
-// `total_count` of `0`; `filter[email]` and `filter[identifier]` are still
-// applied, while the pagination, search, and sort parameters below are accepted
-// but ignored.
+// Returns a paginated list of users in the specified zone.
 //
 // Use cursor pagination via `after`/`before`. Sort: comma-separated field list;
 // prefix with `-` for descending. Use `expand[]=total_count` to include the
@@ -79,13 +72,20 @@ func (r *ZoneUserService) Get(ctx context.Context, id string, params ZoneUserGet
 // to additionally inline the full identity provider on each federation credential.
 // Filter by exact email via `filter[email]` and by exact identifier via
 // `filter[identifier]`; restrict to members of a group via `filter[groups]`
-// (repeatable, OR'd across values); search via `query[email]` / `query[subject]` /
-// `query[]` (substring match, OR'd across repeated values). `query[]` matches
-// against email and federation credential subject. Pass `filter[id]` (repeatable,
-// max 100) to restrict results to a known set of users — mutually exclusive with
-// `after`/`before` (returns 400 if combined). When `filter[id]` is set, `limit` is
-// ignored and the response contains every requested user that exists in the zone,
-// in a single page. IDs not in the zone are silently omitted.
+// (repeatable, OR'd across values); restrict to users directly granted a role via
+// `filter[role]` (role identifier, repeatable up to 100, OR'd across values;
+// group-inherited grants do not match); pass `filter[external]=false` for only
+// users managed in Keycard or `filter[external]=true` for only users provisioned
+// by an external directory (omit to list both); match exactly on the user's
+// `subject` and `issuer` via `filter[subject]` and `filter[issuer]` (each
+// repeatable and OR'd across values; AND'd with each other); search via
+// `query[email]` / `query[subject]` / `query[]` (substring match, OR'd across
+// repeated values). `query[]` matches against email and the user's `subject`. Pass
+// `filter[id]` (repeatable, max 100) to restrict results to a known set of users —
+// mutually exclusive with `after`/`before` (returns 400 if combined). When
+// `filter[id]` is set, `limit` is ignored and the response contains every
+// requested user that exists in the zone, in a single page. IDs not in the zone
+// are silently omitted.
 func (r *ZoneUserService) List(ctx context.Context, zoneID string, query ZoneUserListParams, opts ...option.RequestOption) (res *ZoneUserListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -107,6 +107,10 @@ type User struct {
 	Email string `json:"email" api:"required" format:"email"`
 	// Whether the email address has been verified
 	EmailVerified bool `json:"email_verified" api:"required"`
+	// Whether the user is synced from an external directory over SCIM. When true the
+	// user is directory-owned: `status` cannot be changed and the user cannot be
+	// deleted through this API while the zone has `external_sync_enabled` set.
+	External bool `json:"external" api:"required"`
 	// Zone-scoped user identifier. Defaults to the user's Keycard ID. When the
 	// provider has user_identifier_claim configured, the value is set from that claim
 	// at user creation time.
@@ -152,6 +156,7 @@ type User struct {
 		CreatedAt       respjson.Field
 		Email           respjson.Field
 		EmailVerified   respjson.Field
+		External        respjson.Field
 		Identifier      respjson.Field
 		OrganizationID  respjson.Field
 		Status          respjson.Field
@@ -298,17 +303,26 @@ func (r *UserCredentialUserCredentialPassword) UnmarshalJSON(data []byte) error 
 type UserGroup struct {
 	// Unique identifier of the group
 	ID string `json:"id" api:"required"`
+	// Whether the group is synced from an external directory. When true the group is
+	// directory-owned and its membership is read-only; when false it is managed in
+	// Keycard.
+	External bool `json:"external" api:"required"`
+	// Issuer of the external directory the group was synced from. `null` for groups
+	// managed in Keycard. Read-only: set by external sync, never by the caller.
+	ExternalIssuer string `json:"external_issuer" api:"required"`
 	// Zone-unique slug that policy rules match on.
 	Identifier string `json:"identifier" api:"required"`
 	// Human-readable group name
 	Name string `json:"name" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          respjson.Field
-		Identifier  respjson.Field
-		Name        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		ID             respjson.Field
+		External       respjson.Field
+		ExternalIssuer respjson.Field
+		Identifier     respjson.Field
+		Name           respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
 	} `json:"-"`
 }
 
@@ -482,6 +496,9 @@ type ZoneUserListParams struct {
 	After param.Opt[string] `query:"after,omitzero" json:"-"`
 	// Cursor for backward pagination
 	Before param.Opt[string] `query:"before,omitzero" json:"-"`
+	// Filter by source: `false` for users managed in Keycard, `true` for users
+	// provisioned by an external directory. Omit to list both.
+	FilterExternal param.Opt[bool] `query:"filter[external],omitzero" json:"-"`
 	// Maximum number of items to return
 	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Comma-separated sort fields. Prefix with - for descending. Allowed: created_at,
@@ -497,11 +514,18 @@ type ZoneUserListParams struct {
 	FilterID ZoneUserListParamsFilterIDUnion `query:"filter[id],omitzero" json:"-"`
 	// Filter by exact user identifier
 	FilterIdentifier ZoneUserListParamsFilterIdentifierUnion `query:"filter[identifier],omitzero" json:"-"`
-	// Search across email and credential subject (substring match)
+	// Filter by exact `issuer`. Repeatable; OR'd across values.
+	FilterIssuer ZoneUserListParamsFilterIssuerUnion `query:"filter[issuer],omitzero" json:"-"`
+	// Restrict to users directly granted this role (by role identifier). Repeatable,
+	// max 100; OR'd across values. Group-inherited grants do not match.
+	FilterRole ZoneUserListParamsFilterRoleUnion `query:"filter[role],omitzero" json:"-"`
+	// Filter by exact `subject`. Repeatable; OR'd across values.
+	FilterSubject ZoneUserListParamsFilterSubjectUnion `query:"filter[subject],omitzero" json:"-"`
+	// Search across email and the user's `subject` (substring match)
 	Query ZoneUserListParamsQueryUnion `query:"query[],omitzero" json:"-"`
 	// Search by email (substring match)
 	QueryEmail ZoneUserListParamsQueryEmailUnion `query:"query[email],omitzero" json:"-"`
-	// Search by federated credential subject (substring match)
+	// Search by the user's `subject` (substring match)
 	QuerySubject ZoneUserListParamsQuerySubjectUnion `query:"query[subject],omitzero" json:"-"`
 	// Selects which grants `expand[]=role-assignments` returns, tagging each with
 	// `source`: `user` (direct only, the default), `group` (group-inherited only), or
@@ -574,6 +598,33 @@ type ZoneUserListParamsFilterIDUnion struct {
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type ZoneUserListParamsFilterIdentifierUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneUserListParamsFilterIssuerUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneUserListParamsFilterRoleUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneUserListParamsFilterSubjectUnion struct {
 	OfString      param.Opt[string] `query:",omitzero,inline"`
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
