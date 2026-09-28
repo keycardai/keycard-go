@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.24.1](https://github.com/keycardai/keycard-go/compare/v0.24.0...v0.24.1) (2026-09-28)
+
+
+### Chores
+
+* **stainless:** refresh openapi.yml from api/openapi.yaml ([#42](https://github.com/keycardai/keycard-go/issues/42)) ([579c6ed](https://github.com/keycardai/keycard-go/commit/579c6ede41652bd9af608f37e99207d8dacc9c19))
+
 ## [0.24.0](https://github.com/keycardai/keycard-go/compare/v0.23.0...v0.24.0) (2026-09-22)
 
 
