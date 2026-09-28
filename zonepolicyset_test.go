@@ -32,7 +32,19 @@ func TestZonePolicySetNewWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"zone_id",
 		keycard.ZonePolicySetNewParams{
-			Name:             "name",
+			Name: "name",
+			Manifest: keycard.ZonePolicySetNewParamsManifest{
+				Entries: []keycard.ZonePolicySetNewParamsManifestEntryUnion{{
+					OfZonePolicySetNewsManifestEntryPdpExistingPolicyEntry: &keycard.ZonePolicySetNewParamsManifestEntryPdpExistingPolicyEntry{
+						PolicyID:        "policy_id",
+						CedarJson:       map[string]any{},
+						CedarRaw:        keycard.String("cedar_raw"),
+						PolicyVersionID: keycard.String("policy_version_id"),
+					},
+				}},
+				Activate:      keycard.Bool(true),
+				SchemaVersion: keycard.String("schema_version"),
+			},
 			ScopeType:        keycard.ZonePolicySetNewParamsScopeTypeZone,
 			TargetType:       keycard.ZonePolicySetNewParamsTargetTypeZone,
 			XAPIVersion:      keycard.String("X-API-Version"),
