@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.24.0](https://github.com/keycardai/keycard-go/compare/v0.23.0...v0.24.0) (2026-09-22)
+
+
+### Features
+
+* Sync current openapi state of all repos ([#39](https://github.com/keycardai/keycard-go/issues/39)) ([b5f835f](https://github.com/keycardai/keycard-go/commit/b5f835ffb1fda2371bab17f26648c2b1ae900aa6))
+
 ## 0.23.0 (2026-08-26)
 
 Full Changelog: [v0.22.0...v0.23.0](https://github.com/keycardai/keycard-go/compare/v0.22.0...v0.23.0)
