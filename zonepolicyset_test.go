@@ -68,6 +68,7 @@ func TestZonePolicySetGetWithOptionalParams(t *testing.T) {
 		"policy_set_id",
 		keycard.ZonePolicySetGetParams{
 			ZoneID:           "zone_id",
+			Expand:           []string{"user"},
 			XAPIVersion:      keycard.String("X-API-Version"),
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
