@@ -282,18 +282,32 @@ type ZoneResourceListParams struct {
 	// resource identifier.
 	Identifier param.Opt[string] `query:"identifier,omitzero" json:"-"`
 	// Maximum number of items to return
-	Limit  param.Opt[int64]                  `query:"limit,omitzero" json:"-"`
-	Slug   param.Opt[string]                 `query:"slug,omitzero" json:"-"`
+	Limit param.Opt[int64]  `query:"limit,omitzero" json:"-"`
+	Slug  param.Opt[string] `query:"slug,omitzero" json:"-"`
+	// Comma-separated sort fields. Prefix with - for descending. Allowed: created_at,
+	// name, identifier
+	Sort   param.Opt[string]                 `query:"sort,omitzero" json:"-"`
 	Expand ZoneResourceListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Restrict results to resources with this publicId. Repeatable, max 100. Mutually
+	// exclusive with after/before.
+	FilterID ZoneResourceListParamsFilterIDUnion `query:"filter[id],omitzero" json:"-"`
 	// Filter by exact resource identifier
 	FilterIdentifier ZoneResourceListParamsFilterIdentifierUnion `query:"filter[identifier],omitzero" json:"-"`
 	// Filter by owner type: `platform` (Keycard-managed) or `customer` (org-created).
 	//
 	// Any of "platform", "customer".
 	FilterOwnerType ZoneResourceListParamsFilterOwnerType `query:"filter[owner_type],omitzero" json:"-"`
+	// Filter by exact resource slug
+	FilterSlug ZoneResourceListParamsFilterSlugUnion `query:"filter[slug],omitzero" json:"-"`
 	// Filter by trait. Comma-separated values (`a,b`) are AND'd; repeated params are
 	// OR'd.
 	FilterTraits ZoneResourceListParamsFilterTraitsUnion `query:"filter[traits],omitzero" json:"-"`
+	// Search across name and identifier (substring match)
+	Query ZoneResourceListParamsQueryUnion `query:"query[],omitzero" json:"-"`
+	// Search by identifier (substring match)
+	QueryIdentifier ZoneResourceListParamsQueryIdentifierUnion `query:"query[identifier],omitzero" json:"-"`
+	// Search by name (substring match)
+	QueryName ZoneResourceListParamsQueryNameUnion `query:"query[name],omitzero" json:"-"`
 	paramObj
 }
 
@@ -325,6 +339,15 @@ const (
 // Only one field can be non-zero.
 //
 // Use [param.IsOmitted] to confirm if a field is set.
+type ZoneResourceListParamsFilterIDUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
 type ZoneResourceListParamsFilterIdentifierUnion struct {
 	OfString      param.Opt[string] `query:",omitzero,inline"`
 	OfStringArray []string          `query:",omitzero,inline"`
@@ -342,7 +365,43 @@ const (
 // Only one field can be non-zero.
 //
 // Use [param.IsOmitted] to confirm if a field is set.
+type ZoneResourceListParamsFilterSlugUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
 type ZoneResourceListParamsFilterTraitsUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneResourceListParamsQueryUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneResourceListParamsQueryIdentifierUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneResourceListParamsQueryNameUnion struct {
 	OfString      param.Opt[string] `query:",omitzero,inline"`
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
