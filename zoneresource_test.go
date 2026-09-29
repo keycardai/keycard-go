@@ -156,6 +156,9 @@ func TestZoneResourceListWithOptionalParams(t *testing.T) {
 			Expand: keycard.ZoneResourceListParamsExpandUnion{
 				OfZoneResourceListsExpandString: keycard.String("total_count"),
 			},
+			FilterDependencyOfApplicationIDNe: keycard.ZoneResourceListParamsFilterDependencyOfApplicationIDNeUnion{
+				OfString: keycard.String("string"),
+			},
 			FilterID: keycard.ZoneResourceListParamsFilterIDUnion{
 				OfString: keycard.String("string"),
 			},

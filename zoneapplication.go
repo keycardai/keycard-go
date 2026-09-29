@@ -797,7 +797,6 @@ type ZoneApplicationListCredentialsParams struct {
 	After param.Opt[string] `query:"after,omitzero" json:"-"`
 	// Cursor for backward pagination
 	Before param.Opt[string] `query:"before,omitzero" json:"-"`
-	Cursor param.Opt[string] `query:"cursor,omitzero" json:"-"`
 	// Maximum number of items to return
 	Limit  param.Opt[int64]                                `query:"limit,omitzero" json:"-"`
 	Expand ZoneApplicationListCredentialsParamsExpandUnion `query:"expand[],omitzero" json:"-"`

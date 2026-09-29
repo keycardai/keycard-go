@@ -288,6 +288,9 @@ type ZoneResourceListParams struct {
 	// name, identifier
 	Sort   param.Opt[string]                 `query:"sort,omitzero" json:"-"`
 	Expand ZoneResourceListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Resources that are not a dependency of this application. Repeatable (none of),
+	// max 100.
+	FilterDependencyOfApplicationIDNe ZoneResourceListParamsFilterDependencyOfApplicationIDNeUnion `query:"filter[dependency_of_application_id][ne],omitzero" json:"-"`
 	// Restrict results to resources with this publicId. Repeatable, max 100. Mutually
 	// exclusive with after/before.
 	FilterID ZoneResourceListParamsFilterIDUnion `query:"filter[id],omitzero" json:"-"`
@@ -335,6 +338,15 @@ type ZoneResourceListParamsExpandString string
 const (
 	ZoneResourceListParamsExpandStringTotalCount ZoneResourceListParamsExpandString = "total_count"
 )
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneResourceListParamsFilterDependencyOfApplicationIDNeUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
 
 // Only one field can be non-zero.
 //
