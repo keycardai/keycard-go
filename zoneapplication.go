@@ -669,6 +669,15 @@ type ZoneApplicationListParams struct {
 	FilterID ZoneApplicationListParamsFilterIDUnion `query:"filter[id],omitzero" json:"-"`
 	// Filter by exact application identifier
 	FilterIdentifier ZoneApplicationListParamsFilterIdentifierUnion `query:"filter[identifier],omitzero" json:"-"`
+	// Filter by owner type: `platform` (Keycard-managed) or `customer` (org-created).
+	//
+	// Any of "platform", "customer".
+	FilterOwnerType ZoneApplicationListParamsFilterOwnerType `query:"filter[owner_type],omitzero" json:"-"`
+	// Exclude applications with this owner type, e.g.
+	// `filter[owner_type][ne]=platform` returns only org-created applications.
+	//
+	// Any of "platform", "customer".
+	FilterOwnerTypeNe ZoneApplicationListParamsFilterOwnerTypeNe `query:"filter[owner_type][ne],omitzero" json:"-"`
 	// Filter by exact application slug
 	FilterSlug ZoneApplicationListParamsFilterSlugUnion `query:"filter[slug],omitzero" json:"-"`
 	// Search across name and identifier (substring match)
@@ -724,6 +733,23 @@ type ZoneApplicationListParamsFilterIdentifierUnion struct {
 	paramUnion
 }
 
+// Filter by owner type: `platform` (Keycard-managed) or `customer` (org-created).
+type ZoneApplicationListParamsFilterOwnerType string
+
+const (
+	ZoneApplicationListParamsFilterOwnerTypePlatform ZoneApplicationListParamsFilterOwnerType = "platform"
+	ZoneApplicationListParamsFilterOwnerTypeCustomer ZoneApplicationListParamsFilterOwnerType = "customer"
+)
+
+// Exclude applications with this owner type, e.g.
+// `filter[owner_type][ne]=platform` returns only org-created applications.
+type ZoneApplicationListParamsFilterOwnerTypeNe string
+
+const (
+	ZoneApplicationListParamsFilterOwnerTypeNePlatform ZoneApplicationListParamsFilterOwnerTypeNe = "platform"
+	ZoneApplicationListParamsFilterOwnerTypeNeCustomer ZoneApplicationListParamsFilterOwnerTypeNe = "customer"
+)
+
 // Only one field can be non-zero.
 //
 // Use [param.IsOmitted] to confirm if a field is set.
@@ -771,7 +797,6 @@ type ZoneApplicationListCredentialsParams struct {
 	After param.Opt[string] `query:"after,omitzero" json:"-"`
 	// Cursor for backward pagination
 	Before param.Opt[string] `query:"before,omitzero" json:"-"`
-	Cursor param.Opt[string] `query:"cursor,omitzero" json:"-"`
 	// Maximum number of items to return
 	Limit  param.Opt[int64]                                `query:"limit,omitzero" json:"-"`
 	Expand ZoneApplicationListCredentialsParamsExpandUnion `query:"expand[],omitzero" json:"-"`
