@@ -121,7 +121,10 @@ func (r *ZoneService) Update(ctx context.Context, zoneID string, body ZoneUpdate
 	return res, err
 }
 
-// Returns a list of zones for the authenticated organization
+// Returns a list of zones for the authenticated organization. Cursor pagination
+// via `after`/`before` and `limit`, plus `expand[]=total_count`, name substring
+// search, and `sort`, are honored only when the `zone-pagination` flag is enabled;
+// the default response is the unbounded legacy shape.
 func (r *ZoneService) List(ctx context.Context, query ZoneListParams, opts ...option.RequestOption) (res *ZoneListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "zones"
@@ -233,6 +236,9 @@ type Zone struct {
 	ID string `json:"id" api:"required"`
 	// Entity creation timestamp
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
+	// Whether external directory sync (SCIM) is enabled for this zone. Required to
+	// create external sync tokens.
+	ExternalSyncEnabled bool `json:"external_sync_enabled" api:"required"`
 	// Human-readable name
 	Name string `json:"name" api:"required"`
 	// Organization that owns this zone
@@ -269,6 +275,7 @@ type Zone struct {
 	JSON struct {
 		ID                             respjson.Field
 		CreatedAt                      respjson.Field
+		ExternalSyncEnabled            respjson.Field
 		Name                           respjson.Field
 		OrganizationID                 respjson.Field
 		OwnerType                      respjson.Field
@@ -417,6 +424,8 @@ func (r *ZoneProtocolsOpenid) UnmarshalJSON(data []byte) error {
 type ZoneListResponse struct {
 	Items []Zone `json:"items" api:"required"`
 	// Pagination information
+	//
+	// Deprecated: deprecated
 	PageInfo PageInfoPagination `json:"page_info" api:"required"`
 	// Cursor-based pagination metadata
 	Pagination ZoneListResponsePagination `json:"pagination" api:"required"`
@@ -591,6 +600,9 @@ type ZoneUpdateParams struct {
 	Description param.Opt[string] `json:"description,omitzero" format:"safe-text"`
 	// Provider ID to configure for user login (set to null to unset)
 	UserIdentityProviderID param.Opt[string] `json:"user_identity_provider_id,omitzero"`
+	// Turns external directory sync (SCIM) on or off for this zone. Required to create
+	// external sync tokens.
+	ExternalSyncEnabled param.Opt[bool] `json:"external_sync_enabled,omitzero"`
 	// Human-readable name. Must not contain HTML tags (e.g. `<script>`, `<div>`) or
 	// control characters.
 	Name param.Opt[string] `json:"name,omitzero" format:"safe-text"`
