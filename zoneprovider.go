@@ -83,9 +83,18 @@ func (r *ZoneProviderService) Update(ctx context.Context, id string, params Zone
 	return res, err
 }
 
-// Returns a list of providers in the specified zone. Pass `filter[id]`
-// (repeatable, max 100) to restrict results to a known set of provider IDs;
-// unknown or malformed IDs are silently omitted.
+// Returns a paginated list of providers in the specified zone. Use cursor
+// pagination via `after`/`before`. Sort: comma-separated field list; prefix with
+// `-` for descending. Use `expand[]=total_count` to include the matching row
+// count. Filter by exact slug via `filter[slug]`, exact identifier via
+// `filter[identifier]` and provider type via `filter[type]`. Search via
+// `query[name]` / `query[identifier]` / `query[]` (substring match, OR'd across
+// repeated values). `query[]` matches against name and identifier. Pass
+// `filter[id]` (repeatable, max 100) to restrict results to a known set of
+// provider IDs — mutually exclusive with `after`/`before` (returns 400 if
+// combined). When `filter[id]` is set, `limit` is ignored and the response
+// contains every requested provider that exists in the zone, in a single page.
+// Unknown or malformed IDs are silently omitted.
 func (r *ZoneProviderService) List(ctx context.Context, zoneID string, query ZoneProviderListParams, opts ...option.RequestOption) (res *ZoneProviderListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -279,10 +288,6 @@ func (r *ProviderProtocolsOauth2) UnmarshalJSON(data []byte) error {
 
 // OpenID Connect protocol configuration
 type ProviderProtocolsOpenid struct {
-	// Name of the OIDC claim carrying the stable external id used to correlate logins
-	// with externally provisioned (SCIM) users. Defaults to "sub". Set to "oid" for
-	// Entra, whose pairwise "sub" differs from the SCIM externalId.
-	ExternalIDClaim string `json:"external_id_claim" api:"nullable"`
 	// Additional OIDC scopes to request from this provider during authentication (e.g.
 	// "groups"). Merged with the default scopes (openid, profile, email).
 	Scopes []string `json:"scopes" api:"nullable"`
@@ -295,7 +300,6 @@ type ProviderProtocolsOpenid struct {
 	UserinfoEndpoint    string `json:"userinfo_endpoint" api:"nullable" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ExternalIDClaim     respjson.Field
 		Scopes              respjson.Field
 		SingleLogoutEnabled respjson.Field
 		UserIdentifierClaim respjson.Field
@@ -322,6 +326,8 @@ const (
 type ZoneProviderListResponse struct {
 	Items []Provider `json:"items" api:"required"`
 	// Pagination information
+	//
+	// Deprecated: deprecated
 	PageInfo PageInfoPagination `json:"page_info" api:"required"`
 	// Cursor-based pagination metadata
 	Pagination ZoneProviderListResponsePagination `json:"pagination" api:"required"`
@@ -468,10 +474,6 @@ func (r *ZoneProviderNewParamsProtocolsOauth2) UnmarshalJSON(data []byte) error 
 
 // OpenID Connect protocol configuration for provider creation
 type ZoneProviderNewParamsProtocolsOpenid struct {
-	// Name of the OIDC claim carrying the stable external id used to correlate logins
-	// with externally provisioned (SCIM) users. Defaults to "sub". Set to "oid" for
-	// Entra, whose pairwise "sub" differs from the SCIM externalId.
-	ExternalIDClaim param.Opt[string] `json:"external_id_claim,omitzero"`
 	// When true, logging out of the zone propagates the logout to this provider's
 	// end_session_endpoint (RP-initiated logout). Defaults to false.
 	SingleLogoutEnabled param.Opt[bool] `json:"single_logout_enabled,omitzero"`
@@ -602,11 +604,6 @@ func (r *ZoneProviderUpdateParamsProtocolsOauth2) UnmarshalJSON(data []byte) err
 
 // OpenID Connect protocol configuration. Set to null to remove all OpenID config.
 type ZoneProviderUpdateParamsProtocolsOpenid struct {
-	// Name of the OIDC claim carrying the stable external id used to correlate logins
-	// with externally provisioned (SCIM) users. Defaults to "sub". Set to "oid" for
-	// Entra, whose pairwise "sub" differs from the SCIM externalId. Set to null to
-	// revert to default.
-	ExternalIDClaim param.Opt[string] `json:"external_id_claim,omitzero"`
 	// When true, logging out of the zone propagates the logout to this provider's
 	// end_session_endpoint (RP-initiated logout). Defaults to false.
 	SingleLogoutEnabled param.Opt[bool] `json:"single_logout_enabled,omitzero"`
@@ -638,11 +635,27 @@ type ZoneProviderListParams struct {
 	Cursor     param.Opt[string] `query:"cursor,omitzero" json:"-"`
 	Identifier param.Opt[string] `query:"identifier,omitzero" json:"-"`
 	// Maximum number of items to return
-	Limit  param.Opt[int64]                  `query:"limit,omitzero" json:"-"`
-	Slug   param.Opt[string]                 `query:"slug,omitzero" json:"-"`
+	Limit param.Opt[int64]  `query:"limit,omitzero" json:"-"`
+	Slug  param.Opt[string] `query:"slug,omitzero" json:"-"`
+	// Comma-separated sort fields. Prefix with - for descending. Allowed: created_at,
+	// name, identifier
+	Sort   param.Opt[string]                 `query:"sort,omitzero" json:"-"`
 	Expand ZoneProviderListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
-	// Restrict results to providers with this ID. Repeatable, max 100.
+	// Restrict results to providers with this ID. Repeatable, max 100. Mutually
+	// exclusive with after/before.
 	FilterID ZoneProviderListParamsFilterIDUnion `query:"filter[id],omitzero" json:"-"`
+	// Filter by exact provider identifier
+	FilterIdentifier ZoneProviderListParamsFilterIdentifierUnion `query:"filter[identifier],omitzero" json:"-"`
+	// Filter by exact provider slug
+	FilterSlug ZoneProviderListParamsFilterSlugUnion `query:"filter[slug],omitzero" json:"-"`
+	// Filter by provider type
+	FilterType ZoneProviderListParamsFilterTypeUnion `query:"filter[type],omitzero" json:"-"`
+	// Search across name and identifier (substring match)
+	Query ZoneProviderListParamsQueryUnion `query:"query[],omitzero" json:"-"`
+	// Search by identifier (substring match)
+	QueryIdentifier ZoneProviderListParamsQueryIdentifierUnion `query:"query[identifier],omitzero" json:"-"`
+	// Search by name (substring match)
+	QueryName ZoneProviderListParamsQueryNameUnion `query:"query[name],omitzero" json:"-"`
 	// Any of "external", "keycard-vault", "keycard-sts".
 	Type ZoneProviderListParamsType `query:"type,omitzero" json:"-"`
 	paramObj
@@ -677,6 +690,71 @@ const (
 //
 // Use [param.IsOmitted] to confirm if a field is set.
 type ZoneProviderListParamsFilterIDUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneProviderListParamsFilterIdentifierUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneProviderListParamsFilterSlugUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneProviderListParamsFilterTypeUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneProviderListsFilterTypeString)
+	OfZoneProviderListsFilterTypeString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneProviderListsFilterTypeArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Filter by provider type
+type ZoneProviderListParamsFilterTypeString string
+
+const (
+	ZoneProviderListParamsFilterTypeStringExternal     ZoneProviderListParamsFilterTypeString = "external"
+	ZoneProviderListParamsFilterTypeStringKeycardVault ZoneProviderListParamsFilterTypeString = "keycard-vault"
+	ZoneProviderListParamsFilterTypeStringKeycardSts   ZoneProviderListParamsFilterTypeString = "keycard-sts"
+)
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneProviderListParamsQueryUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneProviderListParamsQueryIdentifierUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneProviderListParamsQueryNameUnion struct {
 	OfString      param.Opt[string] `query:",omitzero,inline"`
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
