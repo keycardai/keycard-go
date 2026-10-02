@@ -156,16 +156,32 @@ func TestZoneResourceListWithOptionalParams(t *testing.T) {
 			Expand: keycard.ZoneResourceListParamsExpandUnion{
 				OfZoneResourceListsExpandString: keycard.String("total_count"),
 			},
+			FilterID: keycard.ZoneResourceListParamsFilterIDUnion{
+				OfString: keycard.String("string"),
+			},
 			FilterIdentifier: keycard.ZoneResourceListParamsFilterIdentifierUnion{
 				OfString: keycard.String("string"),
 			},
 			FilterOwnerType: keycard.ZoneResourceListParamsFilterOwnerTypePlatform,
+			FilterSlug: keycard.ZoneResourceListParamsFilterSlugUnion{
+				OfString: keycard.String("string"),
+			},
 			FilterTraits: keycard.ZoneResourceListParamsFilterTraitsUnion{
 				OfString: keycard.String("string"),
 			},
 			Identifier: keycard.String("identifier"),
 			Limit:      keycard.Int(1),
-			Slug:       keycard.String("slug"),
+			Query: keycard.ZoneResourceListParamsQueryUnion{
+				OfString: keycard.String("x"),
+			},
+			QueryIdentifier: keycard.ZoneResourceListParamsQueryIdentifierUnion{
+				OfString: keycard.String("x"),
+			},
+			QueryName: keycard.ZoneResourceListParamsQueryNameUnion{
+				OfString: keycard.String("x"),
+			},
+			Slug: keycard.String("slug"),
+			Sort: keycard.String("-identifier,\t\r\r \tidentifier,\n\f\t\f\ncreated_at"),
 		},
 	)
 	if err != nil {
