@@ -97,44 +97,6 @@ func (r *OrganizationService) List(ctx context.Context, params OrganizationListP
 	return res, err
 }
 
-// List unified view of users and invitations in an organization
-func (r *OrganizationService) ListIdentities(ctx context.Context, organizationID string, params OrganizationListIdentitiesParams, opts ...option.RequestOption) (res *OrganizationListIdentitiesResponse, err error) {
-	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
-	}
-	opts = slices.Concat(r.Options, opts)
-	if organizationID == "" {
-		err = errors.New("missing required organization_id parameter")
-		return nil, err
-	}
-	path := fmt.Sprintf("organizations/%s/identities", url.PathEscape(organizationID))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return res, err
-}
-
-// Returns the list of available roles in the system for the organization. This
-// includes both organization-level roles (e.g., org_admin, org_member) and
-// zone-level roles (e.g., zone_manager, zone_viewer).
-//
-// Each role includes:
-//
-// - `name`: Internal identifier (e.g., org_admin, zone_manager)
-// - `label`: Human-readable display name (e.g., Organization Administrator)
-// - `scope`: Whether the role applies at organization or zone level
-func (r *OrganizationService) ListRoles(ctx context.Context, organizationID string, params OrganizationListRolesParams, opts ...option.RequestOption) (res *OrganizationListRolesResponse, err error) {
-	if !param.IsOmitted(params.XClientRequestID) {
-		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
-	}
-	opts = slices.Concat(r.Options, opts)
-	if organizationID == "" {
-		err = errors.New("missing required organization_id parameter")
-		return nil, err
-	}
-	path := fmt.Sprintf("organizations/%s/roles", url.PathEscape(organizationID))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return res, err
-}
-
 type Organization struct {
 	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
 	ID string `json:"id" api:"required"`
@@ -148,6 +110,9 @@ type Organization struct {
 	SSOEnabled bool `json:"sso_enabled" api:"required"`
 	// The time the entity was mostly recently updated in utc
 	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
+	// Identifier of the zone containing this organization's users and their
+	// permissions and roles in the organization.
+	ZoneID string `json:"zone_id" api:"required"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -161,6 +126,7 @@ type Organization struct {
 		Name        respjson.Field
 		SSOEnabled  respjson.Field
 		UpdatedAt   respjson.Field
+		ZoneID      respjson.Field
 		Permissions respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -200,17 +166,6 @@ func (r *PageInfoCursor) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// The scope at which a role can be assigned.
-//
-// - organization: Roles that apply at the organization level (e.g., org_admin)
-// - zone: Roles that apply at the zone level (e.g., zone_manager)
-type RoleScope string
-
-const (
-	RoleScopeOrganization RoleScope = "organization"
-	RoleScopeZone         RoleScope = "zone"
-)
-
 type OrganizationListResponse struct {
 	Items []Organization `json:"items" api:"required"`
 	// Pagination information using cursor-based pagination
@@ -233,178 +188,6 @@ type OrganizationListResponse struct {
 // Returns the unmodified JSON received from the API
 func (r OrganizationListResponse) RawJSON() string { return r.JSON.raw }
 func (r *OrganizationListResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// List of identities (users and invitations) in an organization
-type OrganizationListIdentitiesResponse struct {
-	Items []OrganizationListIdentitiesResponseItem `json:"items" api:"required"`
-	// Pagination information using cursor-based pagination
-	PageInfo PageInfoCursor `json:"page_info" api:"required"`
-	// Cursor-based pagination metadata returned alongside a list of results
-	Pagination OrganizationListIdentitiesResponsePagination `json:"pagination" api:"required"`
-	// Permissions granted to the authenticated principal for this resource. Only
-	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
-	// resource types (e.g., "organizations"), values are objects mapping permission
-	// names to boolean values indicating if the permission is granted.
-	Permissions map[string]map[string]bool `json:"permissions"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Items       respjson.Field
-		PageInfo    respjson.Field
-		Pagination  respjson.Field
-		Permissions respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrganizationListIdentitiesResponse) RawJSON() string { return r.JSON.raw }
-func (r *OrganizationListIdentitiesResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Unified view of users and invitations in an organization
-type OrganizationListIdentitiesResponseItem struct {
-	// The identity ID (user or invitation)
-	ID string `json:"id" api:"required"`
-	// The time the entity was created in utc
-	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
-	// Email address of the identity
-	Email string `json:"email" api:"required" format:"email"`
-	// Role in the organization
-	//
-	// Any of "org_admin", "org_member", "org_viewer".
-	Role OrganizationRole `json:"role" api:"required"`
-	// Identity provider issuer
-	Source string `json:"source" api:"required" format:"uri"`
-	// Status of the identity (OrganizationStatus for users, InvitationStatus for
-	// invitations)
-	//
-	// Any of "active", "disabled", "pending", "accepted", "expired", "revoked".
-	Status OrganizationListIdentitiesResponseItemStatus `json:"status" api:"required"`
-	// Type of identity (user or invitation)
-	//
-	// Any of "user", "invitation".
-	Type string `json:"type" api:"required"`
-	// The time the entity was mostly recently updated in utc
-	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
-	// Permissions granted to the authenticated principal for this resource. Only
-	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
-	// resource types (e.g., "organizations"), values are objects mapping permission
-	// names to boolean values indicating if the permission is granted.
-	Permissions map[string]map[string]bool `json:"permissions"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID          respjson.Field
-		CreatedAt   respjson.Field
-		Email       respjson.Field
-		Role        respjson.Field
-		Source      respjson.Field
-		Status      respjson.Field
-		Type        respjson.Field
-		UpdatedAt   respjson.Field
-		Permissions respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrganizationListIdentitiesResponseItem) RawJSON() string { return r.JSON.raw }
-func (r *OrganizationListIdentitiesResponseItem) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Status of the identity (OrganizationStatus for users, InvitationStatus for
-// invitations)
-type OrganizationListIdentitiesResponseItemStatus string
-
-const (
-	OrganizationListIdentitiesResponseItemStatusActive   OrganizationListIdentitiesResponseItemStatus = "active"
-	OrganizationListIdentitiesResponseItemStatusDisabled OrganizationListIdentitiesResponseItemStatus = "disabled"
-	OrganizationListIdentitiesResponseItemStatusPending  OrganizationListIdentitiesResponseItemStatus = "pending"
-	OrganizationListIdentitiesResponseItemStatusAccepted OrganizationListIdentitiesResponseItemStatus = "accepted"
-	OrganizationListIdentitiesResponseItemStatusExpired  OrganizationListIdentitiesResponseItemStatus = "expired"
-	OrganizationListIdentitiesResponseItemStatusRevoked  OrganizationListIdentitiesResponseItemStatus = "revoked"
-)
-
-// Cursor-based pagination metadata returned alongside a list of results
-type OrganizationListIdentitiesResponsePagination struct {
-	// An opaque cursor used for paginating through a list of results
-	AfterCursor string `json:"after_cursor" api:"required"`
-	// An opaque cursor used for paginating through a list of results
-	BeforeCursor string `json:"before_cursor" api:"required"`
-	// Total number of items across all pages. Only present when the request includes
-	// ?expand[]=total_count.
-	TotalCount int64 `json:"total_count"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		AfterCursor  respjson.Field
-		BeforeCursor respjson.Field
-		TotalCount   respjson.Field
-		ExtraFields  map[string]respjson.Field
-		raw          string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrganizationListIdentitiesResponsePagination) RawJSON() string { return r.JSON.raw }
-func (r *OrganizationListIdentitiesResponsePagination) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// List of available roles
-type OrganizationListRolesResponse struct {
-	// List of roles
-	Items []OrganizationListRolesResponseItem `json:"items" api:"required"`
-	// Permissions granted to the authenticated principal for this resource. Only
-	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
-	// resource types (e.g., "organizations"), values are objects mapping permission
-	// names to boolean values indicating if the permission is granted.
-	Permissions map[string]map[string]bool `json:"permissions"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Items       respjson.Field
-		Permissions respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrganizationListRolesResponse) RawJSON() string { return r.JSON.raw }
-func (r *OrganizationListRolesResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// A role definition that can be assigned to users
-type OrganizationListRolesResponseItem struct {
-	// Detailed description of the role and its permissions
-	Description string `json:"description" api:"required"`
-	// Human-readable display name for the role
-	Label string `json:"label" api:"required"`
-	// Internal identifier for the role (e.g., org_admin, zone_manager)
-	Name string `json:"name" api:"required"`
-	// The scope at which this role can be assigned (organization or zone)
-	//
-	// Any of "organization", "zone".
-	Scope RoleScope `json:"scope" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Description respjson.Field
-		Label       respjson.Field
-		Name        respjson.Field
-		Scope       respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r OrganizationListRolesResponseItem) RawJSON() string { return r.JSON.raw }
-func (r *OrganizationListRolesResponseItem) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -480,66 +263,6 @@ type OrganizationListParams struct {
 
 // URLQuery serializes [OrganizationListParams]'s query parameters as `url.Values`.
 func (r OrganizationListParams) URLQuery() (v url.Values, err error) {
-	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
-		NestedFormat: apiquery.NestedQueryFormatBrackets,
-	})
-}
-
-type OrganizationListIdentitiesParams struct {
-	// Cursor for forward pagination
-	After param.Opt[string] `query:"after,omitzero" json:"-"`
-	// Cursor for backward pagination
-	Before param.Opt[string] `query:"before,omitzero" json:"-"`
-	// Maximum number of identities to return
-	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
-	// Search identities by email substring (case-insensitive)
-	QueryEmail       param.Opt[string] `query:"query[email],omitzero" json:"-"`
-	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// Fields to expand in the response. Supports "permissions" to include the
-	// permissions field with the caller's permissions for the resource. For list
-	// organization identities only, "total_count" populates pagination.total_count
-	// with the number of identities matching the same filters as the list (excluding
-	// cursor and limit). Other operations ignore expand values they do not use.
-	//
-	// Any of "permissions", "total_count".
-	Expand []string `query:"expand,omitzero" json:"-"`
-	// Filter identities by role
-	//
-	// Any of "org_admin", "org_member", "org_viewer".
-	Role OrganizationRole `query:"role,omitzero" json:"-"`
-	paramObj
-}
-
-// URLQuery serializes [OrganizationListIdentitiesParams]'s query parameters as
-// `url.Values`.
-func (r OrganizationListIdentitiesParams) URLQuery() (v url.Values, err error) {
-	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
-		NestedFormat: apiquery.NestedQueryFormatBrackets,
-	})
-}
-
-type OrganizationListRolesParams struct {
-	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// Fields to expand in the response. Supports "permissions" to include the
-	// permissions field with the caller's permissions for the resource. For list
-	// organization identities only, "total_count" populates pagination.total_count
-	// with the number of identities matching the same filters as the list (excluding
-	// cursor and limit). Other operations ignore expand values they do not use.
-	//
-	// Any of "permissions", "total_count".
-	Expand []string `query:"expand,omitzero" json:"-"`
-	// Filter roles by scope (organization or zone level)
-	//
-	// Any of "organization", "zone".
-	Scope RoleScope `query:"scope,omitzero" json:"-"`
-	paramObj
-}
-
-// URLQuery serializes [OrganizationListRolesParams]'s query parameters as
-// `url.Values`.
-func (r OrganizationListRolesParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
