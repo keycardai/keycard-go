@@ -669,6 +669,15 @@ type ZoneApplicationListParams struct {
 	FilterID ZoneApplicationListParamsFilterIDUnion `query:"filter[id],omitzero" json:"-"`
 	// Filter by exact application identifier
 	FilterIdentifier ZoneApplicationListParamsFilterIdentifierUnion `query:"filter[identifier],omitzero" json:"-"`
+	// Filter by owner type: `platform` (Keycard-managed) or `customer` (org-created).
+	//
+	// Any of "platform", "customer".
+	FilterOwnerType ZoneApplicationListParamsFilterOwnerType `query:"filter[owner_type],omitzero" json:"-"`
+	// Exclude applications with this owner type, e.g.
+	// `filter[owner_type][ne]=platform` returns only org-created applications.
+	//
+	// Any of "platform", "customer".
+	FilterOwnerTypeNe ZoneApplicationListParamsFilterOwnerTypeNe `query:"filter[owner_type][ne],omitzero" json:"-"`
 	// Filter by exact application slug
 	FilterSlug ZoneApplicationListParamsFilterSlugUnion `query:"filter[slug],omitzero" json:"-"`
 	// Search across name and identifier (substring match)
@@ -723,6 +732,23 @@ type ZoneApplicationListParamsFilterIdentifierUnion struct {
 	OfStringArray []string          `query:",omitzero,inline"`
 	paramUnion
 }
+
+// Filter by owner type: `platform` (Keycard-managed) or `customer` (org-created).
+type ZoneApplicationListParamsFilterOwnerType string
+
+const (
+	ZoneApplicationListParamsFilterOwnerTypePlatform ZoneApplicationListParamsFilterOwnerType = "platform"
+	ZoneApplicationListParamsFilterOwnerTypeCustomer ZoneApplicationListParamsFilterOwnerType = "customer"
+)
+
+// Exclude applications with this owner type, e.g.
+// `filter[owner_type][ne]=platform` returns only org-created applications.
+type ZoneApplicationListParamsFilterOwnerTypeNe string
+
+const (
+	ZoneApplicationListParamsFilterOwnerTypeNePlatform ZoneApplicationListParamsFilterOwnerTypeNe = "platform"
+	ZoneApplicationListParamsFilterOwnerTypeNeCustomer ZoneApplicationListParamsFilterOwnerTypeNe = "customer"
+)
 
 // Only one field can be non-zero.
 //
