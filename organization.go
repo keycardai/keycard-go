@@ -169,7 +169,11 @@ func (r *PageInfoCursor) UnmarshalJSON(data []byte) error {
 type OrganizationListResponse struct {
 	Items []Organization `json:"items" api:"required"`
 	// Pagination information using cursor-based pagination
+	//
+	// Deprecated: deprecated
 	PageInfo PageInfoCursor `json:"page_info" api:"required"`
+	// Cursor-based pagination metadata returned alongside a list of results
+	Pagination OrganizationListResponsePagination `json:"pagination" api:"required"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -179,6 +183,7 @@ type OrganizationListResponse struct {
 	JSON struct {
 		Items       respjson.Field
 		PageInfo    respjson.Field
+		Pagination  respjson.Field
 		Permissions respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -188,6 +193,31 @@ type OrganizationListResponse struct {
 // Returns the unmodified JSON received from the API
 func (r OrganizationListResponse) RawJSON() string { return r.JSON.raw }
 func (r *OrganizationListResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Cursor-based pagination metadata returned alongside a list of results
+type OrganizationListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor" api:"required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor" api:"required"`
+	// Total number of items across all pages. Only present when the request includes
+	// ?expand[]=total_count.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrganizationListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *OrganizationListResponsePagination) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -209,13 +239,12 @@ func (r *OrganizationNewParams) UnmarshalJSON(data []byte) error {
 type OrganizationGetParams struct {
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Fields to expand in the response. Supports "permissions" to include the
-	// permissions field with the caller's permissions for the resource. For list
-	// organization identities only, "total_count" populates pagination.total_count
-	// with the number of identities matching the same filters as the list (excluding
-	// cursor and limit). Other operations ignore expand values they do not use.
-	//
-	// Any of "permissions", "total_count".
-	Expand []string `query:"expand,omitzero" json:"-"`
+	// permissions field with the caller's permissions for the resource. For the
+	// service account and service account credential list operations, "total_count"
+	// populates pagination.total_count with the number of items matching the same
+	// filters as the list (excluding cursor and limit). Other operations ignore expand
+	// values they do not use.
+	Expand OrganizationGetParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	paramObj
 }
 
@@ -226,6 +255,24 @@ func (r OrganizationGetParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type OrganizationGetParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfOrganizationGetsExpandString)
+	OfOrganizationGetsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfOrganizationGetsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type OrganizationGetParamsExpandString string
+
+const (
+	OrganizationGetParamsExpandStringPermissions OrganizationGetParamsExpandString = "permissions"
+	OrganizationGetParamsExpandStringTotalCount  OrganizationGetParamsExpandString = "total_count"
+)
 
 type OrganizationUpdateParams struct {
 	// Organization name
@@ -251,13 +298,12 @@ type OrganizationListParams struct {
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Fields to expand in the response. Supports "permissions" to include the
-	// permissions field with the caller's permissions for the resource. For list
-	// organization identities only, "total_count" populates pagination.total_count
-	// with the number of identities matching the same filters as the list (excluding
-	// cursor and limit). Other operations ignore expand values they do not use.
-	//
-	// Any of "permissions", "total_count".
-	Expand []string `query:"expand,omitzero" json:"-"`
+	// permissions field with the caller's permissions for the resource. For the
+	// service account and service account credential list operations, "total_count"
+	// populates pagination.total_count with the number of items matching the same
+	// filters as the list (excluding cursor and limit). Other operations ignore expand
+	// values they do not use.
+	Expand OrganizationListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	paramObj
 }
 
@@ -268,3 +314,21 @@ func (r OrganizationListParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type OrganizationListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfOrganizationListsExpandString)
+	OfOrganizationListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfOrganizationListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type OrganizationListParamsExpandString string
+
+const (
+	OrganizationListParamsExpandStringPermissions OrganizationListParamsExpandString = "permissions"
+	OrganizationListParamsExpandStringTotalCount  OrganizationListParamsExpandString = "total_count"
+)

@@ -65,9 +65,11 @@ func TestOrganizationInvitationListWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"x",
 		keycard.OrganizationInvitationListParams{
-			After:            keycard.String("x"),
-			Before:           keycard.String("x"),
-			Expand:           []string{"permissions"},
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Expand: keycard.OrganizationInvitationListParamsExpandUnion{
+				OfOrganizationInvitationListsExpandString: keycard.String("permissions"),
+			},
 			Limit:            keycard.Int(1),
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
