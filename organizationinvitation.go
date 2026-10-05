@@ -202,13 +202,12 @@ type OrganizationInvitationListParams struct {
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Fields to expand in the response. Supports "permissions" to include the
-	// permissions field with the caller's permissions for the resource. For list
-	// organization identities only, "total_count" populates pagination.total_count
-	// with the number of identities matching the same filters as the list (excluding
-	// cursor and limit). Other operations ignore expand values they do not use.
-	//
-	// Any of "permissions", "total_count".
-	Expand []string `query:"expand,omitzero" json:"-"`
+	// permissions field with the caller's permissions for the resource. For the
+	// service account and service account credential list operations, "total_count"
+	// populates pagination.total_count with the number of items matching the same
+	// filters as the list (excluding cursor and limit). Other operations ignore expand
+	// values they do not use.
+	Expand OrganizationInvitationListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	paramObj
 }
 
@@ -220,6 +219,24 @@ func (r OrganizationInvitationListParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type OrganizationInvitationListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfOrganizationInvitationListsExpandString)
+	OfOrganizationInvitationListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfOrganizationInvitationListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type OrganizationInvitationListParamsExpandString string
+
+const (
+	OrganizationInvitationListParamsExpandStringPermissions OrganizationInvitationListParamsExpandString = "permissions"
+	OrganizationInvitationListParamsExpandStringTotalCount  OrganizationInvitationListParamsExpandString = "total_count"
+)
 
 type OrganizationInvitationDeleteParams struct {
 	// Organization ID or label identifier
