@@ -75,6 +75,7 @@ func TestZoneUserListWithOptionalParams(t *testing.T) {
 			FilterEmail: keycard.ZoneUserListParamsFilterEmailUnion{
 				OfString: keycard.String("dev@stainless.com"),
 			},
+			FilterExternal: keycard.Bool(true),
 			FilterGroups: keycard.ZoneUserListParamsFilterGroupsUnion{
 				OfString: keycard.String("string"),
 			},
@@ -82,6 +83,15 @@ func TestZoneUserListWithOptionalParams(t *testing.T) {
 				OfString: keycard.String("string"),
 			},
 			FilterIdentifier: keycard.ZoneUserListParamsFilterIdentifierUnion{
+				OfString: keycard.String("string"),
+			},
+			FilterIssuer: keycard.ZoneUserListParamsFilterIssuerUnion{
+				OfString: keycard.String("string"),
+			},
+			FilterRole: keycard.ZoneUserListParamsFilterRoleUnion{
+				OfString: keycard.String("string"),
+			},
+			FilterSubject: keycard.ZoneUserListParamsFilterSubjectUnion{
 				OfString: keycard.String("string"),
 			},
 			Limit: keycard.Int(1),
