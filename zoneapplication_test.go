@@ -167,6 +167,8 @@ func TestZoneApplicationListWithOptionalParams(t *testing.T) {
 			FilterIdentifier: keycard.ZoneApplicationListParamsFilterIdentifierUnion{
 				OfString: keycard.String("string"),
 			},
+			FilterOwnerType:   keycard.ZoneApplicationListParamsFilterOwnerTypePlatform,
+			FilterOwnerTypeNe: keycard.ZoneApplicationListParamsFilterOwnerTypeNePlatform,
 			FilterSlug: keycard.ZoneApplicationListParamsFilterSlugUnion{
 				OfString: keycard.String("string"),
 			},
