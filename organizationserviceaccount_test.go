@@ -65,8 +65,10 @@ func TestOrganizationServiceAccountGetWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"ab3def8hij2klm9opq5rst7uvw",
 		keycard.OrganizationServiceAccountGetParams{
-			OrganizationID:   "x",
-			Expand:           []string{"permissions"},
+			OrganizationID: "x",
+			Expand: keycard.OrganizationServiceAccountGetParamsExpandUnion{
+				OfOrganizationServiceAccountGetsExpandString: keycard.String("permissions"),
+			},
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
@@ -132,10 +134,13 @@ func TestOrganizationServiceAccountListWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"x",
 		keycard.OrganizationServiceAccountListParams{
-			After:            keycard.String("x"),
-			Before:           keycard.String("x"),
-			Expand:           []string{"permissions"},
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Expand: keycard.OrganizationServiceAccountListParamsExpandUnion{
+				OfOrganizationServiceAccountListsExpandString: keycard.String("permissions"),
+			},
 			Limit:            keycard.Int(1),
+			Query:            []string{"x"},
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)

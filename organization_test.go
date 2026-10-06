@@ -60,7 +60,9 @@ func TestOrganizationGetWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"x",
 		keycard.OrganizationGetParams{
-			Expand:           []string{"permissions"},
+			Expand: keycard.OrganizationGetParamsExpandUnion{
+				OfOrganizationGetsExpandString: keycard.String("permissions"),
+			},
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
@@ -121,9 +123,11 @@ func TestOrganizationListWithOptionalParams(t *testing.T) {
 		option.WithClientSecret("My Client Secret"),
 	)
 	_, err := client.Organizations.List(context.TODO(), keycard.OrganizationListParams{
-		After:            keycard.String("x"),
-		Before:           keycard.String("x"),
-		Expand:           []string{"permissions"},
+		After:  keycard.String("x"),
+		Before: keycard.String("x"),
+		Expand: keycard.OrganizationListParamsExpandUnion{
+			OfOrganizationListsExpandString: keycard.String("permissions"),
+		},
 		Limit:            keycard.Int(1),
 		XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 	})

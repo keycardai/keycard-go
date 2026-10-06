@@ -296,6 +296,10 @@ Response Types:
 
 ## Invitations
 
+Params Types:
+
+- <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#InvitationStatus">InvitationStatus</a>
+
 Response Types:
 
 - <a href="https://pkg.go.dev/github.com/keycardai/keycard-go">keycard</a>.<a href="https://pkg.go.dev/github.com/keycardai/keycard-go#Invitation">Invitation</a>

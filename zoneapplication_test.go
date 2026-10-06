@@ -249,7 +249,6 @@ func TestZoneApplicationListCredentialsWithOptionalParams(t *testing.T) {
 			ZoneID: "zoneId",
 			After:  keycard.String("x"),
 			Before: keycard.String("x"),
-			Cursor: keycard.String("cursor"),
 			Expand: keycard.ZoneApplicationListCredentialsParamsExpandUnion{
 				OfZoneApplicationListCredentialssExpandString: keycard.String("total_count"),
 			},
