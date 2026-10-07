@@ -29,6 +29,7 @@ import (
 type ZoneApplicationService struct {
 	Options      []option.RequestOption
 	Dependencies ZoneApplicationDependencyService
+	Roles        ZoneApplicationRoleService
 }
 
 // NewZoneApplicationService generates a new service that applies the given options
@@ -38,6 +39,7 @@ func NewZoneApplicationService(opts ...option.RequestOption) (r ZoneApplicationS
 	r = ZoneApplicationService{}
 	r.Options = opts
 	r.Dependencies = NewZoneApplicationDependencyService(opts...)
+	r.Roles = NewZoneApplicationRoleService(opts...)
 	return
 }
 
@@ -443,13 +445,10 @@ type ZoneApplicationListResourcesResponse struct {
 	Items []Resource `json:"items" api:"required"`
 	// Cursor-based pagination metadata
 	Pagination ZoneApplicationListResourcesResponsePagination `json:"pagination" api:"required"`
-	// Pagination information
-	PageInfo PageInfoPagination `json:"page_info"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
 		Pagination  respjson.Field
-		PageInfo    respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -797,7 +796,6 @@ type ZoneApplicationListCredentialsParams struct {
 	After param.Opt[string] `query:"after,omitzero" json:"-"`
 	// Cursor for backward pagination
 	Before param.Opt[string] `query:"before,omitzero" json:"-"`
-	Cursor param.Opt[string] `query:"cursor,omitzero" json:"-"`
 	// Maximum number of items to return
 	Limit  param.Opt[int64]                                `query:"limit,omitzero" json:"-"`
 	Expand ZoneApplicationListCredentialsParamsExpandUnion `query:"expand[],omitzero" json:"-"`
