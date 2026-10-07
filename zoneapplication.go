@@ -29,6 +29,7 @@ import (
 type ZoneApplicationService struct {
 	Options      []option.RequestOption
 	Dependencies ZoneApplicationDependencyService
+	Roles        ZoneApplicationRoleService
 }
 
 // NewZoneApplicationService generates a new service that applies the given options
@@ -38,6 +39,7 @@ func NewZoneApplicationService(opts ...option.RequestOption) (r ZoneApplicationS
 	r = ZoneApplicationService{}
 	r.Options = opts
 	r.Dependencies = NewZoneApplicationDependencyService(opts...)
+	r.Roles = NewZoneApplicationRoleService(opts...)
 	return
 }
 
