@@ -97,6 +97,22 @@ func (r *OrganizationService) List(ctx context.Context, params OrganizationListP
 	return res, err
 }
 
+// Deletes the organization and all zones.
+func (r *OrganizationService) Delete(ctx context.Context, organizationID string, body OrganizationDeleteParams, opts ...option.RequestOption) (err error) {
+	if !param.IsOmitted(body.XClientRequestID) {
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", body.XClientRequestID.Value)))
+	}
+	opts = slices.Concat(r.Options, opts)
+	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
+	if organizationID == "" {
+		err = errors.New("missing required organization_id parameter")
+		return err
+	}
+	path := fmt.Sprintf("organizations/%s", url.PathEscape(organizationID))
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
+	return err
+}
+
 type Organization struct {
 	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
 	ID string `json:"id" api:"required"`
@@ -332,3 +348,8 @@ const (
 	OrganizationListParamsExpandStringPermissions OrganizationListParamsExpandString = "permissions"
 	OrganizationListParamsExpandStringTotalCount  OrganizationListParamsExpandString = "total_count"
 )
+
+type OrganizationDeleteParams struct {
+	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
+	paramObj
+}

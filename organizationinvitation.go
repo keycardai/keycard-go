@@ -208,6 +208,11 @@ type OrganizationInvitationListParams struct {
 	// filters as the list (excluding cursor and limit). Other operations ignore expand
 	// values they do not use.
 	Expand OrganizationInvitationListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Return only invitations with these statuses. Repeat the parameter to match any
+	// of several statuses (`?filter[status]=pending&filter[status]=accepted`). Expired
+	// invitations are never listed, so `expired` matches nothing. When absent, no
+	// status filter is applied.
+	FilterStatus []InvitationStatus `query:"filter[status],omitzero" json:"-"`
 	paramObj
 }
 

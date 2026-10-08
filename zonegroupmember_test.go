@@ -13,7 +13,7 @@ import (
 	"github.com/keycardai/keycard-go/option"
 )
 
-func TestOrganizationInvitationNewWithOptionalParams(t *testing.T) {
+func TestZoneGroupMemberListWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -28,51 +28,23 @@ func TestOrganizationInvitationNewWithOptionalParams(t *testing.T) {
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
-	_, err := client.Organizations.Invitations.New(
+	_, err := client.Zones.Groups.Members.List(
 		context.TODO(),
-		"x",
-		keycard.OrganizationInvitationNewParams{
-			Email:            "dev@stainless.com",
-			Role:             keycard.OrganizationRoleOrgAdmin,
-			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		},
-	)
-	if err != nil {
-		var apierr *keycard.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestOrganizationInvitationListWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := keycard.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithClientID("My Client ID"),
-		option.WithClientSecret("My Client Secret"),
-	)
-	_, err := client.Organizations.Invitations.List(
-		context.TODO(),
-		"x",
-		keycard.OrganizationInvitationListParams{
+		"groupId",
+		keycard.ZoneGroupMemberListParams{
+			ZoneID: "zoneId",
 			After:  keycard.String("x"),
 			Before: keycard.String("x"),
-			Expand: keycard.OrganizationInvitationListParamsExpandUnion{
-				OfOrganizationInvitationListsExpandString: keycard.String("permissions"),
+			Expand: keycard.ZoneGroupMemberListParamsExpandUnion{
+				OfZoneGroupMemberListsExpandString: keycard.String("total_count"),
 			},
-			FilterStatus:     []keycard.InvitationStatus{keycard.InvitationStatusPending},
-			Limit:            keycard.Int(1),
-			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			FilterID: keycard.ZoneGroupMemberListParamsFilterIDUnion{
+				OfString: keycard.String("string"),
+			},
+			Limit: keycard.Int(1),
+			Query: keycard.ZoneGroupMemberListParamsQueryUnion{
+				OfString: keycard.String("x"),
+			},
 		},
 	)
 	if err != nil {
@@ -84,7 +56,7 @@ func TestOrganizationInvitationListWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestOrganizationInvitationDeleteWithOptionalParams(t *testing.T) {
+func TestZoneGroupMemberAdd(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -99,12 +71,46 @@ func TestOrganizationInvitationDeleteWithOptionalParams(t *testing.T) {
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
-	err := client.Organizations.Invitations.Delete(
+	_, err := client.Zones.Groups.Members.Add(
 		context.TODO(),
-		"ab3def8hij2klm9opq5rst7uvw",
-		keycard.OrganizationInvitationDeleteParams{
-			OrganizationID:   "x",
-			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		"groupId",
+		keycard.ZoneGroupMemberAddParams{
+			ZoneID: "zoneId",
+			GroupMemberCreate: keycard.GroupMemberCreateParam{
+				UserID: "user_id",
+			},
+		},
+	)
+	if err != nil {
+		var apierr *keycard.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestZoneGroupMemberRemove(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := keycard.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
+	)
+	err := client.Zones.Groups.Members.Remove(
+		context.TODO(),
+		"userId",
+		keycard.ZoneGroupMemberRemoveParams{
+			ZoneID:  "zoneId",
+			GroupID: "groupId",
 		},
 	)
 	if err != nil {

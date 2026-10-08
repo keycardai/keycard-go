@@ -13,7 +13,7 @@ import (
 	"github.com/keycardai/keycard-go/option"
 )
 
-func TestZoneNewWithOptionalParams(t *testing.T) {
+func TestZoneGroupNewWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -28,57 +28,13 @@ func TestZoneNewWithOptionalParams(t *testing.T) {
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
-	_, err := client.Zones.New(context.TODO(), keycard.ZoneNewParams{
-		Name:                         "x",
-		DefaultMcpGatewayApplication: keycard.Bool(true),
-		Description:                  keycard.String("description"),
-		EncryptionKey: keycard.EncryptionKeyAwsKmsConfigParam{
-			Arn:  "x",
-			Type: keycard.EncryptionKeyAwsKmsConfigTypeAws,
-		},
-		OrganizationID: keycard.String("organization_id"),
-		Protocols: keycard.ZoneNewParamsProtocols{
-			Oauth2: keycard.ZoneNewParamsProtocolsOauth2{
-				Cimd: keycard.ZoneNewParamsProtocolsOauth2Cimd{
-					AllowedClientIDs: []string{"string"},
-					Enabled:          true,
-				},
-				DcrEnabled:   keycard.Bool(true),
-				PkceRequired: keycard.Bool(true),
-			},
-		},
-		RequiresInvitation: keycard.Bool(true),
-	})
-	if err != nil {
-		var apierr *keycard.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestZoneGetWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := keycard.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithClientID("My Client ID"),
-		option.WithClientSecret("My Client Secret"),
-	)
-	_, err := client.Zones.Get(
+	_, err := client.Zones.Groups.New(
 		context.TODO(),
 		"zoneId",
-		keycard.ZoneGetParams{
-			Expand: keycard.ZoneGetParamsExpandUnion{
-				OfZoneGetsExpandString: keycard.String("permissions"),
+		keycard.ZoneGroupNewParams{
+			GroupCreate: keycard.GroupCreateParam{
+				Name:       "x",
+				Identifier: keycard.String("x"),
 			},
 		},
 	)
@@ -91,7 +47,7 @@ func TestZoneGetWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestZoneUpdateWithOptionalParams(t *testing.T) {
+func TestZoneGroupGetWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -106,31 +62,99 @@ func TestZoneUpdateWithOptionalParams(t *testing.T) {
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
-	_, err := client.Zones.Update(
+	_, err := client.Zones.Groups.Get(
+		context.TODO(),
+		"groupId",
+		keycard.ZoneGroupGetParams{
+			ZoneID: "zoneId",
+			Expand: keycard.ZoneGroupGetParamsExpandUnion{
+				OfZoneGroupGetsExpandString: keycard.String("member_count"),
+			},
+		},
+	)
+	if err != nil {
+		var apierr *keycard.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestZoneGroupUpdateWithOptionalParams(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := keycard.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
+	)
+	_, err := client.Zones.Groups.Update(
+		context.TODO(),
+		"groupId",
+		keycard.ZoneGroupUpdateParams{
+			ZoneID: "zoneId",
+			GroupUpdate: keycard.GroupUpdateParam{
+				Identifier: keycard.String("x"),
+				Name:       keycard.String("x"),
+			},
+		},
+	)
+	if err != nil {
+		var apierr *keycard.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestZoneGroupListWithOptionalParams(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := keycard.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
+	)
+	_, err := client.Zones.Groups.List(
 		context.TODO(),
 		"zoneId",
-		keycard.ZoneUpdateParams{
-			DefaultMcpGatewayApplicationID: keycard.String("default_mcp_gateway_application_id"),
-			DefaultResourceID:              keycard.String("default_resource_id"),
-			Description:                    keycard.String("description"),
-			EncryptionKey: keycard.ZoneUpdateParamsEncryptionKey{
-				Arn:  "x",
-				Type: "aws",
+		keycard.ZoneGroupListParams{
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Expand: keycard.ZoneGroupListParamsExpandUnion{
+				OfZoneGroupListsExpandString: keycard.String("total_count"),
 			},
-			ExternalSyncEnabled: keycard.Bool(true),
-			Name:                keycard.String("x"),
-			Protocols: keycard.ZoneUpdateParamsProtocols{
-				Oauth2: keycard.ZoneUpdateParamsProtocolsOauth2{
-					Cimd: keycard.ZoneUpdateParamsProtocolsOauth2Cimd{
-						AllowedClientIDs: []string{"string"},
-						Enabled:          true,
-					},
-					DcrEnabled:   keycard.Bool(true),
-					PkceRequired: keycard.Bool(true),
-				},
+			FilterExternalIssuer: keycard.ZoneGroupListParamsFilterExternalIssuerUnion{
+				OfString: keycard.String("string"),
 			},
-			RequiresInvitation:     keycard.Bool(true),
-			UserIdentityProviderID: keycard.String("user_identity_provider_id"),
+			FilterExternal: keycard.Bool(true),
+			FilterID: keycard.ZoneGroupListParamsFilterIDUnion{
+				OfString: keycard.String("string"),
+			},
+			FilterIdentifier: keycard.ZoneGroupListParamsFilterIdentifierUnion{
+				OfString: keycard.String("string"),
+			},
+			Limit: keycard.Int(1),
+			Query: keycard.ZoneGroupListParamsQueryUnion{
+				OfString: keycard.String("x"),
+			},
+			Sort: keycard.String("-identifier,\t\r\r \tidentifier,\n\f\t\f\ncreated_at"),
 		},
 	)
 	if err != nil {
@@ -142,7 +166,7 @@ func TestZoneUpdateWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestZoneListWithOptionalParams(t *testing.T) {
+func TestZoneGroupDelete(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -157,45 +181,13 @@ func TestZoneListWithOptionalParams(t *testing.T) {
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
-	_, err := client.Zones.List(context.TODO(), keycard.ZoneListParams{
-		After:  keycard.String("x"),
-		Before: keycard.String("x"),
-		Cursor: keycard.String("cursor"),
-		Expand: keycard.ZoneListParamsExpandUnion{
-			OfZoneListsExpandString: keycard.String("total_count"),
+	err := client.Zones.Groups.Delete(
+		context.TODO(),
+		"groupId",
+		keycard.ZoneGroupDeleteParams{
+			ZoneID: "zoneId",
 		},
-		FilterOrganizationID: keycard.String("filter[organization_id]"),
-		FilterPermissionIn: keycard.ZoneListParamsFilterPermissionInUnion{
-			OfString: keycard.String("string"),
-		},
-		Limit: keycard.Int(1),
-		Slug:  keycard.String("slug"),
-	})
-	if err != nil {
-		var apierr *keycard.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestZoneDelete(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := keycard.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithClientID("My Client ID"),
-		option.WithClientSecret("My Client Secret"),
 	)
-	err := client.Zones.Delete(context.TODO(), "zoneId")
 	if err != nil {
 		var apierr *keycard.Error
 		if errors.As(err, &apierr) {

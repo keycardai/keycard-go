@@ -37,6 +37,8 @@ type ZoneService struct {
 	UserAgents             ZoneUserAgentService
 	Users                  ZoneUserService
 	Members                ZoneMemberService
+	Roles                  ZoneRoleService
+	Groups                 ZoneGroupService
 	Secrets                ZoneSecretService
 	// Zone-scoped Cedar schema management.
 	//
@@ -81,6 +83,8 @@ func NewZoneService(opts ...option.RequestOption) (r ZoneService) {
 	r.UserAgents = NewZoneUserAgentService(opts...)
 	r.Users = NewZoneUserService(opts...)
 	r.Members = NewZoneMemberService(opts...)
+	r.Roles = NewZoneRoleService(opts...)
+	r.Groups = NewZoneGroupService(opts...)
 	r.Secrets = NewZoneSecretService(opts...)
 	r.PolicySchemas = NewZonePolicySchemaService(opts...)
 	r.Policies = NewZonePolicyService(opts...)
@@ -123,8 +127,9 @@ func (r *ZoneService) Update(ctx context.Context, zoneID string, body ZoneUpdate
 
 // Returns a list of zones for the authenticated organization. Cursor pagination
 // via `after`/`before` and `limit`, plus `expand[]=total_count`, name substring
-// search, and `sort`, are honored only when the `zone-pagination` flag is enabled;
-// the default response is the unbounded legacy shape.
+// search, and `sort`, are supported on every request. `filter[permission][in]`
+// narrows the list to zones where the caller holds at least one of the given
+// permissions.
 func (r *ZoneService) List(ctx context.Context, query ZoneListParams, opts ...option.RequestOption) (res *ZoneListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "zones"
@@ -718,6 +723,13 @@ type ZoneListParams struct {
 	Limit  param.Opt[int64]          `query:"limit,omitzero" json:"-"`
 	Slug   param.Opt[string]         `query:"slug,omitzero" json:"-"`
 	Expand ZoneListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Only return zones where the caller is allowed ANY of these permissions
+	// (`<resource_type>:<action>`, e.g. `applications:list`). Repeatable (one
+	// permission per occurrence); values are unioned, max 20 (a stricter cap than the
+	// authorization service's 50). The accessible zone set is resolved by the
+	// authorization service and composes with cursor pagination, search, sort and
+	// `expand[]=total_count`. Malformed values are a 400.
+	FilterPermissionIn ZoneListParamsFilterPermissionInUnion `query:"filter[permission][in],omitzero" json:"-"`
 	paramObj
 }
 
@@ -746,3 +758,12 @@ const (
 	ZoneListParamsExpandStringTotalCount  ZoneListParamsExpandString = "total_count"
 	ZoneListParamsExpandStringPermissions ZoneListParamsExpandString = "permissions"
 )
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneListParamsFilterPermissionInUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
