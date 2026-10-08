@@ -13,7 +13,7 @@ import (
 	"github.com/keycardai/keycard-go/option"
 )
 
-func TestOrganizationInvitationNewWithOptionalParams(t *testing.T) {
+func TestZoneGroupRoleListWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -28,51 +28,24 @@ func TestOrganizationInvitationNewWithOptionalParams(t *testing.T) {
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
-	_, err := client.Organizations.Invitations.New(
+	_, err := client.Zones.Groups.Roles.List(
 		context.TODO(),
-		"x",
-		keycard.OrganizationInvitationNewParams{
-			Email:            "dev@stainless.com",
-			Role:             keycard.OrganizationRoleOrgAdmin,
-			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		},
-	)
-	if err != nil {
-		var apierr *keycard.Error
-		if errors.As(err, &apierr) {
-			t.Log(string(apierr.DumpRequest(true)))
-		}
-		t.Fatalf("err should be nil: %s", err.Error())
-	}
-}
-
-func TestOrganizationInvitationListWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
-	baseURL := "http://localhost:4010"
-	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
-		baseURL = envURL
-	}
-	if !testutil.CheckTestServer(t, baseURL) {
-		return
-	}
-	client := keycard.NewClient(
-		option.WithBaseURL(baseURL),
-		option.WithAPIKey("My API Key"),
-		option.WithClientID("My Client ID"),
-		option.WithClientSecret("My Client Secret"),
-	)
-	_, err := client.Organizations.Invitations.List(
-		context.TODO(),
-		"x",
-		keycard.OrganizationInvitationListParams{
+		"groupId",
+		keycard.ZoneGroupRoleListParams{
+			ZoneID: "zoneId",
 			After:  keycard.String("x"),
 			Before: keycard.String("x"),
-			Expand: keycard.OrganizationInvitationListParamsExpandUnion{
-				OfOrganizationInvitationListsExpandString: keycard.String("permissions"),
+			Expand: keycard.ZoneGroupRoleListParamsExpandUnion{
+				OfZoneGroupRoleListsExpandString: keycard.String("total_count"),
 			},
-			FilterStatus:     []keycard.InvitationStatus{keycard.InvitationStatusPending},
-			Limit:            keycard.Int(1),
-			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			FilterID: keycard.ZoneGroupRoleListParamsFilterIDUnion{
+				OfString: keycard.String("string"),
+			},
+			FilterScopeID: keycard.ZoneGroupRoleListParamsFilterScopeIDUnion{
+				OfString: keycard.String("string"),
+			},
+			FilterScoped: keycard.Bool(true),
+			Limit:        keycard.Int(1),
 		},
 	)
 	if err != nil {
@@ -84,7 +57,7 @@ func TestOrganizationInvitationListWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestOrganizationInvitationDeleteWithOptionalParams(t *testing.T) {
+func TestZoneGroupRoleAddWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -99,12 +72,52 @@ func TestOrganizationInvitationDeleteWithOptionalParams(t *testing.T) {
 		option.WithClientID("My Client ID"),
 		option.WithClientSecret("My Client Secret"),
 	)
-	err := client.Organizations.Invitations.Delete(
+	_, err := client.Zones.Groups.Roles.Add(
 		context.TODO(),
-		"ab3def8hij2klm9opq5rst7uvw",
-		keycard.OrganizationInvitationDeleteParams{
-			OrganizationID:   "x",
-			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		"groupId",
+		keycard.ZoneGroupRoleAddParams{
+			ZoneID: "zoneId",
+			RoleAssignmentCreate: keycard.RoleAssignmentCreateParam{
+				OwnerType:      keycard.RoleAssignmentCreateOwnerTypePlatform,
+				RoleID:         keycard.String("role_id"),
+				RoleIdentifier: keycard.String("role_identifier"),
+				ScopeID:        keycard.String("x"),
+				ScopeType:      keycard.String("x"),
+			},
+		},
+	)
+	if err != nil {
+		var apierr *keycard.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestZoneGroupRoleRemoveWithOptionalParams(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := keycard.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
+	)
+	err := client.Zones.Groups.Roles.Remove(
+		context.TODO(),
+		"roleId",
+		keycard.ZoneGroupRoleRemoveParams{
+			ZoneID:    "zoneId",
+			GroupID:   "groupId",
+			ScopeID:   keycard.String("x"),
+			ScopeType: keycard.String("x"),
 		},
 	)
 	if err != nil {
