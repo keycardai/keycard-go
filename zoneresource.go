@@ -285,7 +285,7 @@ type ZoneResourceListParams struct {
 	Limit param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	Slug  param.Opt[string] `query:"slug,omitzero" json:"-"`
 	// Comma-separated sort fields. Prefix with - for descending. Allowed: created_at,
-	// name, identifier
+	// updated_at, name, identifier
 	Sort   param.Opt[string]                 `query:"sort,omitzero" json:"-"`
 	Expand ZoneResourceListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Resources that are not a dependency of this application. Repeatable (none of),
