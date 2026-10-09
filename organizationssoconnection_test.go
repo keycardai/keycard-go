@@ -32,7 +32,9 @@ func TestOrganizationSSOConnectionGetWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"x",
 		keycard.OrganizationSSOConnectionGetParams{
-			Expand:           []string{"permissions"},
+			Expand: keycard.OrganizationSSOConnectionGetParamsExpandUnion{
+				OfOrganizationSSOConnectionGetsExpandString: keycard.String("permissions"),
+			},
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
