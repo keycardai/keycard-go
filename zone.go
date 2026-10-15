@@ -37,6 +37,8 @@ type ZoneService struct {
 	UserAgents             ZoneUserAgentService
 	Users                  ZoneUserService
 	Members                ZoneMemberService
+	Roles                  ZoneRoleService
+	Groups                 ZoneGroupService
 	Secrets                ZoneSecretService
 	// Zone-scoped Cedar schema management.
 	//
@@ -81,6 +83,8 @@ func NewZoneService(opts ...option.RequestOption) (r ZoneService) {
 	r.UserAgents = NewZoneUserAgentService(opts...)
 	r.Users = NewZoneUserService(opts...)
 	r.Members = NewZoneMemberService(opts...)
+	r.Roles = NewZoneRoleService(opts...)
+	r.Groups = NewZoneGroupService(opts...)
 	r.Secrets = NewZoneSecretService(opts...)
 	r.PolicySchemas = NewZonePolicySchemaService(opts...)
 	r.Policies = NewZonePolicyService(opts...)
@@ -121,7 +125,11 @@ func (r *ZoneService) Update(ctx context.Context, zoneID string, body ZoneUpdate
 	return res, err
 }
 
-// Returns a list of zones for the authenticated organization
+// Returns a list of zones for the authenticated organization. Cursor pagination
+// via `after`/`before` and `limit`, plus `expand[]=total_count`, name substring
+// search, and `sort`, are supported on every request. `filter[permission][in]`
+// narrows the list to zones where the caller holds at least one of the given
+// permissions.
 func (r *ZoneService) List(ctx context.Context, query ZoneListParams, opts ...option.RequestOption) (res *ZoneListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "zones"
@@ -233,6 +241,9 @@ type Zone struct {
 	ID string `json:"id" api:"required"`
 	// Entity creation timestamp
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
+	// Whether external directory sync (SCIM) is enabled for this zone. Required to
+	// create external sync tokens.
+	ExternalSyncEnabled bool `json:"external_sync_enabled" api:"required"`
 	// Human-readable name
 	Name string `json:"name" api:"required"`
 	// Organization that owns this zone
@@ -269,6 +280,7 @@ type Zone struct {
 	JSON struct {
 		ID                             respjson.Field
 		CreatedAt                      respjson.Field
+		ExternalSyncEnabled            respjson.Field
 		Name                           respjson.Field
 		OrganizationID                 respjson.Field
 		OwnerType                      respjson.Field
@@ -417,6 +429,8 @@ func (r *ZoneProtocolsOpenid) UnmarshalJSON(data []byte) error {
 type ZoneListResponse struct {
 	Items []Zone `json:"items" api:"required"`
 	// Pagination information
+	//
+	// Deprecated: deprecated
 	PageInfo PageInfoPagination `json:"page_info" api:"required"`
 	// Cursor-based pagination metadata
 	Pagination ZoneListResponsePagination `json:"pagination" api:"required"`
@@ -591,6 +605,9 @@ type ZoneUpdateParams struct {
 	Description param.Opt[string] `json:"description,omitzero" format:"safe-text"`
 	// Provider ID to configure for user login (set to null to unset)
 	UserIdentityProviderID param.Opt[string] `json:"user_identity_provider_id,omitzero"`
+	// Turns external directory sync (SCIM) on or off for this zone. Required to create
+	// external sync tokens.
+	ExternalSyncEnabled param.Opt[bool] `json:"external_sync_enabled,omitzero"`
 	// Human-readable name. Must not contain HTML tags (e.g. `<script>`, `<div>`) or
 	// control characters.
 	Name param.Opt[string] `json:"name,omitzero" format:"safe-text"`
@@ -706,6 +723,13 @@ type ZoneListParams struct {
 	Limit  param.Opt[int64]          `query:"limit,omitzero" json:"-"`
 	Slug   param.Opt[string]         `query:"slug,omitzero" json:"-"`
 	Expand ZoneListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Only return zones where the caller is allowed ANY of these permissions
+	// (`<resource_type>:<action>`, e.g. `applications:list`). Repeatable (one
+	// permission per occurrence); values are unioned, max 20 (a stricter cap than the
+	// authorization service's 50). The accessible zone set is resolved by the
+	// authorization service and composes with cursor pagination, search, sort and
+	// `expand[]=total_count`. Malformed values are a 400.
+	FilterPermissionIn ZoneListParamsFilterPermissionInUnion `query:"filter[permission][in],omitzero" json:"-"`
 	paramObj
 }
 
@@ -734,3 +758,12 @@ const (
 	ZoneListParamsExpandStringTotalCount  ZoneListParamsExpandString = "total_count"
 	ZoneListParamsExpandStringPermissions ZoneListParamsExpandString = "permissions"
 )
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneListParamsFilterPermissionInUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
