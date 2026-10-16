@@ -166,7 +166,11 @@ func (r *ServiceAccount) UnmarshalJSON(data []byte) error {
 type OrganizationServiceAccountListResponse struct {
 	Items []ServiceAccount `json:"items" api:"required"`
 	// Pagination information using cursor-based pagination
+	//
+	// Deprecated: deprecated
 	PageInfo PageInfoCursor `json:"page_info" api:"required"`
+	// Cursor-based pagination metadata returned alongside a list of results
+	Pagination OrganizationServiceAccountListResponsePagination `json:"pagination" api:"required"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -176,6 +180,7 @@ type OrganizationServiceAccountListResponse struct {
 	JSON struct {
 		Items       respjson.Field
 		PageInfo    respjson.Field
+		Pagination  respjson.Field
 		Permissions respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -185,6 +190,31 @@ type OrganizationServiceAccountListResponse struct {
 // Returns the unmodified JSON received from the API
 func (r OrganizationServiceAccountListResponse) RawJSON() string { return r.JSON.raw }
 func (r *OrganizationServiceAccountListResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Cursor-based pagination metadata returned alongside a list of results
+type OrganizationServiceAccountListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor" api:"required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor" api:"required"`
+	// Total number of items across all pages. Only present when the request includes
+	// ?expand[]=total_count.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrganizationServiceAccountListResponsePagination) RawJSON() string { return r.JSON.raw }
+func (r *OrganizationServiceAccountListResponsePagination) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -210,13 +240,12 @@ type OrganizationServiceAccountGetParams struct {
 	OrganizationID   string            `path:"organization_id" api:"required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Fields to expand in the response. Supports "permissions" to include the
-	// permissions field with the caller's permissions for the resource. For list
-	// organization identities only, "total_count" populates pagination.total_count
-	// with the number of identities matching the same filters as the list (excluding
-	// cursor and limit). Other operations ignore expand values they do not use.
-	//
-	// Any of "permissions", "total_count".
-	Expand []string `query:"expand,omitzero" json:"-"`
+	// permissions field with the caller's permissions for the resource. For the
+	// service account and service account credential list operations, "total_count"
+	// populates pagination.total_count with the number of items matching the same
+	// filters as the list (excluding cursor and limit). Other operations ignore expand
+	// values they do not use.
+	Expand OrganizationServiceAccountGetParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	paramObj
 }
 
@@ -228,6 +257,24 @@ func (r OrganizationServiceAccountGetParams) URLQuery() (v url.Values, err error
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type OrganizationServiceAccountGetParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfOrganizationServiceAccountGetsExpandString)
+	OfOrganizationServiceAccountGetsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfOrganizationServiceAccountGetsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type OrganizationServiceAccountGetParamsExpandString string
+
+const (
+	OrganizationServiceAccountGetParamsExpandStringPermissions OrganizationServiceAccountGetParamsExpandString = "permissions"
+	OrganizationServiceAccountGetParamsExpandStringTotalCount  OrganizationServiceAccountGetParamsExpandString = "total_count"
+)
 
 type OrganizationServiceAccountUpdateParams struct {
 	// Organization ID or label identifier
@@ -257,13 +304,16 @@ type OrganizationServiceAccountListParams struct {
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Fields to expand in the response. Supports "permissions" to include the
-	// permissions field with the caller's permissions for the resource. For list
-	// organization identities only, "total_count" populates pagination.total_count
-	// with the number of identities matching the same filters as the list (excluding
-	// cursor and limit). Other operations ignore expand values they do not use.
-	//
-	// Any of "permissions", "total_count".
-	Expand []string `query:"expand,omitzero" json:"-"`
+	// permissions field with the caller's permissions for the resource. For the
+	// service account and service account credential list operations, "total_count"
+	// populates pagination.total_count with the number of items matching the same
+	// filters as the list (excluding cursor and limit). Other operations ignore expand
+	// values they do not use.
+	Expand OrganizationServiceAccountListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Search service accounts by name or description (case-insensitive substring
+	// match). When multiple values are provided, a service account matches if it
+	// matches any of them.
+	Query []string `query:"query,omitzero" json:"-"`
 	paramObj
 }
 
@@ -275,6 +325,24 @@ func (r OrganizationServiceAccountListParams) URLQuery() (v url.Values, err erro
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type OrganizationServiceAccountListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfOrganizationServiceAccountListsExpandString)
+	OfOrganizationServiceAccountListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfOrganizationServiceAccountListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type OrganizationServiceAccountListParamsExpandString string
+
+const (
+	OrganizationServiceAccountListParamsExpandStringPermissions OrganizationServiceAccountListParamsExpandString = "permissions"
+	OrganizationServiceAccountListParamsExpandStringTotalCount  OrganizationServiceAccountListParamsExpandString = "total_count"
+)
 
 type OrganizationServiceAccountDeleteParams struct {
 	// Organization ID or label identifier
