@@ -47,7 +47,6 @@ func TestZoneNewWithOptionalParams(t *testing.T) {
 				PkceRequired: keycard.Bool(true),
 			},
 		},
-		RequiresInvitation: keycard.Bool(true),
 	})
 	if err != nil {
 		var apierr *keycard.Error
@@ -129,7 +128,6 @@ func TestZoneUpdateWithOptionalParams(t *testing.T) {
 					PkceRequired: keycard.Bool(true),
 				},
 			},
-			RequiresInvitation:     keycard.Bool(true),
 			UserIdentityProviderID: keycard.String("user_identity_provider_id"),
 		},
 	)
