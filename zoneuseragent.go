@@ -54,9 +54,14 @@ func (r *ZoneUserAgentService) Get(ctx context.Context, id string, query ZoneUse
 	return res, err
 }
 
-// Returns a list of user agents in the specified zone. User agents represent
-// client software (browsers, desktop apps, CLI tools) registered via OAuth 2.0
-// Dynamic Client Registration.
+// Returns the user agents in the specified zone, cursor-paginated and ordered by
+// name. User agents represent client software (browsers, desktop apps, CLI tools)
+// registered via OAuth 2.0 Dynamic Client Registration. Pass `filter[id]`
+// (repeatable, max 100) to restrict results to a known set of user agents —
+// mutually exclusive with `after`/`before` (returns 400 if combined). When
+// `filter[id]` is set, `limit` is ignored and the response contains every
+// requested user agent that exists in the zone, in a single page. IDs not in the
+// zone are silently omitted.
 func (r *ZoneUserAgentService) List(ctx context.Context, zoneID string, query ZoneUserAgentListParams, opts ...option.RequestOption) (res *ZoneUserAgentListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -165,6 +170,11 @@ type ZoneUserAgentListParams struct {
 	// Maximum number of items to return
 	Limit  param.Opt[int64]                   `query:"limit,omitzero" json:"-"`
 	Expand ZoneUserAgentListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Restrict results to user agents with this ID. Repeatable, max 100. Mutually
+	// exclusive with after/before.
+	FilterID ZoneUserAgentListParamsFilterIDUnion `query:"filter[id],omitzero" json:"-"`
+	// Filter by exact identifier (OAuth client_id)
+	FilterIdentifier ZoneUserAgentListParamsFilterIdentifierUnion `query:"filter[identifier],omitzero" json:"-"`
 	paramObj
 }
 
@@ -193,3 +203,21 @@ type ZoneUserAgentListParamsExpandString string
 const (
 	ZoneUserAgentListParamsExpandStringTotalCount ZoneUserAgentListParamsExpandString = "total_count"
 )
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneUserAgentListParamsFilterIDUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneUserAgentListParamsFilterIdentifierUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
