@@ -117,7 +117,8 @@ func TestZoneUpdateWithOptionalParams(t *testing.T) {
 				Arn:  "x",
 				Type: "aws",
 			},
-			Name: keycard.String("x"),
+			ExternalSyncEnabled: keycard.Bool(true),
+			Name:                keycard.String("x"),
 			Protocols: keycard.ZoneUpdateParamsProtocols{
 				Oauth2: keycard.ZoneUpdateParamsProtocolsOauth2{
 					Cimd: keycard.ZoneUpdateParamsProtocolsOauth2Cimd{
