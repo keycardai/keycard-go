@@ -312,7 +312,7 @@ type ZonePolicySchemaListParams struct {
 	// supplying both `expand` and `expand[]` with disagreeing values returns
 	// `400 Bad Request`.
 	//
-	// Any of "total_count".
+	// Any of "total_count", "user".
 	Expand []string `query:"expand,omitzero" json:"-"`
 	// Schema representation format. `cedar` returns human-readable Cedar syntax in
 	// `cedar_schema`, `json` returns Cedar JSON schema object in `cedar_schema_json`.
