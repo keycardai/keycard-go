@@ -75,6 +75,7 @@ func TestZonePolicySetVersionGetWithOptionalParams(t *testing.T) {
 		keycard.ZonePolicySetVersionGetParams{
 			ZoneID:           "zone_id",
 			PolicySetID:      "policy_set_id",
+			Expand:           []string{"user"},
 			XAPIVersion:      keycard.String("X-API-Version"),
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
