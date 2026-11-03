@@ -864,5 +864,6 @@ type ZoneApplicationListResourcesParamsExpandUnion struct {
 type ZoneApplicationListResourcesParamsExpandString string
 
 const (
-	ZoneApplicationListResourcesParamsExpandStringTotalCount ZoneApplicationListResourcesParamsExpandString = "total_count"
+	ZoneApplicationListResourcesParamsExpandStringTotalCount         ZoneApplicationListResourcesParamsExpandString = "total_count"
+	ZoneApplicationListResourcesParamsExpandStringCredentialProvider ZoneApplicationListResourcesParamsExpandString = "credential_provider"
 )

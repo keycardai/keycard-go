@@ -67,7 +67,8 @@ func (r *ZoneApplicationCredentialService) Get(ctx context.Context, id string, q
 	return res, err
 }
 
-// Updates an application credential's configuration
+// Updates an application credential's configuration. A field the credential type
+// cannot change returns 400, unless it matches the stored value.
 func (r *ZoneApplicationCredentialService) Update(ctx context.Context, id string, params ZoneApplicationCredentialUpdateParams, opts ...option.RequestOption) (res *CredentialUnion, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
@@ -777,6 +778,8 @@ func init() {
 
 // Schema for updating a public key credential
 type ZoneApplicationCredentialUpdateParamsBodyPublicKeyCredentialUpdate struct {
+	// JWKS URI to retrieve public keys from
+	JwksUri param.Opt[string] `json:"jwks_uri,omitzero" format:"uri"`
 	// Any of "public-key".
 	Type string `json:"type,omitzero"`
 	paramObj
