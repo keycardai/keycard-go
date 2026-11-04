@@ -335,9 +335,7 @@ type ZonePolicyVersionGetParams struct {
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Opt-in to additional response fields on a single resource (`user`). Repeatable.
-	//
-	// Any of "user".
-	Expand []string `query:"expand,omitzero" json:"-"`
+	Expand ZonePolicyVersionGetParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Narrows which Cedar representation the response includes. When omitted, both
 	// `cedar_json` and `cedar_raw` are populated. Pass `json` to receive only
 	// `cedar_json`, or `cedar` to receive only `cedar_raw`. Callers that don't care
@@ -356,6 +354,25 @@ func (r ZonePolicyVersionGetParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZonePolicyVersionGetParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZonePolicyVersionGetsExpandPdpExpandSingleField)
+	OfZonePolicyVersionGetsExpandPdpExpandSingleField param.Opt[string] `query:",omitzero,inline"`
+	OfZonePolicyVersionGetsExpandArrayItemArray       []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Opt-in response field requested via `expand[]` on single-resource reads. `user`
+// behaves as described on `ExpandField`.
+type ZonePolicyVersionGetParamsExpandPdpExpandSingleField string
+
+const (
+	ZonePolicyVersionGetParamsExpandPdpExpandSingleFieldUser ZonePolicyVersionGetParamsExpandPdpExpandSingleField = "user"
+)
 
 // Narrows which Cedar representation the response includes. When omitted, both
 // `cedar_json` and `cedar_raw` are populated. Pass `json` to receive only
@@ -380,14 +397,9 @@ type ZonePolicyVersionListParams struct {
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// **Deprecated.** Use `expand[]` instead.
-	//
-	// Opt-in to additional response fields. Still honored for backward compatibility;
-	// supplying both `expand` and `expand[]` with disagreeing values returns
-	// `400 Bad Request`.
-	//
-	// Any of "total_count", "user".
-	Expand []string `query:"expand,omitzero" json:"-"`
+	// Opt-in to additional response fields (`total_count`, `user`). Repeatable;
+	// matches the `expand[]` convention used across the Keycard API.
+	Expand ZonePolicyVersionListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Narrows which Cedar representation the response includes. When omitted, both
 	// `cedar_json` and `cedar_raw` are populated. Pass `json` to receive only
 	// `cedar_json`, or `cedar` to receive only `cedar_raw`. Callers that don't care
@@ -414,6 +426,28 @@ func (r ZonePolicyVersionListParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZonePolicyVersionListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZonePolicyVersionListsExpandPdpExpandField)
+	OfZonePolicyVersionListsExpandPdpExpandField param.Opt[string] `query:",omitzero,inline"`
+	OfZonePolicyVersionListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Opt-in response field requested via `expand[]` on list endpoints. `total_count`
+// adds `pagination.total_count`; `user` adds a `*_user` object beside every
+// `created_by`, `updated_by` and `archived_by` field that resolves to an
+// organization user.
+type ZonePolicyVersionListParamsExpandPdpExpandField string
+
+const (
+	ZonePolicyVersionListParamsExpandPdpExpandFieldTotalCount ZonePolicyVersionListParamsExpandPdpExpandField = "total_count"
+	ZonePolicyVersionListParamsExpandPdpExpandFieldUser       ZonePolicyVersionListParamsExpandPdpExpandField = "user"
+)
 
 // Narrows which Cedar representation the response includes. When omitted, both
 // `cedar_json` and `cedar_raw` are populated. Pass `json` to receive only
