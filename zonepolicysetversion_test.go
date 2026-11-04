@@ -75,6 +75,7 @@ func TestZonePolicySetVersionGetWithOptionalParams(t *testing.T) {
 		keycard.ZonePolicySetVersionGetParams{
 			ZoneID:           "zone_id",
 			PolicySetID:      "policy_set_id",
+			Expand:           []string{"user"},
 			XAPIVersion:      keycard.String("X-API-Version"),
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
@@ -145,7 +146,6 @@ func TestZonePolicySetVersionListWithOptionalParams(t *testing.T) {
 			ZoneID:           "zone_id",
 			After:            keycard.String("x"),
 			Before:           keycard.String("x"),
-			Expand:           []string{"total_count"},
 			Limit:            keycard.Int(1),
 			Order:            keycard.ZonePolicySetVersionListParamsOrderAsc,
 			Sort:             keycard.ZonePolicySetVersionListParamsSortCreatedAt,
@@ -219,7 +219,6 @@ func TestZonePolicySetVersionListPoliciesWithOptionalParams(t *testing.T) {
 			PolicySetID:      "policy_set_id",
 			After:            keycard.String("x"),
 			Before:           keycard.String("x"),
-			Expand:           []string{"total_count"},
 			Format:           keycard.ZonePolicySetVersionListPoliciesParamsFormatCedar,
 			Limit:            keycard.Int(1),
 			Order:            keycard.ZonePolicySetVersionListPoliciesParamsOrderAsc,

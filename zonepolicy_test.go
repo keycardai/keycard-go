@@ -67,6 +67,7 @@ func TestZonePolicyGetWithOptionalParams(t *testing.T) {
 		"policy_id",
 		keycard.ZonePolicyGetParams{
 			ZoneID:           "zone_id",
+			Expand:           []string{"user"},
 			XAPIVersion:      keycard.String("X-API-Version"),
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
@@ -137,12 +138,10 @@ func TestZonePolicyListWithOptionalParams(t *testing.T) {
 		keycard.ZonePolicyListParams{
 			After:            keycard.String("x"),
 			Before:           keycard.String("x"),
-			Expand:           []string{"total_count"},
 			FilterID:         []string{"string"},
 			FilterOwnerType:  []string{"string"},
 			Limit:            keycard.Int(1),
 			Order:            keycard.ZonePolicyListParamsOrderAsc,
-			Query:            []string{"x"},
 			QueryDescription: []string{"x"},
 			QueryName:        []string{"x"},
 			Sort:             keycard.ZonePolicyListParamsSortCreatedAt,

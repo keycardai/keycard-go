@@ -68,7 +68,6 @@ func TestZonePolicySchemaListWithOptionalParams(t *testing.T) {
 		keycard.ZonePolicySchemaListParams{
 			After:            keycard.String("x"),
 			Before:           keycard.String("x"),
-			Expand:           []string{"total_count"},
 			FilterDefault:    keycard.Bool(true),
 			Format:           keycard.ZonePolicySchemaListParamsFormatCedar,
 			IsDefault:        keycard.Bool(true),

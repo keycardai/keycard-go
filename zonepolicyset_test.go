@@ -32,7 +32,19 @@ func TestZonePolicySetNewWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"zone_id",
 		keycard.ZonePolicySetNewParams{
-			Name:             "name",
+			Name: "name",
+			Manifest: keycard.ZonePolicySetNewParamsManifest{
+				Entries: []keycard.ZonePolicySetNewParamsManifestEntryUnion{{
+					OfZonePolicySetNewsManifestEntryPdpExistingPolicyEntry: &keycard.ZonePolicySetNewParamsManifestEntryPdpExistingPolicyEntry{
+						PolicyID:        "policy_id",
+						CedarJson:       map[string]any{},
+						CedarRaw:        keycard.String("cedar_raw"),
+						PolicyVersionID: keycard.String("policy_version_id"),
+					},
+				}},
+				Activate:      keycard.Bool(true),
+				SchemaVersion: keycard.String("schema_version"),
+			},
 			ScopeType:        keycard.ZonePolicySetNewParamsScopeTypeZone,
 			TargetType:       keycard.ZonePolicySetNewParamsTargetTypeZone,
 			XAPIVersion:      keycard.String("X-API-Version"),
@@ -68,6 +80,7 @@ func TestZonePolicySetGetWithOptionalParams(t *testing.T) {
 		"policy_set_id",
 		keycard.ZonePolicySetGetParams{
 			ZoneID:           "zone_id",
+			Expand:           []string{"user"},
 			XAPIVersion:      keycard.String("X-API-Version"),
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
@@ -138,14 +151,12 @@ func TestZonePolicySetListWithOptionalParams(t *testing.T) {
 			Active:           keycard.Bool(true),
 			After:            keycard.String("x"),
 			Before:           keycard.String("x"),
-			Expand:           []string{"total_count"},
 			FilterActive:     keycard.Bool(true),
 			FilterOwnerType:  []string{"string"},
 			FilterScopeType:  []string{"string"},
 			FilterTargetType: []string{"string"},
 			Limit:            keycard.Int(1),
 			Order:            keycard.ZonePolicySetListParamsOrderAsc,
-			Query:            []string{"x"},
 			QueryName:        []string{"x"},
 			Sort:             keycard.ZonePolicySetListParamsSortCreatedAt,
 			XAPIVersion:      keycard.String("X-API-Version"),
