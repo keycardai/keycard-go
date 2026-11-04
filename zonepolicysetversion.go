@@ -480,11 +480,8 @@ type ZonePolicySetVersionListParams struct {
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// **Deprecated.** Use `expand[]` instead.
-	//
-	// Opt-in to additional response fields. Still honored for backward compatibility;
-	// supplying both `expand` and `expand[]` with disagreeing values returns
-	// `400 Bad Request`.
+	// Opt-in to additional response fields (`total_count`, `user`). Repeatable;
+	// matches the `expand[]` convention used across the Keycard API.
 	//
 	// Any of "total_count", "user".
 	Expand []string `query:"expand,omitzero" json:"-"`
@@ -544,11 +541,8 @@ type ZonePolicySetVersionListPoliciesParams struct {
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// **Deprecated.** Use `expand[]` instead.
-	//
-	// Opt-in to additional response fields. Still honored for backward compatibility;
-	// supplying both `expand` and `expand[]` with disagreeing values returns
-	// `400 Bad Request`.
+	// Opt-in to additional response fields (`total_count`, `user`). Repeatable;
+	// matches the `expand[]` convention used across the Keycard API.
 	//
 	// Any of "total_count", "user".
 	Expand []string `query:"expand,omitzero" json:"-"`

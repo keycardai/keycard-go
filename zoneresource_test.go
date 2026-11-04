@@ -56,7 +56,7 @@ func TestZoneResourceNewWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestZoneResourceGet(t *testing.T) {
+func TestZoneResourceGetWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -76,6 +76,9 @@ func TestZoneResourceGet(t *testing.T) {
 		"id",
 		keycard.ZoneResourceGetParams{
 			ZoneID: "zoneId",
+			Expand: keycard.ZoneResourceGetParamsExpandUnion{
+				OfZoneResourceGetsExpandString: keycard.String("credential_provider"),
+			},
 		},
 	)
 	if err != nil {
