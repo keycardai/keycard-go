@@ -83,7 +83,11 @@ func (r *ZoneApplicationCredentialService) Update(ctx context.Context, id string
 	return res, err
 }
 
-// Returns a list of application credentials in the specified zone
+// Returns a paginated list of application credentials in the specified zone. Use
+// cursor pagination via `after`/`before`. Use `expand[]=total_count` to include
+// the matching row count. Search via `query[identifier]`, `query[provider_name]`,
+// or `query[]` (identifier or provider name); all are substring matches, OR'd
+// across repeated values.
 func (r *ZoneApplicationCredentialService) List(ctx context.Context, zoneID string, query ZoneApplicationCredentialListParams, opts ...option.RequestOption) (res *ZoneApplicationCredentialListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -459,6 +463,8 @@ func (r *ZoneApplicationCredentialNewResponseUnion) UnmarshalJSON(data []byte) e
 type ZoneApplicationCredentialListResponse struct {
 	Items []CredentialUnion `json:"items" api:"required"`
 	// Pagination information
+	//
+	// Deprecated: deprecated
 	PageInfo PageInfoPagination `json:"page_info" api:"required"`
 	// Cursor-based pagination metadata
 	Pagination ZoneApplicationCredentialListResponsePagination `json:"pagination" api:"required"`
@@ -842,7 +848,6 @@ type ZoneApplicationCredentialListParams struct {
 	ApplicationID param.Opt[string] `query:"applicationId,omitzero" json:"-"`
 	// Cursor for backward pagination
 	Before param.Opt[string] `query:"before,omitzero" json:"-"`
-	Cursor param.Opt[string] `query:"cursor,omitzero" json:"-"`
 	// Maximum number of items to return
 	Limit  param.Opt[int64]                               `query:"limit,omitzero" json:"-"`
 	Slug   param.Opt[string]                              `query:"slug,omitzero" json:"-"`
