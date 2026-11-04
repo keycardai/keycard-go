@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.25.0](https://github.com/keycardai/keycard-go/compare/v0.24.0...v0.25.0) (2026-11-04)
+
+
+### Features
+
+* **ID-604:** filter[dependency_of_application_id][ne] on list resources ([#44](https://github.com/keycardai/keycard-go/issues/44)) ([1f26fc1](https://github.com/keycardai/keycard-go/commit/1f26fc1704211529327d58da9908f1a1adfe2ae5))
+* **pdp:** send expand[] / query[] on policy list and get params (CX-1590) ([#45](https://github.com/keycardai/keycard-go/issues/45)) ([ea83104](https://github.com/keycardai/keycard-go/commit/ea831041aeb52e0ba9320ab9573f31d6e6964193))
+
+
+### Chores
+
+* **stainless:** refresh openapi.yml from api/openapi.yaml ([#42](https://github.com/keycardai/keycard-go/issues/42)) ([579c6ed](https://github.com/keycardai/keycard-go/commit/579c6ede41652bd9af608f37e99207d8dacc9c19))
+
 ## [0.24.0](https://github.com/keycardai/keycard-go/compare/v0.23.0...v0.24.0) (2026-09-22)
 
 
