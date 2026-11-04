@@ -36,7 +36,6 @@ type ZoneService struct {
 	Sessions               ZoneSessionService
 	UserAgents             ZoneUserAgentService
 	Users                  ZoneUserService
-	Members                ZoneMemberService
 	Roles                  ZoneRoleService
 	Groups                 ZoneGroupService
 	Secrets                ZoneSecretService
@@ -82,7 +81,6 @@ func NewZoneService(opts ...option.RequestOption) (r ZoneService) {
 	r.Sessions = NewZoneSessionService(opts...)
 	r.UserAgents = NewZoneUserAgentService(opts...)
 	r.Users = NewZoneUserService(opts...)
-	r.Members = NewZoneMemberService(opts...)
 	r.Roles = NewZoneRoleService(opts...)
 	r.Groups = NewZoneGroupService(opts...)
 	r.Secrets = NewZoneSecretService(opts...)
