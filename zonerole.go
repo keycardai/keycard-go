@@ -85,10 +85,8 @@ func (r *ZoneRoleService) Update(ctx context.Context, roleID string, params Zone
 	return res, err
 }
 
-// Returns the roles defined in the specified zone. The full result set is
-// currently returned in a single page; the `after`/`before`/`limit` cursor
-// parameters are reserved and not yet enforced, and `pagination` cursors are
-// always null.
+// Returns the roles defined in the specified zone, cursor-paginated. Ordered by
+// identifier.
 func (r *ZoneRoleService) List(ctx context.Context, zoneID string, query ZoneRoleListParams, opts ...option.RequestOption) (res *ZoneRoleListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {

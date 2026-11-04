@@ -36,7 +36,6 @@ type ZoneService struct {
 	Sessions               ZoneSessionService
 	UserAgents             ZoneUserAgentService
 	Users                  ZoneUserService
-	Members                ZoneMemberService
 	Roles                  ZoneRoleService
 	Groups                 ZoneGroupService
 	Secrets                ZoneSecretService
@@ -82,7 +81,6 @@ func NewZoneService(opts ...option.RequestOption) (r ZoneService) {
 	r.Sessions = NewZoneSessionService(opts...)
 	r.UserAgents = NewZoneUserAgentService(opts...)
 	r.Users = NewZoneUserService(opts...)
-	r.Members = NewZoneMemberService(opts...)
 	r.Roles = NewZoneRoleService(opts...)
 	r.Groups = NewZoneGroupService(opts...)
 	r.Secrets = NewZoneSecretService(opts...)
@@ -127,8 +125,9 @@ func (r *ZoneService) Update(ctx context.Context, zoneID string, body ZoneUpdate
 
 // Returns a list of zones for the authenticated organization. Cursor pagination
 // via `after`/`before` and `limit`, plus `expand[]=total_count`, name substring
-// search, and `sort`, are honored only when the `zone-pagination` flag is enabled;
-// the default response is the unbounded legacy shape.
+// search, and `sort`, are supported on every request. `filter[permission][in]`
+// narrows the list to zones where the caller holds at least one of the given
+// permissions.
 func (r *ZoneService) List(ctx context.Context, query ZoneListParams, opts ...option.RequestOption) (res *ZoneListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "zones"
@@ -270,9 +269,6 @@ type Zone struct {
 	// expand[]=permissions query parameter is provided. Keys are resource types,
 	// values are objects mapping action names to boolean values.
 	Permissions map[string]map[string]bool `json:"permissions"`
-	// Whether the zone requires an invitation for email/password registration, only
-	// applies when user_identity_provider_id is not set
-	RequiresInvitation bool `json:"requires_invitation"`
 	// Provider ID configured for user login
 	UserIdentityProviderID string `json:"user_identity_provider_id"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -291,7 +287,6 @@ type Zone struct {
 		Description                    respjson.Field
 		EncryptionKey                  respjson.Field
 		Permissions                    respjson.Field
-		RequiresInvitation             respjson.Field
 		UserIdentityProviderID         respjson.Field
 		ExtraFields                    map[string]respjson.Field
 		raw                            string
@@ -487,9 +482,6 @@ type ZoneNewParams struct {
 	// organization claim); for organization-scoped principals it is optional and must
 	// match the authenticated organization if supplied.
 	OrganizationID param.Opt[string] `json:"organization_id,omitzero"`
-	// Whether the zone requires an invitation for email/password registration, only
-	// applies when user_identity_provider_id is not set. Defaults to true.
-	RequiresInvitation param.Opt[bool] `json:"requires_invitation,omitzero"`
 	// AWS KMS configuration for zone encryption. When not specified, the default
 	// Keycard Cloud encryption key will be used.
 	EncryptionKey EncryptionKeyAwsKmsConfigParam `json:"encryption_key,omitzero"`
@@ -610,9 +602,6 @@ type ZoneUpdateParams struct {
 	// Human-readable name. Must not contain HTML tags (e.g. `<script>`, `<div>`) or
 	// control characters.
 	Name param.Opt[string] `json:"name,omitzero" format:"safe-text"`
-	// Whether the zone requires an invitation for email/password registration, only
-	// applies when user_identity_provider_id is not set
-	RequiresInvitation param.Opt[bool] `json:"requires_invitation,omitzero"`
 	// AWS KMS configuration for zone encryption update (set to null to remove
 	// customer-managed key and revert to default)
 	EncryptionKey ZoneUpdateParamsEncryptionKey `json:"encryption_key,omitzero"`
@@ -722,6 +711,13 @@ type ZoneListParams struct {
 	Limit  param.Opt[int64]          `query:"limit,omitzero" json:"-"`
 	Slug   param.Opt[string]         `query:"slug,omitzero" json:"-"`
 	Expand ZoneListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Only return zones where the caller is allowed ANY of these permissions
+	// (`<resource_type>:<action>`, e.g. `applications:list`). Repeatable (one
+	// permission per occurrence); values are unioned, max 20 (a stricter cap than the
+	// authorization service's 50). The accessible zone set is resolved by the
+	// authorization service and composes with cursor pagination, search, sort and
+	// `expand[]=total_count`. Malformed values are a 400.
+	FilterPermissionIn ZoneListParamsFilterPermissionInUnion `query:"filter[permission][in],omitzero" json:"-"`
 	paramObj
 }
 
@@ -750,3 +746,12 @@ const (
 	ZoneListParamsExpandStringTotalCount  ZoneListParamsExpandString = "total_count"
 	ZoneListParamsExpandStringPermissions ZoneListParamsExpandString = "permissions"
 )
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneListParamsFilterPermissionInUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}

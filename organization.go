@@ -27,7 +27,6 @@ import (
 // the [NewOrganizationService] method instead.
 type OrganizationService struct {
 	Options         []option.RequestOption
-	Users           OrganizationUserService
 	Invitations     OrganizationInvitationService
 	ServiceAccounts OrganizationServiceAccountService
 	SSOConnection   OrganizationSSOConnectionService
@@ -39,7 +38,6 @@ type OrganizationService struct {
 func NewOrganizationService(opts ...option.RequestOption) (r OrganizationService) {
 	r = OrganizationService{}
 	r.Options = opts
-	r.Users = NewOrganizationUserService(opts...)
 	r.Invitations = NewOrganizationInvitationService(opts...)
 	r.ServiceAccounts = NewOrganizationServiceAccountService(opts...)
 	r.SSOConnection = NewOrganizationSSOConnectionService(opts...)
@@ -154,6 +152,15 @@ func (r Organization) RawJSON() string { return r.JSON.raw }
 func (r *Organization) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// User's role in the organization
+type OrganizationRole string
+
+const (
+	OrganizationRoleOrgAdmin  OrganizationRole = "org_admin"
+	OrganizationRoleOrgMember OrganizationRole = "org_member"
+	OrganizationRoleOrgViewer OrganizationRole = "org_viewer"
+)
 
 // Pagination information using cursor-based pagination
 type PageInfoCursor struct {

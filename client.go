@@ -21,7 +21,6 @@ type Client struct {
 	Zones         ZoneService
 	Organizations OrganizationService
 	Invitations   InvitationService
-	PolicyBundle  PolicyBundleService
 }
 
 // DefaultClientOptions read from the environment (KEYCARD_API_API_KEY,
@@ -65,7 +64,6 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 	r.Zones = NewZoneService(opts...)
 	r.Organizations = NewOrganizationService(opts...)
 	r.Invitations = NewInvitationService(opts...)
-	r.PolicyBundle = NewPolicyBundleService(opts...)
 
 	return
 }
