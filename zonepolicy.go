@@ -345,9 +345,7 @@ type ZonePolicyGetParams struct {
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Opt-in to additional response fields on a single resource (`user`). Repeatable.
-	//
-	// Any of "user".
-	Expand []string `query:"expand,omitzero" json:"-"`
+	Expand ZonePolicyGetParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	paramObj
 }
 
@@ -358,6 +356,25 @@ func (r ZonePolicyGetParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZonePolicyGetParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZonePolicyGetsExpandPdpExpandSingleField)
+	OfZonePolicyGetsExpandPdpExpandSingleField param.Opt[string] `query:",omitzero,inline"`
+	OfZonePolicyGetsExpandArrayItemArray       []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Opt-in response field requested via `expand[]` on single-resource reads. `user`
+// behaves as described on `ExpandField`.
+type ZonePolicyGetParamsExpandPdpExpandSingleField string
+
+const (
+	ZonePolicyGetParamsExpandPdpExpandSingleFieldUser ZonePolicyGetParamsExpandPdpExpandSingleField = "user"
+)
 
 type ZonePolicyUpdateParams struct {
 	ZoneID           string            `path:"zone_id" api:"required" json:"-"`
@@ -388,6 +405,9 @@ type ZonePolicyListParams struct {
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
+	// Opt-in to additional response fields (`total_count`, `user`). Repeatable;
+	// matches the `expand[]` convention used across the Keycard API.
+	Expand ZonePolicyListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Filter by policy ID. Repeatable; multiple values are OR-ed (e.g.
 	// `?filter[id]=p1&filter[id]=p2`). Capped at 100 IDs per request — over-cap
 	// returns 400.
@@ -419,6 +439,10 @@ type ZonePolicyListParams struct {
 	//
 	// Any of "asc", "desc".
 	Order ZonePolicyListParamsOrder `query:"order,omitzero" json:"-"`
+	// Case-insensitive substring search across all searchable fields of the resource.
+	// For policies that is `name` and `description`; for policy sets that is `name`.
+	// Repeatable; if multiple terms are supplied they are OR-ed.
+	Query ZonePolicyListParamsQueryUnion `query:"query[],omitzero" json:"-"`
 	// Case-insensitive substring search on `description` (policies only). Repeatable;
 	// if multiple terms are supplied they are OR-ed.
 	QueryDescription []string `query:"query[description],omitzero" json:"-"`
@@ -440,6 +464,28 @@ func (r ZonePolicyListParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZonePolicyListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZonePolicyListsExpandPdpExpandField)
+	OfZonePolicyListsExpandPdpExpandField param.Opt[string] `query:",omitzero,inline"`
+	OfZonePolicyListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Opt-in response field requested via `expand[]` on list endpoints. `total_count`
+// adds `pagination.total_count`; `user` adds a `*_user` object beside every
+// `created_by`, `updated_by` and `archived_by` field that resolves to an
+// organization user.
+type ZonePolicyListParamsExpandPdpExpandField string
+
+const (
+	ZonePolicyListParamsExpandPdpExpandFieldTotalCount ZonePolicyListParamsExpandPdpExpandField = "total_count"
+	ZonePolicyListParamsExpandPdpExpandFieldUser       ZonePolicyListParamsExpandPdpExpandField = "user"
+)
+
 // Sort direction. Default is desc (newest first).
 type ZonePolicyListParamsOrder string
 
@@ -447,6 +493,15 @@ const (
 	ZonePolicyListParamsOrderAsc  ZonePolicyListParamsOrder = "asc"
 	ZonePolicyListParamsOrderDesc ZonePolicyListParamsOrder = "desc"
 )
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZonePolicyListParamsQueryUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
 
 // Field to sort by.
 type ZonePolicyListParamsSort string

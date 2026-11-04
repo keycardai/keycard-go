@@ -73,9 +73,11 @@ func TestZonePolicySetVersionGetWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"version_id",
 		keycard.ZonePolicySetVersionGetParams{
-			ZoneID:           "zone_id",
-			PolicySetID:      "policy_set_id",
-			Expand:           []string{"user"},
+			ZoneID:      "zone_id",
+			PolicySetID: "policy_set_id",
+			Expand: keycard.ZonePolicySetVersionGetParamsExpandUnion{
+				OfZonePolicySetVersionGetsExpandPdpExpandSingleField: keycard.String("user"),
+			},
 			XAPIVersion:      keycard.String("X-API-Version"),
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
@@ -143,9 +145,12 @@ func TestZonePolicySetVersionListWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"policy_set_id",
 		keycard.ZonePolicySetVersionListParams{
-			ZoneID:           "zone_id",
-			After:            keycard.String("x"),
-			Before:           keycard.String("x"),
+			ZoneID: "zone_id",
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Expand: keycard.ZonePolicySetVersionListParamsExpandUnion{
+				OfZonePolicySetVersionListsExpandPdpExpandField: keycard.String("total_count"),
+			},
 			Limit:            keycard.Int(1),
 			Order:            keycard.ZonePolicySetVersionListParamsOrderAsc,
 			Sort:             keycard.ZonePolicySetVersionListParamsSortCreatedAt,
@@ -215,10 +220,13 @@ func TestZonePolicySetVersionListPoliciesWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"version_id",
 		keycard.ZonePolicySetVersionListPoliciesParams{
-			ZoneID:           "zone_id",
-			PolicySetID:      "policy_set_id",
-			After:            keycard.String("x"),
-			Before:           keycard.String("x"),
+			ZoneID:      "zone_id",
+			PolicySetID: "policy_set_id",
+			After:       keycard.String("x"),
+			Before:      keycard.String("x"),
+			Expand: keycard.ZonePolicySetVersionListPoliciesParamsExpandUnion{
+				OfZonePolicySetVersionListPoliciessExpandPdpExpandField: keycard.String("total_count"),
+			},
 			Format:           keycard.ZonePolicySetVersionListPoliciesParamsFormatCedar,
 			Limit:            keycard.Int(1),
 			Order:            keycard.ZonePolicySetVersionListPoliciesParamsOrderAsc,

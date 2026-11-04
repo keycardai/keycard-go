@@ -306,6 +306,9 @@ type ZonePolicySchemaListParams struct {
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
+	// Opt-in to additional response fields (`total_count`, `user`). Repeatable;
+	// matches the `expand[]` convention used across the Keycard API.
+	Expand ZonePolicySchemaListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Schema representation format. `cedar` returns human-readable Cedar syntax in
 	// `cedar_schema`, `json` returns Cedar JSON schema object in `cedar_schema_json`.
 	//
@@ -330,6 +333,28 @@ func (r ZonePolicySchemaListParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZonePolicySchemaListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZonePolicySchemaListsExpandPdpExpandField)
+	OfZonePolicySchemaListsExpandPdpExpandField param.Opt[string] `query:",omitzero,inline"`
+	OfZonePolicySchemaListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Opt-in response field requested via `expand[]` on list endpoints. `total_count`
+// adds `pagination.total_count`; `user` adds a `*_user` object beside every
+// `created_by`, `updated_by` and `archived_by` field that resolves to an
+// organization user.
+type ZonePolicySchemaListParamsExpandPdpExpandField string
+
+const (
+	ZonePolicySchemaListParamsExpandPdpExpandFieldTotalCount ZonePolicySchemaListParamsExpandPdpExpandField = "total_count"
+	ZonePolicySchemaListParamsExpandPdpExpandFieldUser       ZonePolicySchemaListParamsExpandPdpExpandField = "user"
+)
 
 // Schema representation format. `cedar` returns human-readable Cedar syntax in
 // `cedar_schema`, `json` returns Cedar JSON schema object in `cedar_schema_json`.

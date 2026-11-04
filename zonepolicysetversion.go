@@ -433,9 +433,7 @@ type ZonePolicySetVersionGetParams struct {
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Opt-in to additional response fields on a single resource (`user`). Repeatable.
-	//
-	// Any of "user".
-	Expand []string `query:"expand,omitzero" json:"-"`
+	Expand ZonePolicySetVersionGetParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	paramObj
 }
 
@@ -447,6 +445,25 @@ func (r ZonePolicySetVersionGetParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZonePolicySetVersionGetParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZonePolicySetVersionGetsExpandPdpExpandSingleField)
+	OfZonePolicySetVersionGetsExpandPdpExpandSingleField param.Opt[string] `query:",omitzero,inline"`
+	OfZonePolicySetVersionGetsExpandArrayItemArray       []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Opt-in response field requested via `expand[]` on single-resource reads. `user`
+// behaves as described on `ExpandField`.
+type ZonePolicySetVersionGetParamsExpandPdpExpandSingleField string
+
+const (
+	ZonePolicySetVersionGetParamsExpandPdpExpandSingleFieldUser ZonePolicySetVersionGetParamsExpandPdpExpandSingleField = "user"
+)
 
 type ZonePolicySetVersionUpdateParams struct {
 	ZoneID      string `path:"zone_id" api:"required" json:"-"`
@@ -480,6 +497,9 @@ type ZonePolicySetVersionListParams struct {
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
+	// Opt-in to additional response fields (`total_count`, `user`). Repeatable;
+	// matches the `expand[]` convention used across the Keycard API.
+	Expand ZonePolicySetVersionListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Sort direction. Default is desc (newest first).
 	//
 	// Any of "asc", "desc".
@@ -499,6 +519,28 @@ func (r ZonePolicySetVersionListParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZonePolicySetVersionListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZonePolicySetVersionListsExpandPdpExpandField)
+	OfZonePolicySetVersionListsExpandPdpExpandField param.Opt[string] `query:",omitzero,inline"`
+	OfZonePolicySetVersionListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Opt-in response field requested via `expand[]` on list endpoints. `total_count`
+// adds `pagination.total_count`; `user` adds a `*_user` object beside every
+// `created_by`, `updated_by` and `archived_by` field that resolves to an
+// organization user.
+type ZonePolicySetVersionListParamsExpandPdpExpandField string
+
+const (
+	ZonePolicySetVersionListParamsExpandPdpExpandFieldTotalCount ZonePolicySetVersionListParamsExpandPdpExpandField = "total_count"
+	ZonePolicySetVersionListParamsExpandPdpExpandFieldUser       ZonePolicySetVersionListParamsExpandPdpExpandField = "user"
+)
 
 // Sort direction. Default is desc (newest first).
 type ZonePolicySetVersionListParamsOrder string
@@ -536,6 +578,9 @@ type ZonePolicySetVersionListPoliciesParams struct {
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
+	// Opt-in to additional response fields (`total_count`, `user`). Repeatable;
+	// matches the `expand[]` convention used across the Keycard API.
+	Expand ZonePolicySetVersionListPoliciesParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Narrows which Cedar representation the response includes. When omitted, both
 	// `cedar_json` and `cedar_raw` are populated. Pass `json` to receive only
 	// `cedar_json`, or `cedar` to receive only `cedar_raw`. Callers that don't care
@@ -562,6 +607,28 @@ func (r ZonePolicySetVersionListPoliciesParams) URLQuery() (v url.Values, err er
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZonePolicySetVersionListPoliciesParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZonePolicySetVersionListPoliciessExpandPdpExpandField)
+	OfZonePolicySetVersionListPoliciessExpandPdpExpandField param.Opt[string] `query:",omitzero,inline"`
+	OfZonePolicySetVersionListPoliciessExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Opt-in response field requested via `expand[]` on list endpoints. `total_count`
+// adds `pagination.total_count`; `user` adds a `*_user` object beside every
+// `created_by`, `updated_by` and `archived_by` field that resolves to an
+// organization user.
+type ZonePolicySetVersionListPoliciesParamsExpandPdpExpandField string
+
+const (
+	ZonePolicySetVersionListPoliciesParamsExpandPdpExpandFieldTotalCount ZonePolicySetVersionListPoliciesParamsExpandPdpExpandField = "total_count"
+	ZonePolicySetVersionListPoliciesParamsExpandPdpExpandFieldUser       ZonePolicySetVersionListPoliciesParamsExpandPdpExpandField = "user"
+)
 
 // Narrows which Cedar representation the response includes. When omitted, both
 // `cedar_json` and `cedar_raw` are populated. Pass `json` to receive only
