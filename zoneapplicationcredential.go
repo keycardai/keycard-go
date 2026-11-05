@@ -320,8 +320,9 @@ func (r *PublicKey) UnmarshalJSON(data []byte) error {
 
 // Token-based application credential
 type Token struct {
-	// Identifier for this credential. For token type, this equals the subject value,
-	// or '\*' when subject is not specified.
+	// Identifier for this credential. For version 2, this equals the credential ID and
+	// is the OAuth 2.0 client ID the workload sends. For version 1, this equals the
+	// subject value, or '\*' when subject is not specified.
 	Identifier string `json:"identifier" api:"required"`
 	// ID of the provider issuing tokens verified by this credential
 	ProviderID string `json:"provider_id" api:"required"`
@@ -557,7 +558,8 @@ type ZoneApplicationCredentialNewParamsBodyApplicationCredentialCreateToken stru
 	// Any of "token".
 	Type string `json:"type,omitzero" api:"required"`
 	// Subject identifier for the token. When omitted, any token from the provider is
-	// accepted without checking application-specific claims.
+	// accepted without checking application-specific claims. A version 2 credential
+	// must set subject or authentication_condition.
 	Subject param.Opt[string] `json:"subject,omitzero"`
 	paramObj
 }
