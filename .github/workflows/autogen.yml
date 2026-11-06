@@ -1,0 +1,54 @@
+name: Autogen
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - autogen
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  autogen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: mint release app token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.SDK_RELEASE_APP_ID }}
+          private-key: ${{ secrets.SDK_RELEASE_PRIVATE_KEY }}
+          owner: keycardai
+          repositories: |
+            keycard-go
+
+      - name: configure git user
+        run: |
+          APP_ID="${{ vars.SDK_RELEASE_APP_ID }}"
+          APP_NAME="keycard-sdk-release[bot]"
+          git config --global user.name "$APP_NAME"
+          git config --global user.email "$APP_ID+$APP_NAME@users.noreply.github.com"
+
+      - name: checkout
+        uses: actions/checkout@v4
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        with:
+          fetch-depth: 0
+
+      - name: create & merge `autogen` → `main` PR
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          PR_NUM=$(gh pr list --base main --head autogen --state open --json number --jq '.[0].number')
+          if [[ $PR_NUM ]]; then
+            echo "Autogen Pull Request: $PR_NUM"
+          else
+            PR_URL=$(gh pr create --base main --head autogen --fill)
+            PR_NUM=${PR_URL##*/}
+            echo "Autogen Pull Request: $PR_NUM"
+          fi
+          gh pr merge $PR_NUM --squash --auto
