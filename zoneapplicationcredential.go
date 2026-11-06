@@ -67,7 +67,8 @@ func (r *ZoneApplicationCredentialService) Get(ctx context.Context, id string, q
 	return res, err
 }
 
-// Updates an application credential's configuration
+// Updates an application credential's configuration. A field the credential type
+// cannot change returns 400, unless it matches the stored value.
 func (r *ZoneApplicationCredentialService) Update(ctx context.Context, id string, params ZoneApplicationCredentialUpdateParams, opts ...option.RequestOption) (res *CredentialUnion, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if params.ZoneID == "" {
@@ -83,7 +84,11 @@ func (r *ZoneApplicationCredentialService) Update(ctx context.Context, id string
 	return res, err
 }
 
-// Returns a list of application credentials in the specified zone
+// Returns a paginated list of application credentials in the specified zone. Use
+// cursor pagination via `after`/`before`. Use `expand[]=total_count` to include
+// the matching row count. Search via `query[identifier]`, `query[provider_name]`,
+// or `query[]` (identifier or provider name); all are substring matches, OR'd
+// across repeated values.
 func (r *ZoneApplicationCredentialService) List(ctx context.Context, zoneID string, query ZoneApplicationCredentialListParams, opts ...option.RequestOption) (res *ZoneApplicationCredentialListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -315,8 +320,9 @@ func (r *PublicKey) UnmarshalJSON(data []byte) error {
 
 // Token-based application credential
 type Token struct {
-	// Identifier for this credential. For token type, this equals the subject value,
-	// or '\*' when subject is not specified.
+	// Identifier for this credential. For version 2, this equals the credential ID and
+	// is the OAuth 2.0 client ID the workload sends. For version 1, this equals the
+	// subject value, or '\*' when subject is not specified.
 	Identifier string `json:"identifier" api:"required"`
 	// ID of the provider issuing tokens verified by this credential
 	ProviderID string `json:"provider_id" api:"required"`
@@ -459,6 +465,8 @@ func (r *ZoneApplicationCredentialNewResponseUnion) UnmarshalJSON(data []byte) e
 type ZoneApplicationCredentialListResponse struct {
 	Items []CredentialUnion `json:"items" api:"required"`
 	// Pagination information
+	//
+	// Deprecated: deprecated
 	PageInfo PageInfoPagination `json:"page_info" api:"required"`
 	// Cursor-based pagination metadata
 	Pagination ZoneApplicationCredentialListResponsePagination `json:"pagination" api:"required"`
@@ -550,7 +558,8 @@ type ZoneApplicationCredentialNewParamsBodyApplicationCredentialCreateToken stru
 	// Any of "token".
 	Type string `json:"type,omitzero" api:"required"`
 	// Subject identifier for the token. When omitted, any token from the provider is
-	// accepted without checking application-specific claims.
+	// accepted without checking application-specific claims. A version 2 credential
+	// must set subject or authentication_condition.
 	Subject param.Opt[string] `json:"subject,omitzero"`
 	paramObj
 }
@@ -771,6 +780,8 @@ func init() {
 
 // Schema for updating a public key credential
 type ZoneApplicationCredentialUpdateParamsBodyPublicKeyCredentialUpdate struct {
+	// JWKS URI to retrieve public keys from
+	JwksUri param.Opt[string] `json:"jwks_uri,omitzero" format:"uri"`
 	// Any of "public-key".
 	Type string `json:"type,omitzero"`
 	paramObj
@@ -842,11 +853,35 @@ type ZoneApplicationCredentialListParams struct {
 	ApplicationID param.Opt[string] `query:"applicationId,omitzero" json:"-"`
 	// Cursor for backward pagination
 	Before param.Opt[string] `query:"before,omitzero" json:"-"`
-	Cursor param.Opt[string] `query:"cursor,omitzero" json:"-"`
 	// Maximum number of items to return
-	Limit  param.Opt[int64]                               `query:"limit,omitzero" json:"-"`
-	Slug   param.Opt[string]                              `query:"slug,omitzero" json:"-"`
+	Limit param.Opt[int64]  `query:"limit,omitzero" json:"-"`
+	Slug  param.Opt[string] `query:"slug,omitzero" json:"-"`
+	// Comma-separated sort fields. Prefix with - for descending. Allowed: created_at
+	Sort   param.Opt[string]                              `query:"sort,omitzero" json:"-"`
 	Expand ZoneApplicationCredentialListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Exclude credentials whose owning application has this owner type, e.g.
+	// `filter[owner_type][ne]=platform` returns only credentials of org-created
+	// applications.
+	//
+	// Any of "platform", "customer".
+	FilterOwnerTypeNe ZoneApplicationCredentialListParamsFilterOwnerTypeNe `query:"filter[owner_type][ne],omitzero" json:"-"`
+	// Exclude credentials whose owning application has this trait. A single value
+	// excludes that trait; repeated params accumulate into a not-in set (max 100), so
+	// a credential matches when its application's traits contain none of them. Each
+	// value is a single literal trait; a comma is a literal character in the value,
+	// not a delimiter.
+	FilterTraitsNe ZoneApplicationCredentialListParamsFilterTraitsNeUnion `query:"filter[traits][ne],omitzero" json:"-"`
+	// Filter by credential type; repeated values are OR'd, e.g.
+	// `filter[type]=token&filter[type]=password`.
+	FilterType ZoneApplicationCredentialListParamsFilterTypeUnion `query:"filter[type],omitzero" json:"-"`
+	// Search across credential identifier and linked provider name (substring match,
+	// OR'd across repeated values)
+	Query ZoneApplicationCredentialListParamsQueryUnion `query:"query[],omitzero" json:"-"`
+	// Search by credential identifier (substring match, OR'd across repeated values)
+	QueryIdentifier ZoneApplicationCredentialListParamsQueryIdentifierUnion `query:"query[identifier],omitzero" json:"-"`
+	// Search by the linked provider's name (substring match, OR'd across repeated
+	// values)
+	QueryProviderName ZoneApplicationCredentialListParamsQueryProviderNameUnion `query:"query[provider_name],omitzero" json:"-"`
 	paramObj
 }
 
@@ -875,6 +910,75 @@ type ZoneApplicationCredentialListParamsExpandString string
 const (
 	ZoneApplicationCredentialListParamsExpandStringTotalCount ZoneApplicationCredentialListParamsExpandString = "total_count"
 )
+
+// Exclude credentials whose owning application has this owner type, e.g.
+// `filter[owner_type][ne]=platform` returns only credentials of org-created
+// applications.
+type ZoneApplicationCredentialListParamsFilterOwnerTypeNe string
+
+const (
+	ZoneApplicationCredentialListParamsFilterOwnerTypeNePlatform ZoneApplicationCredentialListParamsFilterOwnerTypeNe = "platform"
+	ZoneApplicationCredentialListParamsFilterOwnerTypeNeCustomer ZoneApplicationCredentialListParamsFilterOwnerTypeNe = "customer"
+)
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneApplicationCredentialListParamsFilterTraitsNeUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneApplicationCredentialListParamsFilterTypeUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneApplicationCredentialListsFilterTypeString)
+	OfZoneApplicationCredentialListsFilterTypeString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneApplicationCredentialListsFilterTypeArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Filter by credential type; repeated values are OR'd, e.g.
+// `filter[type]=token&filter[type]=password`.
+type ZoneApplicationCredentialListParamsFilterTypeString string
+
+const (
+	ZoneApplicationCredentialListParamsFilterTypeStringToken     ZoneApplicationCredentialListParamsFilterTypeString = "token"
+	ZoneApplicationCredentialListParamsFilterTypeStringPassword  ZoneApplicationCredentialListParamsFilterTypeString = "password"
+	ZoneApplicationCredentialListParamsFilterTypeStringPublicKey ZoneApplicationCredentialListParamsFilterTypeString = "public-key"
+	ZoneApplicationCredentialListParamsFilterTypeStringURL       ZoneApplicationCredentialListParamsFilterTypeString = "url"
+	ZoneApplicationCredentialListParamsFilterTypeStringPublic    ZoneApplicationCredentialListParamsFilterTypeString = "public"
+)
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneApplicationCredentialListParamsQueryUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneApplicationCredentialListParamsQueryIdentifierUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneApplicationCredentialListParamsQueryProviderNameUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
 
 type ZoneApplicationCredentialDeleteParams struct {
 	ZoneID string `path:"zoneId" api:"required" json:"-"`
