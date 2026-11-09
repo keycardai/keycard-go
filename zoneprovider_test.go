@@ -46,10 +46,18 @@ func TestZoneProviderNewWithOptionalParams(t *testing.T) {
 					AuthorizationParameters: map[string]string{
 						"foo": "string",
 					},
-					AuthorizationResourceEnabled:    keycard.Bool(true),
-					AuthorizationResourceParameter:  keycard.String("authorization_resource_parameter"),
-					CodeChallengeMethodsSupported:   []string{"string"},
-					Issuer:                          keycard.String("https://example.com"),
+					AuthorizationResourceEnabled:   keycard.Bool(true),
+					AuthorizationResourceParameter: keycard.String("authorization_resource_parameter"),
+					CodeChallengeMethodsSupported:  []string{"string"},
+					Issuer:                         keycard.String("https://example.com"),
+					Jwks: keycard.ZoneProviderNewParamsProtocolsOauth2Jwks{
+						Keys: []keycard.ZoneProviderNewParamsProtocolsOauth2JwksKey{{
+							Kid: "x",
+							Kty: "kty",
+							Alg: keycard.String("alg"),
+							Use: keycard.String("use"),
+						}},
+					},
 					JwksUri:                         keycard.String("https://example.com"),
 					RegistrationEndpoint:            keycard.String("https://example.com"),
 					ScopeParameter:                  keycard.String("scope_parameter"),
@@ -59,7 +67,6 @@ func TestZoneProviderNewWithOptionalParams(t *testing.T) {
 					TokenResponseAccessTokenPointer: keycard.String("token_response_access_token_pointer"),
 				},
 				Openid: keycard.ZoneProviderNewParamsProtocolsOpenid{
-					ExternalIDClaim:     keycard.String("external_id_claim"),
 					Scopes:              []string{"string"},
 					SingleLogoutEnabled: keycard.Bool(true),
 					UserIdentifierClaim: keycard.String("user_identifier_claim"),
@@ -142,10 +149,18 @@ func TestZoneProviderUpdateWithOptionalParams(t *testing.T) {
 					AuthorizationParameters: map[string]string{
 						"foo": "string",
 					},
-					AuthorizationResourceEnabled:    keycard.Bool(true),
-					AuthorizationResourceParameter:  keycard.String("authorization_resource_parameter"),
-					CodeChallengeMethodsSupported:   []string{"string"},
-					Issuer:                          keycard.String("https://example.com"),
+					AuthorizationResourceEnabled:   keycard.Bool(true),
+					AuthorizationResourceParameter: keycard.String("authorization_resource_parameter"),
+					CodeChallengeMethodsSupported:  []string{"string"},
+					Issuer:                         keycard.String("https://example.com"),
+					Jwks: keycard.ZoneProviderUpdateParamsProtocolsOauth2Jwks{
+						Keys: []keycard.ZoneProviderUpdateParamsProtocolsOauth2JwksKey{{
+							Kid: "x",
+							Kty: "kty",
+							Alg: keycard.String("alg"),
+							Use: keycard.String("use"),
+						}},
+					},
 					JwksUri:                         keycard.String("https://example.com"),
 					RegistrationEndpoint:            keycard.String("https://example.com"),
 					ScopeParameter:                  keycard.String("scope_parameter"),
@@ -155,7 +170,6 @@ func TestZoneProviderUpdateWithOptionalParams(t *testing.T) {
 					TokenResponseAccessTokenPointer: keycard.String("token_response_access_token_pointer"),
 				},
 				Openid: keycard.ZoneProviderUpdateParamsProtocolsOpenid{
-					ExternalIDClaim:     keycard.String("external_id_claim"),
 					Scopes:              []string{"string"},
 					SingleLogoutEnabled: keycard.Bool(true),
 					UserIdentifierClaim: keycard.String("user_identifier_claim"),
@@ -201,10 +215,29 @@ func TestZoneProviderListWithOptionalParams(t *testing.T) {
 			FilterID: keycard.ZoneProviderListParamsFilterIDUnion{
 				OfString: keycard.String("string"),
 			},
+			FilterIdentifier: keycard.ZoneProviderListParamsFilterIdentifierUnion{
+				OfString: keycard.String("string"),
+			},
+			FilterSlug: keycard.ZoneProviderListParamsFilterSlugUnion{
+				OfString: keycard.String("string"),
+			},
+			FilterType: keycard.ZoneProviderListParamsFilterTypeUnion{
+				OfZoneProviderListsFilterTypeString: keycard.String("external"),
+			},
 			Identifier: keycard.String("identifier"),
 			Limit:      keycard.Int(1),
-			Slug:       keycard.String("slug"),
-			Type:       keycard.ZoneProviderListParamsTypeExternal,
+			Query: keycard.ZoneProviderListParamsQueryUnion{
+				OfString: keycard.String("x"),
+			},
+			QueryIdentifier: keycard.ZoneProviderListParamsQueryIdentifierUnion{
+				OfString: keycard.String("x"),
+			},
+			QueryName: keycard.ZoneProviderListParamsQueryNameUnion{
+				OfString: keycard.String("x"),
+			},
+			Slug: keycard.String("slug"),
+			Sort: keycard.String("-identifier,\t\r\r \tidentifier,\n\f\t\f\ncreated_at"),
+			Type: keycard.ZoneProviderListParamsTypeExternal,
 		},
 	)
 	if err != nil {
@@ -235,6 +268,37 @@ func TestZoneProviderDelete(t *testing.T) {
 		context.TODO(),
 		"id",
 		keycard.ZoneProviderDeleteParams{
+			ZoneID: "zoneId",
+		},
+	)
+	if err != nil {
+		var apierr *keycard.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestZoneProviderValidate(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := keycard.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
+	)
+	_, err := client.Zones.Providers.Validate(
+		context.TODO(),
+		"id",
+		keycard.ZoneProviderValidateParams{
 			ZoneID: "zoneId",
 		},
 	)
