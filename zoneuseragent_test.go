@@ -68,6 +68,12 @@ func TestZoneUserAgentListWithOptionalParams(t *testing.T) {
 			Expand: keycard.ZoneUserAgentListParamsExpandUnion{
 				OfZoneUserAgentListsExpandString: keycard.String("total_count"),
 			},
+			FilterID: keycard.ZoneUserAgentListParamsFilterIDUnion{
+				OfString: keycard.String("string"),
+			},
+			FilterIdentifier: keycard.ZoneUserAgentListParamsFilterIdentifierUnion{
+				OfString: keycard.String("string"),
+			},
 			Limit: keycard.Int(1),
 		},
 	)
