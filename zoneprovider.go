@@ -266,8 +266,13 @@ type ProviderProtocolsOauth2 struct {
 	// "resource" when authorization_resource_enabled is true.
 	AuthorizationResourceParameter string   `json:"authorization_resource_parameter" api:"nullable"`
 	CodeChallengeMethodsSupported  []string `json:"code_challenge_methods_supported" api:"nullable"`
-	JwksUri                        string   `json:"jwks_uri" api:"nullable" format:"uri"`
-	RegistrationEndpoint           string   `json:"registration_endpoint" api:"nullable" format:"uri"`
+	// Inline JSON Web Key Set (RFC 7517) used to verify the provider's tokens instead
+	// of fetching jwks_uri or discovery, for issuers Keycard can't reach, such as a
+	// local Kubernetes cluster. Mutually exclusive with jwks_uri. Keys stay trusted
+	// until removed, so add a rotated key before the issuer signs with it.
+	Jwks                 ProviderProtocolsOauth2Jwks `json:"jwks" api:"nullable"`
+	JwksUri              string                      `json:"jwks_uri" api:"nullable" format:"uri"`
+	RegistrationEndpoint string                      `json:"registration_endpoint" api:"nullable" format:"uri"`
 	// The query parameter name for scopes in authorization requests. Defaults to
 	// "scope". Slack v2 uses "user_scope".
 	ScopeParameter string `json:"scope_parameter" api:"nullable"`
@@ -287,6 +292,7 @@ type ProviderProtocolsOauth2 struct {
 		AuthorizationResourceEnabled    respjson.Field
 		AuthorizationResourceParameter  respjson.Field
 		CodeChallengeMethodsSupported   respjson.Field
+		Jwks                            respjson.Field
 		JwksUri                         respjson.Field
 		RegistrationEndpoint            respjson.Field
 		ScopeParameter                  respjson.Field
@@ -302,6 +308,56 @@ type ProviderProtocolsOauth2 struct {
 // Returns the unmodified JSON received from the API
 func (r ProviderProtocolsOauth2) RawJSON() string { return r.JSON.raw }
 func (r *ProviderProtocolsOauth2) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Inline JSON Web Key Set (RFC 7517) used to verify the provider's tokens instead
+// of fetching jwks_uri or discovery, for issuers Keycard can't reach, such as a
+// local Kubernetes cluster. Mutually exclusive with jwks_uri. Keys stay trusted
+// until removed, so add a rotated key before the issuer signs with it.
+type ProviderProtocolsOauth2Jwks struct {
+	Keys []ProviderProtocolsOauth2JwksKey `json:"keys" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Keys        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ProviderProtocolsOauth2Jwks) RawJSON() string { return r.JSON.raw }
+func (r *ProviderProtocolsOauth2Jwks) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A public JSON Web Key (RFC 7517). Members beyond those listed, such as n and e,
+// or crv, x and y, are kept as given. Private key material is rejected.
+type ProviderProtocolsOauth2JwksKey struct {
+	// Key ID, unique within the set.
+	Kid string `json:"kid" api:"required"`
+	// Key type: "RSA", or "EC" on P-256, P-384 or P-521.
+	Kty string `json:"kty" api:"required"`
+	// Algorithm the key verifies: RS256 for RSA, ES256, ES384 or ES512 for EC on the
+	// matching curve.
+	Alg string `json:"alg"`
+	// Public key use. Must be "sig" when set.
+	Use         string         `json:"use"`
+	ExtraFields map[string]any `json:"" api:"extrafields"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Kid         respjson.Field
+		Kty         respjson.Field
+		Alg         respjson.Field
+		Use         respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ProviderProtocolsOauth2JwksKey) RawJSON() string { return r.JSON.raw }
+func (r *ProviderProtocolsOauth2JwksKey) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -550,6 +606,11 @@ type ZoneProviderNewParamsProtocolsOauth2 struct {
 	// Dot-separated path to the access token in the token response body. Defaults to
 	// "access_token". Slack v2 uses "authed_user.access_token".
 	TokenResponseAccessTokenPointer param.Opt[string] `json:"token_response_access_token_pointer,omitzero"`
+	// Inline JSON Web Key Set (RFC 7517) used to verify the provider's tokens instead
+	// of fetching jwks_uri or discovery, for issuers Keycard can't reach, such as a
+	// local Kubernetes cluster. Mutually exclusive with jwks_uri. Keys stay trusted
+	// until removed, so add a rotated key before the issuer signs with it.
+	Jwks ZoneProviderNewParamsProtocolsOauth2Jwks `json:"jwks,omitzero"`
 	// Custom query parameters appended to authorization redirect URLs. Use for
 	// non-standard providers (e.g. Google prompt=consent, access_type=offline).
 	AuthorizationParameters       map[string]string `json:"authorization_parameters,omitzero"`
@@ -563,6 +624,51 @@ func (r ZoneProviderNewParamsProtocolsOauth2) MarshalJSON() (data []byte, err er
 	return param.MarshalObject(r, (*shadow)(&r))
 }
 func (r *ZoneProviderNewParamsProtocolsOauth2) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Inline JSON Web Key Set (RFC 7517) used to verify the provider's tokens instead
+// of fetching jwks_uri or discovery, for issuers Keycard can't reach, such as a
+// local Kubernetes cluster. Mutually exclusive with jwks_uri. Keys stay trusted
+// until removed, so add a rotated key before the issuer signs with it.
+//
+// The property Keys is required.
+type ZoneProviderNewParamsProtocolsOauth2Jwks struct {
+	Keys []ZoneProviderNewParamsProtocolsOauth2JwksKey `json:"keys,omitzero" api:"required"`
+	paramObj
+}
+
+func (r ZoneProviderNewParamsProtocolsOauth2Jwks) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneProviderNewParamsProtocolsOauth2Jwks
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZoneProviderNewParamsProtocolsOauth2Jwks) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A public JSON Web Key (RFC 7517). Members beyond those listed, such as n and e,
+// or crv, x and y, are kept as given. Private key material is rejected.
+//
+// The properties Kid, Kty are required.
+type ZoneProviderNewParamsProtocolsOauth2JwksKey struct {
+	// Key ID, unique within the set.
+	Kid string `json:"kid" api:"required"`
+	// Key type: "RSA", or "EC" on P-256, P-384 or P-521.
+	Kty string `json:"kty" api:"required"`
+	// Algorithm the key verifies: RS256 for RSA, ES256, ES384 or ES512 for EC on the
+	// matching curve.
+	Alg param.Opt[string] `json:"alg,omitzero"`
+	// Public key use. Must be "sig" when set.
+	Use         param.Opt[string] `json:"use,omitzero"`
+	ExtraFields map[string]any    `json:"-"`
+	paramObj
+}
+
+func (r ZoneProviderNewParamsProtocolsOauth2JwksKey) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneProviderNewParamsProtocolsOauth2JwksKey
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *ZoneProviderNewParamsProtocolsOauth2JwksKey) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -684,7 +790,12 @@ type ZoneProviderUpdateParamsProtocolsOauth2 struct {
 	// unset.
 	AuthorizationParameters       map[string]string `json:"authorization_parameters,omitzero"`
 	CodeChallengeMethodsSupported []string          `json:"code_challenge_methods_supported,omitzero"`
-	ScopesSupported               []string          `json:"scopes_supported,omitzero"`
+	// Inline JSON Web Key Set (RFC 7517) used to verify the provider's tokens instead
+	// of fetching jwks_uri or discovery, for issuers Keycard can't reach, such as a
+	// local Kubernetes cluster. Mutually exclusive with jwks_uri. Keys stay trusted
+	// until removed, so add a rotated key before the issuer signs with it.
+	Jwks            ZoneProviderUpdateParamsProtocolsOauth2Jwks `json:"jwks,omitzero"`
+	ScopesSupported []string                                    `json:"scopes_supported,omitzero"`
 	paramObj
 }
 
@@ -693,6 +804,51 @@ func (r ZoneProviderUpdateParamsProtocolsOauth2) MarshalJSON() (data []byte, err
 	return param.MarshalObject(r, (*shadow)(&r))
 }
 func (r *ZoneProviderUpdateParamsProtocolsOauth2) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Inline JSON Web Key Set (RFC 7517) used to verify the provider's tokens instead
+// of fetching jwks_uri or discovery, for issuers Keycard can't reach, such as a
+// local Kubernetes cluster. Mutually exclusive with jwks_uri. Keys stay trusted
+// until removed, so add a rotated key before the issuer signs with it.
+//
+// The property Keys is required.
+type ZoneProviderUpdateParamsProtocolsOauth2Jwks struct {
+	Keys []ZoneProviderUpdateParamsProtocolsOauth2JwksKey `json:"keys,omitzero" api:"required"`
+	paramObj
+}
+
+func (r ZoneProviderUpdateParamsProtocolsOauth2Jwks) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneProviderUpdateParamsProtocolsOauth2Jwks
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZoneProviderUpdateParamsProtocolsOauth2Jwks) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A public JSON Web Key (RFC 7517). Members beyond those listed, such as n and e,
+// or crv, x and y, are kept as given. Private key material is rejected.
+//
+// The properties Kid, Kty are required.
+type ZoneProviderUpdateParamsProtocolsOauth2JwksKey struct {
+	// Key ID, unique within the set.
+	Kid string `json:"kid" api:"required"`
+	// Key type: "RSA", or "EC" on P-256, P-384 or P-521.
+	Kty string `json:"kty" api:"required"`
+	// Algorithm the key verifies: RS256 for RSA, ES256, ES384 or ES512 for EC on the
+	// matching curve.
+	Alg param.Opt[string] `json:"alg,omitzero"`
+	// Public key use. Must be "sig" when set.
+	Use         param.Opt[string] `json:"use,omitzero"`
+	ExtraFields map[string]any    `json:"-"`
+	paramObj
+}
+
+func (r ZoneProviderUpdateParamsProtocolsOauth2JwksKey) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneProviderUpdateParamsProtocolsOauth2JwksKey
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *ZoneProviderUpdateParamsProtocolsOauth2JwksKey) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
