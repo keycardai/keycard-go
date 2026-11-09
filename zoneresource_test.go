@@ -56,7 +56,7 @@ func TestZoneResourceNewWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestZoneResourceGet(t *testing.T) {
+func TestZoneResourceGetWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -76,6 +76,9 @@ func TestZoneResourceGet(t *testing.T) {
 		"id",
 		keycard.ZoneResourceGetParams{
 			ZoneID: "zoneId",
+			Expand: keycard.ZoneResourceGetParamsExpandUnion{
+				OfZoneResourceGetsExpandString: keycard.String("credential_provider"),
+			},
 		},
 	)
 	if err != nil {
@@ -156,16 +159,35 @@ func TestZoneResourceListWithOptionalParams(t *testing.T) {
 			Expand: keycard.ZoneResourceListParamsExpandUnion{
 				OfZoneResourceListsExpandString: keycard.String("total_count"),
 			},
+			FilterDependencyOfApplicationIDNe: keycard.ZoneResourceListParamsFilterDependencyOfApplicationIDNeUnion{
+				OfString: keycard.String("string"),
+			},
+			FilterID: keycard.ZoneResourceListParamsFilterIDUnion{
+				OfString: keycard.String("string"),
+			},
 			FilterIdentifier: keycard.ZoneResourceListParamsFilterIdentifierUnion{
 				OfString: keycard.String("string"),
 			},
 			FilterOwnerType: keycard.ZoneResourceListParamsFilterOwnerTypePlatform,
+			FilterSlug: keycard.ZoneResourceListParamsFilterSlugUnion{
+				OfString: keycard.String("string"),
+			},
 			FilterTraits: keycard.ZoneResourceListParamsFilterTraitsUnion{
 				OfString: keycard.String("string"),
 			},
 			Identifier: keycard.String("identifier"),
 			Limit:      keycard.Int(1),
-			Slug:       keycard.String("slug"),
+			Query: keycard.ZoneResourceListParamsQueryUnion{
+				OfString: keycard.String("x"),
+			},
+			QueryIdentifier: keycard.ZoneResourceListParamsQueryIdentifierUnion{
+				OfString: keycard.String("x"),
+			},
+			QueryName: keycard.ZoneResourceListParamsQueryNameUnion{
+				OfString: keycard.String("x"),
+			},
+			Slug: keycard.String("slug"),
+			Sort: keycard.String("-identifier,\t\r\r \tidentifier,\n\f\t\f\ncreated_at"),
 		},
 	)
 	if err != nil {
