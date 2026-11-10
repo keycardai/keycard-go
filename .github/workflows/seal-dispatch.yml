@@ -1,0 +1,46 @@
+name: Seal custom code
+
+# When a human change lands on main, ask keycard-api to run `stlc build`. The build seals the
+# new commit as custom code, so later regenerations re-apply it. This fires the
+# `repository_dispatch: seal-custom-code` trigger in keycard-api's stlc-generate.yml.
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}
+  # Several merges in a row only need one sync.
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  seal-dispatch:
+    runs-on: ubuntu-latest
+    # Skip codegen merges (autogen.yml auto-merges `autogen` → `main` as this app), so an SDK
+    # build doesn't trigger another build.
+    if: github.actor != 'keycard-sdk-release[bot]'
+    timeout-minutes: 5
+    steps:
+      - name: mint keycard-api app token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.SDK_RELEASE_APP_ID }}
+          private-key: ${{ secrets.SDK_RELEASE_PRIVATE_KEY }}
+          owner: keycardai
+          repositories: |
+            keycard-api
+
+      - name: dispatch seal-custom-code
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          SOURCE_REPO: ${{ github.repository }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          gh api repos/keycardai/keycard-api/dispatches \
+            -f event_type=seal-custom-code \
+            -f "client_payload[repo]=$SOURCE_REPO" \
+            -f "client_payload[sha]=$SOURCE_SHA"
+          echo "Asked keycard-api to seal $SOURCE_REPO@$SOURCE_SHA"
