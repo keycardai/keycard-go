@@ -47,7 +47,6 @@ func TestZoneNewWithOptionalParams(t *testing.T) {
 				PkceRequired: keycard.Bool(true),
 			},
 		},
-		RequiresInvitation: keycard.Bool(true),
 	})
 	if err != nil {
 		var apierr *keycard.Error
@@ -117,7 +116,8 @@ func TestZoneUpdateWithOptionalParams(t *testing.T) {
 				Arn:  "x",
 				Type: "aws",
 			},
-			Name: keycard.String("x"),
+			ExternalSyncEnabled: keycard.Bool(true),
+			Name:                keycard.String("x"),
 			Protocols: keycard.ZoneUpdateParamsProtocols{
 				Oauth2: keycard.ZoneUpdateParamsProtocolsOauth2{
 					Cimd: keycard.ZoneUpdateParamsProtocolsOauth2Cimd{
@@ -128,7 +128,6 @@ func TestZoneUpdateWithOptionalParams(t *testing.T) {
 					PkceRequired: keycard.Bool(true),
 				},
 			},
-			RequiresInvitation:     keycard.Bool(true),
 			UserIdentityProviderID: keycard.String("user_identity_provider_id"),
 		},
 	)
@@ -164,8 +163,11 @@ func TestZoneListWithOptionalParams(t *testing.T) {
 			OfZoneListsExpandString: keycard.String("total_count"),
 		},
 		FilterOrganizationID: keycard.String("filter[organization_id]"),
-		Limit:                keycard.Int(1),
-		Slug:                 keycard.String("slug"),
+		FilterPermissionIn: keycard.ZoneListParamsFilterPermissionInUnion{
+			OfString: keycard.String("string"),
+		},
+		Limit: keycard.Int(1),
+		Slug:  keycard.String("slug"),
 	})
 	if err != nil {
 		var apierr *keycard.Error
