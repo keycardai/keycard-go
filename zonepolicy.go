@@ -79,7 +79,7 @@ func (r *ZonePolicyService) Get(ctx context.Context, policyID string, params Zon
 		return nil, err
 	}
 	path := fmt.Sprintf("zones/%s/policies/%s", url.PathEscape(params.ZoneID), url.PathEscape(policyID))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
 	return res, err
 }
 
@@ -168,11 +168,14 @@ type Policy struct {
 	// - `"customer"` — managed by the tenant (custom policies).
 	//
 	// Any of "platform", "customer".
-	OwnerType   PolicyOwnerType `json:"owner_type" api:"required"`
-	UpdatedAt   time.Time       `json:"updated_at" api:"required" format:"date-time"`
-	ZoneID      string          `json:"zone_id" api:"required"`
-	ArchivedAt  time.Time       `json:"archived_at" api:"nullable" format:"date-time"`
-	Description string          `json:"description" api:"nullable"`
+	OwnerType  PolicyOwnerType `json:"owner_type" api:"required"`
+	UpdatedAt  time.Time       `json:"updated_at" api:"required" format:"date-time"`
+	ZoneID     string          `json:"zone_id" api:"required"`
+	ArchivedAt time.Time       `json:"archived_at" api:"nullable" format:"date-time"`
+	// The organization user behind a `created_by`, `updated_by` or `archived_by`
+	// value. Returned only when `expand[]=user` is requested.
+	CreatedByUser PolicyCreatedByUser `json:"created_by_user"`
+	Description   string              `json:"description" api:"nullable"`
 	// Schema version the latest version was validated against (e.g., "2026-02-24").
 	// Null when the policy has no published versions. Denormalized from
 	// `PolicyVersion.schema_version` for the policy referenced by `latest_version_id`.
@@ -181,6 +184,9 @@ type Policy struct {
 	LatestVersion   int64  `json:"latest_version" api:"nullable"`
 	LatestVersionID string `json:"latest_version_id" api:"nullable"`
 	UpdatedBy       string `json:"updated_by" api:"nullable"`
+	// The organization user behind a `created_by`, `updated_by` or `archived_by`
+	// value. Returned only when `expand[]=user` is requested.
+	UpdatedByUser PolicyUpdatedByUser `json:"updated_by_user"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                  respjson.Field
@@ -191,11 +197,13 @@ type Policy struct {
 		UpdatedAt           respjson.Field
 		ZoneID              respjson.Field
 		ArchivedAt          respjson.Field
+		CreatedByUser       respjson.Field
 		Description         respjson.Field
 		LatestSchemaVersion respjson.Field
 		LatestVersion       respjson.Field
 		LatestVersionID     respjson.Field
 		UpdatedBy           respjson.Field
+		UpdatedByUser       respjson.Field
 		ExtraFields         map[string]respjson.Field
 		raw                 string
 	} `json:"-"`
@@ -217,6 +225,60 @@ const (
 	PolicyOwnerTypePlatform PolicyOwnerType = "platform"
 	PolicyOwnerTypeCustomer PolicyOwnerType = "customer"
 )
+
+// The organization user behind a `created_by`, `updated_by` or `archived_by`
+// value. Returned only when `expand[]=user` is requested.
+type PolicyCreatedByUser struct {
+	// Public ID of the user in the organization's platform zone. This is not the same
+	// value as the `*_by` field it expands; use it to link to
+	// `/zones/{zone_id}/users/{id}`.
+	ID string `json:"id" api:"required"`
+	// The user's email address, or null when not known.
+	Email string `json:"email" api:"required"`
+	// Public ID of the organization's platform zone the user belongs to.
+	ZoneID string `json:"zone_id" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Email       respjson.Field
+		ZoneID      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PolicyCreatedByUser) RawJSON() string { return r.JSON.raw }
+func (r *PolicyCreatedByUser) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The organization user behind a `created_by`, `updated_by` or `archived_by`
+// value. Returned only when `expand[]=user` is requested.
+type PolicyUpdatedByUser struct {
+	// Public ID of the user in the organization's platform zone. This is not the same
+	// value as the `*_by` field it expands; use it to link to
+	// `/zones/{zone_id}/users/{id}`.
+	ID string `json:"id" api:"required"`
+	// The user's email address, or null when not known.
+	Email string `json:"email" api:"required"`
+	// Public ID of the organization's platform zone the user belongs to.
+	ZoneID string `json:"zone_id" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Email       respjson.Field
+		ZoneID      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PolicyUpdatedByUser) RawJSON() string { return r.JSON.raw }
+func (r *PolicyUpdatedByUser) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type ZonePolicyListResponse struct {
 	Items []Policy `json:"items" api:"required"`
@@ -282,8 +344,37 @@ type ZonePolicyGetParams struct {
 	ZoneID           string            `path:"zone_id" api:"required" json:"-"`
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
+	// Opt-in to additional response fields on a single resource (`user`). Repeatable.
+	Expand ZonePolicyGetParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	paramObj
 }
+
+// URLQuery serializes [ZonePolicyGetParams]'s query parameters as `url.Values`.
+func (r ZonePolicyGetParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatRepeat,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZonePolicyGetParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZonePolicyGetsExpandPdpExpandSingleField)
+	OfZonePolicyGetsExpandPdpExpandSingleField param.Opt[string] `query:",omitzero,inline"`
+	OfZonePolicyGetsExpandArrayItemArray       []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Opt-in response field requested via `expand[]` on single-resource reads. `user`
+// behaves as described on `ExpandField`.
+type ZonePolicyGetParamsExpandPdpExpandSingleField string
+
+const (
+	ZonePolicyGetParamsExpandPdpExpandSingleFieldUser ZonePolicyGetParamsExpandPdpExpandSingleField = "user"
+)
 
 type ZonePolicyUpdateParams struct {
 	ZoneID           string            `path:"zone_id" api:"required" json:"-"`
@@ -314,14 +405,9 @@ type ZonePolicyListParams struct {
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
-	// **Deprecated.** Use `expand[]` instead.
-	//
-	// Opt-in to additional response fields. Still honored for backward compatibility;
-	// supplying both `expand` and `expand[]` with disagreeing values returns
-	// `400 Bad Request`.
-	//
-	// Any of "total_count".
-	Expand []string `query:"expand,omitzero" json:"-"`
+	// Opt-in to additional response fields (`total_count`, `user`). Repeatable;
+	// matches the `expand[]` convention used across the Keycard API.
+	Expand ZonePolicyListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	// Filter by policy ID. Repeatable; multiple values are OR-ed (e.g.
 	// `?filter[id]=p1&filter[id]=p2`). Capped at 100 IDs per request — over-cap
 	// returns 400.
@@ -356,7 +442,7 @@ type ZonePolicyListParams struct {
 	// Case-insensitive substring search across all searchable fields of the resource.
 	// For policies that is `name` and `description`; for policy sets that is `name`.
 	// Repeatable; if multiple terms are supplied they are OR-ed.
-	Query []string `query:"query,omitzero" json:"-"`
+	Query ZonePolicyListParamsQueryUnion `query:"query[],omitzero" json:"-"`
 	// Case-insensitive substring search on `description` (policies only). Repeatable;
 	// if multiple terms are supplied they are OR-ed.
 	QueryDescription []string `query:"query[description],omitzero" json:"-"`
@@ -378,6 +464,28 @@ func (r ZonePolicyListParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZonePolicyListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZonePolicyListsExpandPdpExpandField)
+	OfZonePolicyListsExpandPdpExpandField param.Opt[string] `query:",omitzero,inline"`
+	OfZonePolicyListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Opt-in response field requested via `expand[]` on list endpoints. `total_count`
+// adds `pagination.total_count`; `user` adds a `*_user` object beside every
+// `created_by`, `updated_by` and `archived_by` field that resolves to an
+// organization user.
+type ZonePolicyListParamsExpandPdpExpandField string
+
+const (
+	ZonePolicyListParamsExpandPdpExpandFieldTotalCount ZonePolicyListParamsExpandPdpExpandField = "total_count"
+	ZonePolicyListParamsExpandPdpExpandFieldUser       ZonePolicyListParamsExpandPdpExpandField = "user"
+)
+
 // Sort direction. Default is desc (newest first).
 type ZonePolicyListParamsOrder string
 
@@ -385,6 +493,15 @@ const (
 	ZonePolicyListParamsOrderAsc  ZonePolicyListParamsOrder = "asc"
 	ZonePolicyListParamsOrderDesc ZonePolicyListParamsOrder = "desc"
 )
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZonePolicyListParamsQueryUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
 
 // Field to sort by.
 type ZonePolicyListParamsSort string
