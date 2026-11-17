@@ -74,7 +74,7 @@ func (r *ZoneSessionService) Update(ctx context.Context, id string, params ZoneS
 // Returns sessions in the specified zone. By default, returns entry sessions (app
 // user sessions with an initiator that are roots or direct children of a root user
 // session). Use include_nested=true to include nested sessions. Can be filtered by
-// session type, status, and user.
+// session type, status, user, and background access.
 func (r *ZoneSessionService) List(ctx context.Context, zoneID string, query ZoneSessionListParams, opts ...option.RequestOption) (res *ZoneSessionListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -117,6 +117,7 @@ type SessionUnion struct {
 	Application     Application `json:"application"`
 	ApplicationID   string      `json:"application_id"`
 	AuthenticatedAt time.Time   `json:"authenticated_at"`
+	Background      bool        `json:"background"`
 	CreatedAt       time.Time   `json:"created_at"`
 	ExpiresAt       time.Time   `json:"expires_at"`
 	Issuer          string      `json:"issuer"`
@@ -146,6 +147,7 @@ type SessionUnion struct {
 		Application     respjson.Field
 		ApplicationID   respjson.Field
 		AuthenticatedAt respjson.Field
+		Background      respjson.Field
 		CreatedAt       respjson.Field
 		ExpiresAt       respjson.Field
 		Issuer          respjson.Field
@@ -222,6 +224,8 @@ type SessionUserSessionType struct {
 	ApplicationID string `json:"application_id"`
 	// Date when the session was authenticated
 	AuthenticatedAt time.Time `json:"authenticated_at" format:"date-time"`
+	// Whether the session has background access
+	Background bool `json:"background"`
 	// Entity creation timestamp
 	CreatedAt time.Time `json:"created_at" format:"date-time"`
 	// Date when session expires
@@ -270,6 +274,7 @@ type SessionUserSessionType struct {
 		Application     respjson.Field
 		ApplicationID   respjson.Field
 		AuthenticatedAt respjson.Field
+		Background      respjson.Field
 		CreatedAt       respjson.Field
 		ExpiresAt       respjson.Field
 		Issuer          respjson.Field
@@ -340,6 +345,8 @@ type SessionApplicationSessionType struct {
 	Application Application `json:"application"`
 	// Date when the session was authenticated
 	AuthenticatedAt time.Time `json:"authenticated_at" format:"date-time"`
+	// Whether the session has background access
+	Background bool `json:"background"`
 	// Entity creation timestamp
 	CreatedAt time.Time `json:"created_at" format:"date-time"`
 	// Date when session expires
@@ -368,6 +375,7 @@ type SessionApplicationSessionType struct {
 		Active          respjson.Field
 		Application     respjson.Field
 		AuthenticatedAt respjson.Field
+		Background      respjson.Field
 		CreatedAt       respjson.Field
 		ExpiresAt       respjson.Field
 		Metadata        respjson.Field
@@ -480,6 +488,8 @@ type ZoneSessionListParams struct {
 	After param.Opt[string] `query:"after,omitzero" json:"-"`
 	// Cursor for backward pagination
 	Before param.Opt[string] `query:"before,omitzero" json:"-"`
+	// Filter by background access. Omit to list both.
+	FilterBackground param.Opt[bool] `query:"filter[background],omitzero" json:"-"`
 	// Maximum number of items to return
 	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
 	// Filter by user ID
