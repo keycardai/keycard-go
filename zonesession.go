@@ -86,7 +86,9 @@ func (r *ZoneSessionService) List(ctx context.Context, zoneID string, query Zone
 	return res, err
 }
 
-// Permanently deletes a session, effectively logging out the user or application
+// Revokes a session and all its child sessions, including nested descendants,
+// without deleting their stored records. Revoking an already-revoked session is
+// idempotent and returns 204 No Content.
 func (r *ZoneSessionService) Delete(ctx context.Context, id string, body ZoneSessionDeleteParams, opts ...option.RequestOption) (err error) {
 	opts = slices.Concat(r.Options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
