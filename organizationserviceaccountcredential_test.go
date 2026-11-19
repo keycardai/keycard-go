@@ -68,7 +68,9 @@ func TestOrganizationServiceAccountCredentialGetWithOptionalParams(t *testing.T)
 		keycard.OrganizationServiceAccountCredentialGetParams{
 			OrganizationID:   "x",
 			ServiceAccountID: "ab3def8hij2klm9opq5rst7uvw",
-			Expand:           []string{"permissions"},
+			Expand: keycard.OrganizationServiceAccountCredentialGetParamsExpandUnion{
+				OfOrganizationServiceAccountCredentialGetsExpandString: keycard.String("permissions"),
+			},
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
@@ -135,11 +137,14 @@ func TestOrganizationServiceAccountCredentialListWithOptionalParams(t *testing.T
 		context.TODO(),
 		"ab3def8hij2klm9opq5rst7uvw",
 		keycard.OrganizationServiceAccountCredentialListParams{
-			OrganizationID:   "x",
-			After:            keycard.String("x"),
-			Before:           keycard.String("x"),
-			Expand:           []string{"permissions"},
+			OrganizationID: "x",
+			After:          keycard.String("x"),
+			Before:         keycard.String("x"),
+			Expand: keycard.OrganizationServiceAccountCredentialListParamsExpandUnion{
+				OfOrganizationServiceAccountCredentialListsExpandString: keycard.String("permissions"),
+			},
 			Limit:            keycard.Int(1),
+			Query:            []string{"x"},
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
