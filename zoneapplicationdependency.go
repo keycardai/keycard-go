@@ -165,8 +165,6 @@ type Resource struct {
 	CredentialLifetimeSeconds int64 `json:"credential_lifetime_seconds" api:"nullable"`
 	// A Provider is a system that supplies access to Resources and allows actors
 	// (Users or Applications) to authenticate.
-	//
-	// Deprecated: deprecated
 	CredentialProvider Provider `json:"credential_provider"`
 	// ID of the credential provider for this resource
 	CredentialProviderID string `json:"credential_provider_id"`
@@ -234,13 +232,10 @@ type ZoneApplicationDependencyListResponse struct {
 	Items []Resource `json:"items" api:"required"`
 	// Cursor-based pagination metadata
 	Pagination ZoneApplicationDependencyListResponsePagination `json:"pagination" api:"required"`
-	// Pagination information
-	PageInfo PageInfoPagination `json:"page_info"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Items       respjson.Field
 		Pagination  respjson.Field
-		PageInfo    respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -320,7 +315,8 @@ type ZoneApplicationDependencyListParamsExpandUnion struct {
 type ZoneApplicationDependencyListParamsExpandString string
 
 const (
-	ZoneApplicationDependencyListParamsExpandStringTotalCount ZoneApplicationDependencyListParamsExpandString = "total_count"
+	ZoneApplicationDependencyListParamsExpandStringTotalCount         ZoneApplicationDependencyListParamsExpandString = "total_count"
+	ZoneApplicationDependencyListParamsExpandStringCredentialProvider ZoneApplicationDependencyListParamsExpandString = "credential_provider"
 )
 
 type ZoneApplicationDependencyAddParams struct {
