@@ -38,6 +38,8 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Merge commit, not squash: stlc tracks the build commit SHA, and squashing rewrites it,
+      # which makes the next build see main as diverged and misread generated code as custom.
       - name: create & merge `autogen` → `main` PR
         continue-on-error: true
         env:
@@ -51,4 +53,4 @@ jobs:
             PR_NUM=${PR_URL##*/}
             echo "Autogen Pull Request: $PR_NUM"
           fi
-          gh pr merge $PR_NUM --squash --auto
+          gh pr merge $PR_NUM --merge --auto
