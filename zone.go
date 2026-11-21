@@ -65,6 +65,16 @@ type ZoneService struct {
 	Policies ZonePolicyService
 	// Policy set CRUD and binding management
 	PolicySets ZonePolicySetService
+	// Policy set binding management. Active slots are replace-only by design: once
+	// bound (at zone bootstrap or on a principal's first policy check), an active slot
+	// is never emptied — evaluation fails closed, so an empty active slot would deny
+	// all access. Replace the bound version rather than removing the binding. DELETE
+	// applies to shadow bindings only.
+	PolicyBindings ZonePolicyBindingService
+	// Stateless Cedar policy validation
+	PolicyValidations ZonePolicyValidationService
+	// Stateless policy evaluation testing
+	PolicyEvaluations ZonePolicyEvaluationService
 }
 
 // NewZoneService generates a new service that applies the given options to each
@@ -87,6 +97,9 @@ func NewZoneService(opts ...option.RequestOption) (r ZoneService) {
 	r.PolicySchemas = NewZonePolicySchemaService(opts...)
 	r.Policies = NewZonePolicyService(opts...)
 	r.PolicySets = NewZonePolicySetService(opts...)
+	r.PolicyBindings = NewZonePolicyBindingService(opts...)
+	r.PolicyValidations = NewZonePolicyValidationService(opts...)
+	r.PolicyEvaluations = NewZonePolicyEvaluationService(opts...)
 	return
 }
 
