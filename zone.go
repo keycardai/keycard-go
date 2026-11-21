@@ -36,7 +36,8 @@ type ZoneService struct {
 	Sessions               ZoneSessionService
 	UserAgents             ZoneUserAgentService
 	Users                  ZoneUserService
-	Members                ZoneMemberService
+	Roles                  ZoneRoleService
+	Groups                 ZoneGroupService
 	Secrets                ZoneSecretService
 	// Zone-scoped Cedar schema management.
 	//
@@ -80,7 +81,8 @@ func NewZoneService(opts ...option.RequestOption) (r ZoneService) {
 	r.Sessions = NewZoneSessionService(opts...)
 	r.UserAgents = NewZoneUserAgentService(opts...)
 	r.Users = NewZoneUserService(opts...)
-	r.Members = NewZoneMemberService(opts...)
+	r.Roles = NewZoneRoleService(opts...)
+	r.Groups = NewZoneGroupService(opts...)
 	r.Secrets = NewZoneSecretService(opts...)
 	r.PolicySchemas = NewZonePolicySchemaService(opts...)
 	r.Policies = NewZonePolicyService(opts...)
@@ -121,7 +123,11 @@ func (r *ZoneService) Update(ctx context.Context, zoneID string, body ZoneUpdate
 	return res, err
 }
 
-// Returns a list of zones for the authenticated organization
+// Returns a list of zones for the authenticated organization. Cursor pagination
+// via `after`/`before` and `limit`, plus `expand[]=total_count`, name substring
+// search, and `sort`, are supported on every request. `filter[permission][in]`
+// narrows the list to zones where the caller holds at least one of the given
+// permissions.
 func (r *ZoneService) List(ctx context.Context, query ZoneListParams, opts ...option.RequestOption) (res *ZoneListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	path := "zones"
@@ -233,6 +239,9 @@ type Zone struct {
 	ID string `json:"id" api:"required"`
 	// Entity creation timestamp
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
+	// Whether external directory sync (SCIM) is enabled for this zone. Required to
+	// create external sync tokens.
+	ExternalSyncEnabled bool `json:"external_sync_enabled" api:"required"`
 	// Human-readable name
 	Name string `json:"name" api:"required"`
 	// Organization that owns this zone
@@ -260,15 +269,13 @@ type Zone struct {
 	// expand[]=permissions query parameter is provided. Keys are resource types,
 	// values are objects mapping action names to boolean values.
 	Permissions map[string]map[string]bool `json:"permissions"`
-	// Whether the zone requires an invitation for email/password registration, only
-	// applies when user_identity_provider_id is not set
-	RequiresInvitation bool `json:"requires_invitation"`
 	// Provider ID configured for user login
 	UserIdentityProviderID string `json:"user_identity_provider_id"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                             respjson.Field
 		CreatedAt                      respjson.Field
+		ExternalSyncEnabled            respjson.Field
 		Name                           respjson.Field
 		OrganizationID                 respjson.Field
 		OwnerType                      respjson.Field
@@ -280,7 +287,6 @@ type Zone struct {
 		Description                    respjson.Field
 		EncryptionKey                  respjson.Field
 		Permissions                    respjson.Field
-		RequiresInvitation             respjson.Field
 		UserIdentityProviderID         respjson.Field
 		ExtraFields                    map[string]respjson.Field
 		raw                            string
@@ -329,6 +335,8 @@ type ZoneProtocolsOauth2 struct {
 	// OAuth 2.0 Authorization Server Metadata endpoint
 	// (.well-known/oauth-authorization-server)
 	AuthorizationServerMetadata string `json:"authorization_server_metadata" api:"required" format:"uri"`
+	// Maximum age of a background session.
+	BackgroundSessionMaxLifetimeSeconds int64 `json:"background_session_max_lifetime_seconds" api:"required"`
 	// Client ID Metadata Document auto-provisioning configuration
 	Cimd ZoneProtocolsOauth2Cimd `json:"cimd" api:"required"`
 	// Whether Dynamic Client Registration is enabled
@@ -343,22 +351,26 @@ type ZoneProtocolsOauth2 struct {
 	RedirectUri string `json:"redirect_uri" api:"required" format:"uri"`
 	// OAuth 2.0 Dynamic Client Registration endpoint
 	RegistrationEndpoint string `json:"registration_endpoint" api:"required" format:"uri"`
+	// Maximum age of a regular session.
+	SessionMaxLifetimeSeconds int64 `json:"session_max_lifetime_seconds" api:"required"`
 	// OAuth 2.0 token endpoint
 	TokenEndpoint string `json:"token_endpoint" api:"required" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		AuthorizationEndpoint       respjson.Field
-		AuthorizationServerMetadata respjson.Field
-		Cimd                        respjson.Field
-		DcrEnabled                  respjson.Field
-		Issuer                      respjson.Field
-		JwksUri                     respjson.Field
-		PkceRequired                respjson.Field
-		RedirectUri                 respjson.Field
-		RegistrationEndpoint        respjson.Field
-		TokenEndpoint               respjson.Field
-		ExtraFields                 map[string]respjson.Field
-		raw                         string
+		AuthorizationEndpoint               respjson.Field
+		AuthorizationServerMetadata         respjson.Field
+		BackgroundSessionMaxLifetimeSeconds respjson.Field
+		Cimd                                respjson.Field
+		DcrEnabled                          respjson.Field
+		Issuer                              respjson.Field
+		JwksUri                             respjson.Field
+		PkceRequired                        respjson.Field
+		RedirectUri                         respjson.Field
+		RegistrationEndpoint                respjson.Field
+		SessionMaxLifetimeSeconds           respjson.Field
+		TokenEndpoint                       respjson.Field
+		ExtraFields                         map[string]respjson.Field
+		raw                                 string
 	} `json:"-"`
 }
 
@@ -417,6 +429,8 @@ func (r *ZoneProtocolsOpenid) UnmarshalJSON(data []byte) error {
 type ZoneListResponse struct {
 	Items []Zone `json:"items" api:"required"`
 	// Pagination information
+	//
+	// Deprecated: deprecated
 	PageInfo PageInfoPagination `json:"page_info" api:"required"`
 	// Cursor-based pagination metadata
 	Pagination ZoneListResponsePagination `json:"pagination" api:"required"`
@@ -474,9 +488,6 @@ type ZoneNewParams struct {
 	// organization claim); for organization-scoped principals it is optional and must
 	// match the authenticated organization if supplied.
 	OrganizationID param.Opt[string] `json:"organization_id,omitzero"`
-	// Whether the zone requires an invitation for email/password registration, only
-	// applies when user_identity_provider_id is not set. Defaults to true.
-	RequiresInvitation param.Opt[bool] `json:"requires_invitation,omitzero"`
 	// AWS KMS configuration for zone encryption. When not specified, the default
 	// Keycard Cloud encryption key will be used.
 	EncryptionKey EncryptionKeyAwsKmsConfigParam `json:"encryption_key,omitzero"`
@@ -510,10 +521,14 @@ func (r *ZoneNewParamsProtocols) UnmarshalJSON(data []byte) error {
 
 // OAuth 2.0 protocol configuration for zone creation
 type ZoneNewParamsProtocolsOauth2 struct {
+	// Maximum age of a background session. Range: 1 hour to 1 year. Default: 90 days.
+	BackgroundSessionMaxLifetimeSeconds param.Opt[int64] `json:"background_session_max_lifetime_seconds,omitzero"`
 	// Whether Dynamic Client Registration is enabled
 	DcrEnabled param.Opt[bool] `json:"dcr_enabled,omitzero"`
 	// Whether PKCE is required for authorization code flows
 	PkceRequired param.Opt[bool] `json:"pkce_required,omitzero"`
+	// Maximum age of a regular session. Range: 1 hour to 1 year. Default: 90 days.
+	SessionMaxLifetimeSeconds param.Opt[int64] `json:"session_max_lifetime_seconds,omitzero"`
 	// Client ID Metadata Document auto-provisioning configuration
 	Cimd ZoneNewParamsProtocolsOauth2Cimd `json:"cimd,omitzero"`
 	paramObj
@@ -591,12 +606,12 @@ type ZoneUpdateParams struct {
 	Description param.Opt[string] `json:"description,omitzero" format:"safe-text"`
 	// Provider ID to configure for user login (set to null to unset)
 	UserIdentityProviderID param.Opt[string] `json:"user_identity_provider_id,omitzero"`
+	// Turns external directory sync (SCIM) on or off for this zone. Required to create
+	// external sync tokens.
+	ExternalSyncEnabled param.Opt[bool] `json:"external_sync_enabled,omitzero"`
 	// Human-readable name. Must not contain HTML tags (e.g. `<script>`, `<div>`) or
 	// control characters.
 	Name param.Opt[string] `json:"name,omitzero" format:"safe-text"`
-	// Whether the zone requires an invitation for email/password registration, only
-	// applies when user_identity_provider_id is not set
-	RequiresInvitation param.Opt[bool] `json:"requires_invitation,omitzero"`
 	// AWS KMS configuration for zone encryption update (set to null to remove
 	// customer-managed key and revert to default)
 	EncryptionKey ZoneUpdateParamsEncryptionKey `json:"encryption_key,omitzero"`
@@ -656,10 +671,14 @@ func (r *ZoneUpdateParamsProtocols) UnmarshalJSON(data []byte) error {
 
 // OAuth 2.0 protocol configuration update for a zone (partial update)
 type ZoneUpdateParamsProtocolsOauth2 struct {
+	// Maximum age of a background session. Range: 1 hour to 1 year. Default: 90 days.
+	BackgroundSessionMaxLifetimeSeconds param.Opt[int64] `json:"background_session_max_lifetime_seconds,omitzero"`
 	// Whether Dynamic Client Registration is enabled
 	DcrEnabled param.Opt[bool] `json:"dcr_enabled,omitzero"`
 	// Whether PKCE is required for authorization code flows
 	PkceRequired param.Opt[bool] `json:"pkce_required,omitzero"`
+	// Maximum age of a regular session. Range: 1 hour to 1 year. Default: 90 days.
+	SessionMaxLifetimeSeconds param.Opt[int64] `json:"session_max_lifetime_seconds,omitzero"`
 	// Client ID Metadata Document auto-provisioning configuration
 	Cimd ZoneUpdateParamsProtocolsOauth2Cimd `json:"cimd,omitzero"`
 	paramObj
@@ -706,6 +725,13 @@ type ZoneListParams struct {
 	Limit  param.Opt[int64]          `query:"limit,omitzero" json:"-"`
 	Slug   param.Opt[string]         `query:"slug,omitzero" json:"-"`
 	Expand ZoneListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Only return zones where the caller is allowed ANY of these permissions
+	// (`<resource_type>:<action>`, e.g. `applications:list`). Repeatable (one
+	// permission per occurrence); values are unioned, max 20 (a stricter cap than the
+	// authorization service's 50). The accessible zone set is resolved by the
+	// authorization service and composes with cursor pagination, search, sort and
+	// `expand[]=total_count`. Malformed values are a 400.
+	FilterPermissionIn ZoneListParamsFilterPermissionInUnion `query:"filter[permission][in],omitzero" json:"-"`
 	paramObj
 }
 
@@ -734,3 +760,12 @@ const (
 	ZoneListParamsExpandStringTotalCount  ZoneListParamsExpandString = "total_count"
 	ZoneListParamsExpandStringPermissions ZoneListParamsExpandString = "permissions"
 )
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneListParamsFilterPermissionInUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
