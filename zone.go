@@ -335,6 +335,8 @@ type ZoneProtocolsOauth2 struct {
 	// OAuth 2.0 Authorization Server Metadata endpoint
 	// (.well-known/oauth-authorization-server)
 	AuthorizationServerMetadata string `json:"authorization_server_metadata" api:"required" format:"uri"`
+	// Maximum age of a background session.
+	BackgroundSessionMaxLifetimeSeconds int64 `json:"background_session_max_lifetime_seconds" api:"required"`
 	// Client ID Metadata Document auto-provisioning configuration
 	Cimd ZoneProtocolsOauth2Cimd `json:"cimd" api:"required"`
 	// Whether Dynamic Client Registration is enabled
@@ -349,22 +351,26 @@ type ZoneProtocolsOauth2 struct {
 	RedirectUri string `json:"redirect_uri" api:"required" format:"uri"`
 	// OAuth 2.0 Dynamic Client Registration endpoint
 	RegistrationEndpoint string `json:"registration_endpoint" api:"required" format:"uri"`
+	// Maximum age of a regular session.
+	SessionMaxLifetimeSeconds int64 `json:"session_max_lifetime_seconds" api:"required"`
 	// OAuth 2.0 token endpoint
 	TokenEndpoint string `json:"token_endpoint" api:"required" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		AuthorizationEndpoint       respjson.Field
-		AuthorizationServerMetadata respjson.Field
-		Cimd                        respjson.Field
-		DcrEnabled                  respjson.Field
-		Issuer                      respjson.Field
-		JwksUri                     respjson.Field
-		PkceRequired                respjson.Field
-		RedirectUri                 respjson.Field
-		RegistrationEndpoint        respjson.Field
-		TokenEndpoint               respjson.Field
-		ExtraFields                 map[string]respjson.Field
-		raw                         string
+		AuthorizationEndpoint               respjson.Field
+		AuthorizationServerMetadata         respjson.Field
+		BackgroundSessionMaxLifetimeSeconds respjson.Field
+		Cimd                                respjson.Field
+		DcrEnabled                          respjson.Field
+		Issuer                              respjson.Field
+		JwksUri                             respjson.Field
+		PkceRequired                        respjson.Field
+		RedirectUri                         respjson.Field
+		RegistrationEndpoint                respjson.Field
+		SessionMaxLifetimeSeconds           respjson.Field
+		TokenEndpoint                       respjson.Field
+		ExtraFields                         map[string]respjson.Field
+		raw                                 string
 	} `json:"-"`
 }
 
@@ -515,10 +521,14 @@ func (r *ZoneNewParamsProtocols) UnmarshalJSON(data []byte) error {
 
 // OAuth 2.0 protocol configuration for zone creation
 type ZoneNewParamsProtocolsOauth2 struct {
+	// Maximum age of a background session. Range: 1 hour to 1 year. Default: 90 days.
+	BackgroundSessionMaxLifetimeSeconds param.Opt[int64] `json:"background_session_max_lifetime_seconds,omitzero"`
 	// Whether Dynamic Client Registration is enabled
 	DcrEnabled param.Opt[bool] `json:"dcr_enabled,omitzero"`
 	// Whether PKCE is required for authorization code flows
 	PkceRequired param.Opt[bool] `json:"pkce_required,omitzero"`
+	// Maximum age of a regular session. Range: 1 hour to 1 year. Default: 90 days.
+	SessionMaxLifetimeSeconds param.Opt[int64] `json:"session_max_lifetime_seconds,omitzero"`
 	// Client ID Metadata Document auto-provisioning configuration
 	Cimd ZoneNewParamsProtocolsOauth2Cimd `json:"cimd,omitzero"`
 	paramObj
@@ -661,10 +671,14 @@ func (r *ZoneUpdateParamsProtocols) UnmarshalJSON(data []byte) error {
 
 // OAuth 2.0 protocol configuration update for a zone (partial update)
 type ZoneUpdateParamsProtocolsOauth2 struct {
+	// Maximum age of a background session. Range: 1 hour to 1 year. Default: 90 days.
+	BackgroundSessionMaxLifetimeSeconds param.Opt[int64] `json:"background_session_max_lifetime_seconds,omitzero"`
 	// Whether Dynamic Client Registration is enabled
 	DcrEnabled param.Opt[bool] `json:"dcr_enabled,omitzero"`
 	// Whether PKCE is required for authorization code flows
 	PkceRequired param.Opt[bool] `json:"pkce_required,omitzero"`
+	// Maximum age of a regular session. Range: 1 hour to 1 year. Default: 90 days.
+	SessionMaxLifetimeSeconds param.Opt[int64] `json:"session_max_lifetime_seconds,omitzero"`
 	// Client ID Metadata Document auto-provisioning configuration
 	Cimd ZoneUpdateParamsProtocolsOauth2Cimd `json:"cimd,omitzero"`
 	paramObj
