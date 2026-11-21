@@ -38,7 +38,11 @@ func NewOrganizationInvitationService(opts ...option.RequestOption) (r Organizat
 	return
 }
 
-// Create an invitation to join an organization
+// Create an invitation to join an organization and queue the invitation email. The
+// invitation is created even when the email service cannot be reached; the
+// response's `delivery_status` is `failed` then, no email was queued, and the
+// caller must resend. A 4xx from the email service, such as a recipient send cap,
+// creates no invitation.
 func (r *OrganizationInvitationService) New(ctx context.Context, organizationID string, params OrganizationInvitationNewParams, opts ...option.RequestOption) (res *Invitation, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
@@ -88,6 +92,33 @@ func (r *OrganizationInvitationService) Delete(ctx context.Context, invitationID
 	return err
 }
 
+// Send a fresh invitation email. The invitation token is rotated, so the link in
+// any earlier email stops working. Returns 409 while a previous email is still
+// queued or sending, or when the invitation is no longer pending. Returns 200 even
+// when the email service cannot be reached: the token has already been rotated,
+// the response's `delivery_status` is `failed`, no new email was queued, and the
+// caller must resend. Each resend counts toward the organization's daily
+// invitation limit. Returns 429 with a `Retry-After` header when that limit or the
+// per-recipient send cap is reached. If the email service rejects the send, the
+// earlier link keeps working.
+func (r *OrganizationInvitationService) Resend(ctx context.Context, invitationID string, params OrganizationInvitationResendParams, opts ...option.RequestOption) (res *Invitation, err error) {
+	if !param.IsOmitted(params.XClientRequestID) {
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
+	}
+	opts = slices.Concat(r.Options, opts)
+	if params.OrganizationID == "" {
+		err = errors.New("missing required organization_id parameter")
+		return nil, err
+	}
+	if invitationID == "" {
+		err = errors.New("missing required invitation_id parameter")
+		return nil, err
+	}
+	path := fmt.Sprintf("organizations/%s/invitations/%s/resend", url.PathEscape(params.OrganizationID), url.PathEscape(invitationID))
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
+	return res, err
+}
+
 type Invitation struct {
 	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
 	ID string `json:"id" api:"required"`
@@ -111,6 +142,14 @@ type Invitation struct {
 	Status InvitationStatus `json:"status" api:"required"`
 	// The time the entity was mostly recently updated in utc
 	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
+	// Delivery state of the most recent invitation email. `queued` and `sending` mean
+	// the email service still holds the message. `sent` means the provider accepted
+	// it. `failed` means the email service could not be reached or rejected the
+	// message. `expired` means the invitation expired before the message was
+	// delivered. Absent for invitations created before delivery tracking existed.
+	//
+	// Any of "queued", "sending", "sent", "failed", "expired".
+	DeliveryStatus InvitationDeliveryStatus `json:"delivery_status"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -127,6 +166,7 @@ type Invitation struct {
 		Role           respjson.Field
 		Status         respjson.Field
 		UpdatedAt      respjson.Field
+		DeliveryStatus respjson.Field
 		Permissions    respjson.Field
 		ExtraFields    map[string]respjson.Field
 		raw            string
@@ -138,6 +178,21 @@ func (r Invitation) RawJSON() string { return r.JSON.raw }
 func (r *Invitation) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Delivery state of the most recent invitation email. `queued` and `sending` mean
+// the email service still holds the message. `sent` means the provider accepted
+// it. `failed` means the email service could not be reached or rejected the
+// message. `expired` means the invitation expired before the message was
+// delivered. Absent for invitations created before delivery tracking existed.
+type InvitationDeliveryStatus string
+
+const (
+	InvitationDeliveryStatusQueued  InvitationDeliveryStatus = "queued"
+	InvitationDeliveryStatusSending InvitationDeliveryStatus = "sending"
+	InvitationDeliveryStatusSent    InvitationDeliveryStatus = "sent"
+	InvitationDeliveryStatusFailed  InvitationDeliveryStatus = "failed"
+	InvitationDeliveryStatusExpired InvitationDeliveryStatus = "expired"
+)
 
 // Status of an invitation
 type InvitationStatus string
@@ -202,13 +257,17 @@ type OrganizationInvitationListParams struct {
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Fields to expand in the response. Supports "permissions" to include the
-	// permissions field with the caller's permissions for the resource. For list
-	// organization identities only, "total_count" populates pagination.total_count
-	// with the number of identities matching the same filters as the list (excluding
-	// cursor and limit). Other operations ignore expand values they do not use.
-	//
-	// Any of "permissions", "total_count".
-	Expand []string `query:"expand,omitzero" json:"-"`
+	// permissions field with the caller's permissions for the resource. For the
+	// service account and service account credential list operations, "total_count"
+	// populates pagination.total_count with the number of items matching the same
+	// filters as the list (excluding cursor and limit). Other operations ignore expand
+	// values they do not use.
+	Expand OrganizationInvitationListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Return only invitations with these statuses. Repeat the parameter to match any
+	// of several statuses (`?filter[status]=pending&filter[status]=accepted`). Expired
+	// invitations are never listed, so `expired` matches nothing. When absent, no
+	// status filter is applied.
+	FilterStatus []InvitationStatus `query:"filter[status],omitzero" json:"-"`
 	paramObj
 }
 
@@ -221,7 +280,32 @@ func (r OrganizationInvitationListParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type OrganizationInvitationListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfOrganizationInvitationListsExpandString)
+	OfOrganizationInvitationListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfOrganizationInvitationListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type OrganizationInvitationListParamsExpandString string
+
+const (
+	OrganizationInvitationListParamsExpandStringPermissions OrganizationInvitationListParamsExpandString = "permissions"
+	OrganizationInvitationListParamsExpandStringTotalCount  OrganizationInvitationListParamsExpandString = "total_count"
+)
+
 type OrganizationInvitationDeleteParams struct {
+	// Organization ID or label identifier
+	OrganizationID   string            `path:"organization_id" api:"required" json:"-"`
+	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
+	paramObj
+}
+
+type OrganizationInvitationResendParams struct {
 	// Organization ID or label identifier
 	OrganizationID   string            `path:"organization_id" api:"required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
