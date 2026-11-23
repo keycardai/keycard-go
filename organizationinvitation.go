@@ -38,7 +38,11 @@ func NewOrganizationInvitationService(opts ...option.RequestOption) (r Organizat
 	return
 }
 
-// Create an invitation to join an organization
+// Create an invitation to join an organization and queue the invitation email. The
+// invitation is created even when the email service cannot be reached; the
+// response's `delivery_status` is `failed` then, no email was queued, and the
+// caller must resend. A 4xx from the email service, such as a recipient send cap,
+// creates no invitation.
 func (r *OrganizationInvitationService) New(ctx context.Context, organizationID string, params OrganizationInvitationNewParams, opts ...option.RequestOption) (res *Invitation, err error) {
 	if !param.IsOmitted(params.XClientRequestID) {
 		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
@@ -111,6 +115,35 @@ type Invitation struct {
 	Status InvitationStatus `json:"status" api:"required"`
 	// The time the entity was mostly recently updated in utc
 	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
+	// Kind of bounce when `delivery_outcome` is `bounced`. `permanent` means the
+	// address does not accept mail; the provider suppresses later sends to it until it
+	// is removed from the suppression list. `transient` means a temporary rejection,
+	// such as a full mailbox. `undetermined` means the provider could not tell.
+	//
+	// Any of "permanent", "transient", "undetermined".
+	BounceType InvitationBounceType `json:"bounce_type"`
+	// What happened to the most recent invitation email after the provider accepted it
+	// (`delivery_status` is `sent`). `delayed` means the recipient's server has not
+	// accepted it yet. `delivered` means the recipient's server accepted it. `failed`
+	// means the provider could not send it. `suppressed` means the provider did not
+	// send it because the address bounced or complained before. `bounced` means the
+	// recipient's server rejected it; see `bounce_type`. `complained` means the
+	// recipient marked it as spam. Absent until an outcome is known, and for
+	// invitations sent before outcomes were tracked. Cleared on resend. `delivered`
+	// can later change to `complained` within the 24 hours the outcome is tracked.
+	//
+	// Any of "delayed", "delivered", "failed", "suppressed", "bounced", "complained".
+	DeliveryOutcome InvitationDeliveryOutcome `json:"delivery_outcome"`
+	// Delivery state of the most recent invitation email. `queued` and `sending` mean
+	// the email service still holds the message. `sent` means the provider accepted
+	// it. `failed` means the email service could not be reached or rejected the
+	// message. `expired` means the invitation expired before the message was
+	// delivered. Absent for invitations created before delivery tracking existed.
+	//
+	// Any of "queued", "sending", "sent", "failed", "expired".
+	DeliveryStatus InvitationDeliveryStatus `json:"delivery_status"`
+	// When `delivery_outcome` last changed in the email service.
+	DeliveryUpdatedAt time.Time `json:"delivery_updated_at" format:"date-time"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -118,18 +151,22 @@ type Invitation struct {
 	Permissions map[string]map[string]bool `json:"permissions"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID             respjson.Field
-		CreatedAt      respjson.Field
-		CreatedBy      respjson.Field
-		Email          respjson.Field
-		ExpiresAt      respjson.Field
-		OrganizationID respjson.Field
-		Role           respjson.Field
-		Status         respjson.Field
-		UpdatedAt      respjson.Field
-		Permissions    respjson.Field
-		ExtraFields    map[string]respjson.Field
-		raw            string
+		ID                respjson.Field
+		CreatedAt         respjson.Field
+		CreatedBy         respjson.Field
+		Email             respjson.Field
+		ExpiresAt         respjson.Field
+		OrganizationID    respjson.Field
+		Role              respjson.Field
+		Status            respjson.Field
+		UpdatedAt         respjson.Field
+		BounceType        respjson.Field
+		DeliveryOutcome   respjson.Field
+		DeliveryStatus    respjson.Field
+		DeliveryUpdatedAt respjson.Field
+		Permissions       respjson.Field
+		ExtraFields       map[string]respjson.Field
+		raw               string
 	} `json:"-"`
 }
 
@@ -138,6 +175,53 @@ func (r Invitation) RawJSON() string { return r.JSON.raw }
 func (r *Invitation) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Kind of bounce when `delivery_outcome` is `bounced`. `permanent` means the
+// address does not accept mail; the provider suppresses later sends to it until it
+// is removed from the suppression list. `transient` means a temporary rejection,
+// such as a full mailbox. `undetermined` means the provider could not tell.
+type InvitationBounceType string
+
+const (
+	InvitationBounceTypePermanent    InvitationBounceType = "permanent"
+	InvitationBounceTypeTransient    InvitationBounceType = "transient"
+	InvitationBounceTypeUndetermined InvitationBounceType = "undetermined"
+)
+
+// What happened to the most recent invitation email after the provider accepted it
+// (`delivery_status` is `sent`). `delayed` means the recipient's server has not
+// accepted it yet. `delivered` means the recipient's server accepted it. `failed`
+// means the provider could not send it. `suppressed` means the provider did not
+// send it because the address bounced or complained before. `bounced` means the
+// recipient's server rejected it; see `bounce_type`. `complained` means the
+// recipient marked it as spam. Absent until an outcome is known, and for
+// invitations sent before outcomes were tracked. Cleared on resend. `delivered`
+// can later change to `complained` within the 24 hours the outcome is tracked.
+type InvitationDeliveryOutcome string
+
+const (
+	InvitationDeliveryOutcomeDelayed    InvitationDeliveryOutcome = "delayed"
+	InvitationDeliveryOutcomeDelivered  InvitationDeliveryOutcome = "delivered"
+	InvitationDeliveryOutcomeFailed     InvitationDeliveryOutcome = "failed"
+	InvitationDeliveryOutcomeSuppressed InvitationDeliveryOutcome = "suppressed"
+	InvitationDeliveryOutcomeBounced    InvitationDeliveryOutcome = "bounced"
+	InvitationDeliveryOutcomeComplained InvitationDeliveryOutcome = "complained"
+)
+
+// Delivery state of the most recent invitation email. `queued` and `sending` mean
+// the email service still holds the message. `sent` means the provider accepted
+// it. `failed` means the email service could not be reached or rejected the
+// message. `expired` means the invitation expired before the message was
+// delivered. Absent for invitations created before delivery tracking existed.
+type InvitationDeliveryStatus string
+
+const (
+	InvitationDeliveryStatusQueued  InvitationDeliveryStatus = "queued"
+	InvitationDeliveryStatusSending InvitationDeliveryStatus = "sending"
+	InvitationDeliveryStatusSent    InvitationDeliveryStatus = "sent"
+	InvitationDeliveryStatusFailed  InvitationDeliveryStatus = "failed"
+	InvitationDeliveryStatusExpired InvitationDeliveryStatus = "expired"
+)
 
 // Status of an invitation
 type InvitationStatus string
@@ -202,13 +286,17 @@ type OrganizationInvitationListParams struct {
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Fields to expand in the response. Supports "permissions" to include the
-	// permissions field with the caller's permissions for the resource. For list
-	// organization identities only, "total_count" populates pagination.total_count
-	// with the number of identities matching the same filters as the list (excluding
-	// cursor and limit). Other operations ignore expand values they do not use.
-	//
-	// Any of "permissions", "total_count".
-	Expand []string `query:"expand,omitzero" json:"-"`
+	// permissions field with the caller's permissions for the resource. For the
+	// service account and service account credential list operations, "total_count"
+	// populates pagination.total_count with the number of items matching the same
+	// filters as the list (excluding cursor and limit). Other operations ignore expand
+	// values they do not use.
+	Expand OrganizationInvitationListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Return only invitations with these statuses. Repeat the parameter to match any
+	// of several statuses (`?filter[status]=pending&filter[status]=accepted`). Expired
+	// invitations are never listed, so `expired` matches nothing. When absent, no
+	// status filter is applied.
+	FilterStatus []InvitationStatus `query:"filter[status],omitzero" json:"-"`
 	paramObj
 }
 
@@ -220,6 +308,24 @@ func (r OrganizationInvitationListParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type OrganizationInvitationListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfOrganizationInvitationListsExpandString)
+	OfOrganizationInvitationListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfOrganizationInvitationListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type OrganizationInvitationListParamsExpandString string
+
+const (
+	OrganizationInvitationListParamsExpandStringPermissions OrganizationInvitationListParamsExpandString = "permissions"
+	OrganizationInvitationListParamsExpandStringTotalCount  OrganizationInvitationListParamsExpandString = "total_count"
+)
 
 type OrganizationInvitationDeleteParams struct {
 	// Organization ID or label identifier
