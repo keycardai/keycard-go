@@ -40,8 +40,8 @@ jobs:
 
       # Merge commit, not squash: stlc tracks the build commit SHA, and squashing rewrites it,
       # which makes the next build see main as diverged and misread generated code as custom.
+      # --admin merges now: the release app bypasses the review rule, which --auto would wait on.
       - name: create & merge `autogen` → `main` PR
-        continue-on-error: true
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
@@ -53,4 +53,4 @@ jobs:
             PR_NUM=${PR_URL##*/}
             echo "Autogen Pull Request: $PR_NUM"
           fi
-          gh pr merge $PR_NUM --merge --auto
+          gh pr merge $PR_NUM --merge --admin
