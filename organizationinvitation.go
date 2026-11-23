@@ -115,6 +115,25 @@ type Invitation struct {
 	Status InvitationStatus `json:"status" api:"required"`
 	// The time the entity was mostly recently updated in utc
 	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
+	// Kind of bounce when `delivery_outcome` is `bounced`. `permanent` means the
+	// address does not accept mail; the provider suppresses later sends to it until it
+	// is removed from the suppression list. `transient` means a temporary rejection,
+	// such as a full mailbox. `undetermined` means the provider could not tell.
+	//
+	// Any of "permanent", "transient", "undetermined".
+	BounceType InvitationBounceType `json:"bounce_type"`
+	// What happened to the most recent invitation email after the provider accepted it
+	// (`delivery_status` is `sent`). `delayed` means the recipient's server has not
+	// accepted it yet. `delivered` means the recipient's server accepted it. `failed`
+	// means the provider could not send it. `suppressed` means the provider did not
+	// send it because the address bounced or complained before. `bounced` means the
+	// recipient's server rejected it; see `bounce_type`. `complained` means the
+	// recipient marked it as spam. Absent until an outcome is known, and for
+	// invitations sent before outcomes were tracked. Cleared on resend. `delivered`
+	// can later change to `complained` within the 24 hours the outcome is tracked.
+	//
+	// Any of "delayed", "delivered", "failed", "suppressed", "bounced", "complained".
+	DeliveryOutcome InvitationDeliveryOutcome `json:"delivery_outcome"`
 	// Delivery state of the most recent invitation email. `queued` and `sending` mean
 	// the email service still holds the message. `sent` means the provider accepted
 	// it. `failed` means the email service could not be reached or rejected the
@@ -123,6 +142,8 @@ type Invitation struct {
 	//
 	// Any of "queued", "sending", "sent", "failed", "expired".
 	DeliveryStatus InvitationDeliveryStatus `json:"delivery_status"`
+	// When `delivery_outcome` last changed in the email service.
+	DeliveryUpdatedAt time.Time `json:"delivery_updated_at" format:"date-time"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -130,19 +151,22 @@ type Invitation struct {
 	Permissions map[string]map[string]bool `json:"permissions"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID             respjson.Field
-		CreatedAt      respjson.Field
-		CreatedBy      respjson.Field
-		Email          respjson.Field
-		ExpiresAt      respjson.Field
-		OrganizationID respjson.Field
-		Role           respjson.Field
-		Status         respjson.Field
-		UpdatedAt      respjson.Field
-		DeliveryStatus respjson.Field
-		Permissions    respjson.Field
-		ExtraFields    map[string]respjson.Field
-		raw            string
+		ID                respjson.Field
+		CreatedAt         respjson.Field
+		CreatedBy         respjson.Field
+		Email             respjson.Field
+		ExpiresAt         respjson.Field
+		OrganizationID    respjson.Field
+		Role              respjson.Field
+		Status            respjson.Field
+		UpdatedAt         respjson.Field
+		BounceType        respjson.Field
+		DeliveryOutcome   respjson.Field
+		DeliveryStatus    respjson.Field
+		DeliveryUpdatedAt respjson.Field
+		Permissions       respjson.Field
+		ExtraFields       map[string]respjson.Field
+		raw               string
 	} `json:"-"`
 }
 
@@ -151,6 +175,38 @@ func (r Invitation) RawJSON() string { return r.JSON.raw }
 func (r *Invitation) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Kind of bounce when `delivery_outcome` is `bounced`. `permanent` means the
+// address does not accept mail; the provider suppresses later sends to it until it
+// is removed from the suppression list. `transient` means a temporary rejection,
+// such as a full mailbox. `undetermined` means the provider could not tell.
+type InvitationBounceType string
+
+const (
+	InvitationBounceTypePermanent    InvitationBounceType = "permanent"
+	InvitationBounceTypeTransient    InvitationBounceType = "transient"
+	InvitationBounceTypeUndetermined InvitationBounceType = "undetermined"
+)
+
+// What happened to the most recent invitation email after the provider accepted it
+// (`delivery_status` is `sent`). `delayed` means the recipient's server has not
+// accepted it yet. `delivered` means the recipient's server accepted it. `failed`
+// means the provider could not send it. `suppressed` means the provider did not
+// send it because the address bounced or complained before. `bounced` means the
+// recipient's server rejected it; see `bounce_type`. `complained` means the
+// recipient marked it as spam. Absent until an outcome is known, and for
+// invitations sent before outcomes were tracked. Cleared on resend. `delivered`
+// can later change to `complained` within the 24 hours the outcome is tracked.
+type InvitationDeliveryOutcome string
+
+const (
+	InvitationDeliveryOutcomeDelayed    InvitationDeliveryOutcome = "delayed"
+	InvitationDeliveryOutcomeDelivered  InvitationDeliveryOutcome = "delivered"
+	InvitationDeliveryOutcomeFailed     InvitationDeliveryOutcome = "failed"
+	InvitationDeliveryOutcomeSuppressed InvitationDeliveryOutcome = "suppressed"
+	InvitationDeliveryOutcomeBounced    InvitationDeliveryOutcome = "bounced"
+	InvitationDeliveryOutcomeComplained InvitationDeliveryOutcome = "complained"
+)
 
 // Delivery state of the most recent invitation email. `queued` and `sending` mean
 // the email service still holds the message. `sent` means the provider accepted
