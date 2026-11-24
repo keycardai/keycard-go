@@ -83,9 +83,18 @@ func (r *ZoneProviderService) Update(ctx context.Context, id string, params Zone
 	return res, err
 }
 
-// Returns a list of providers in the specified zone. Pass `filter[id]`
-// (repeatable, max 100) to restrict results to a known set of provider IDs;
-// unknown or malformed IDs are silently omitted.
+// Returns a paginated list of providers in the specified zone. Use cursor
+// pagination via `after`/`before`. Sort: comma-separated field list; prefix with
+// `-` for descending. Use `expand[]=total_count` to include the matching row
+// count. Filter by exact slug via `filter[slug]`, exact identifier via
+// `filter[identifier]` and provider type via `filter[type]`. Search via
+// `query[name]` / `query[identifier]` / `query[]` (substring match, OR'd across
+// repeated values). `query[]` matches against name and identifier. Pass
+// `filter[id]` (repeatable, max 100) to restrict results to a known set of
+// provider IDs — mutually exclusive with `after`/`before` (returns 400 if
+// combined). When `filter[id]` is set, `limit` is ignored and the response
+// contains every requested provider that exists in the zone, in a single page.
+// Unknown or malformed IDs are silently omitted.
 func (r *ZoneProviderService) List(ctx context.Context, zoneID string, query ZoneProviderListParams, opts ...option.RequestOption) (res *ZoneProviderListResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if zoneID == "" {
@@ -112,6 +121,25 @@ func (r *ZoneProviderService) Delete(ctx context.Context, id string, body ZonePr
 	path := fmt.Sprintf("zones/%s/providers/%s", url.PathEscape(body.ZoneID), url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
 	return err
+}
+
+// Runs on-demand OIDC connection checks (issuer reachability, metadata retrieval,
+// endpoint consistency, authorization endpoint reachability, and a demonstration
+// client_credentials exchange) against the provider and returns a per-check
+// result. Results are not persisted.
+func (r *ZoneProviderService) Validate(ctx context.Context, id string, body ZoneProviderValidateParams, opts ...option.RequestOption) (res *ValidationResult, err error) {
+	opts = slices.Concat(r.Options, opts)
+	if body.ZoneID == "" {
+		err = errors.New("missing required zoneId parameter")
+		return nil, err
+	}
+	if id == "" {
+		err = errors.New("missing required id parameter")
+		return nil, err
+	}
+	path := fmt.Sprintf("zones/%s/providers/%s/validate", url.PathEscape(body.ZoneID), url.PathEscape(id))
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
+	return res, err
 }
 
 // A Provider is a system that supplies access to Resources and allows actors
@@ -238,8 +266,13 @@ type ProviderProtocolsOauth2 struct {
 	// "resource" when authorization_resource_enabled is true.
 	AuthorizationResourceParameter string   `json:"authorization_resource_parameter" api:"nullable"`
 	CodeChallengeMethodsSupported  []string `json:"code_challenge_methods_supported" api:"nullable"`
-	JwksUri                        string   `json:"jwks_uri" api:"nullable" format:"uri"`
-	RegistrationEndpoint           string   `json:"registration_endpoint" api:"nullable" format:"uri"`
+	// Inline JSON Web Key Set (RFC 7517) used to verify the provider's tokens instead
+	// of fetching jwks_uri or discovery, for issuers Keycard can't reach, such as a
+	// local Kubernetes cluster. Mutually exclusive with jwks_uri. Keys stay trusted
+	// until removed, so add a rotated key before the issuer signs with it.
+	Jwks                 ProviderProtocolsOauth2Jwks `json:"jwks" api:"nullable"`
+	JwksUri              string                      `json:"jwks_uri" api:"nullable" format:"uri"`
+	RegistrationEndpoint string                      `json:"registration_endpoint" api:"nullable" format:"uri"`
 	// The query parameter name for scopes in authorization requests. Defaults to
 	// "scope". Slack v2 uses "user_scope".
 	ScopeParameter string `json:"scope_parameter" api:"nullable"`
@@ -259,6 +292,7 @@ type ProviderProtocolsOauth2 struct {
 		AuthorizationResourceEnabled    respjson.Field
 		AuthorizationResourceParameter  respjson.Field
 		CodeChallengeMethodsSupported   respjson.Field
+		Jwks                            respjson.Field
 		JwksUri                         respjson.Field
 		RegistrationEndpoint            respjson.Field
 		ScopeParameter                  respjson.Field
@@ -277,12 +311,58 @@ func (r *ProviderProtocolsOauth2) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Inline JSON Web Key Set (RFC 7517) used to verify the provider's tokens instead
+// of fetching jwks_uri or discovery, for issuers Keycard can't reach, such as a
+// local Kubernetes cluster. Mutually exclusive with jwks_uri. Keys stay trusted
+// until removed, so add a rotated key before the issuer signs with it.
+type ProviderProtocolsOauth2Jwks struct {
+	Keys []ProviderProtocolsOauth2JwksKey `json:"keys" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Keys        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ProviderProtocolsOauth2Jwks) RawJSON() string { return r.JSON.raw }
+func (r *ProviderProtocolsOauth2Jwks) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A public JSON Web Key (RFC 7517). Members beyond those listed, such as n and e,
+// or crv, x and y, are kept as given. Private key material is rejected.
+type ProviderProtocolsOauth2JwksKey struct {
+	// Key ID, unique within the set.
+	Kid string `json:"kid" api:"required"`
+	// Key type: "RSA", or "EC" on P-256, P-384 or P-521.
+	Kty string `json:"kty" api:"required"`
+	// Algorithm the key verifies: RS256 for RSA, ES256, ES384 or ES512 for EC on the
+	// matching curve.
+	Alg string `json:"alg"`
+	// Public key use. Must be "sig" when set.
+	Use         string         `json:"use"`
+	ExtraFields map[string]any `json:"" api:"extrafields"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Kid         respjson.Field
+		Kty         respjson.Field
+		Alg         respjson.Field
+		Use         respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ProviderProtocolsOauth2JwksKey) RawJSON() string { return r.JSON.raw }
+func (r *ProviderProtocolsOauth2JwksKey) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // OpenID Connect protocol configuration
 type ProviderProtocolsOpenid struct {
-	// Name of the OIDC claim carrying the stable external id used to correlate logins
-	// with externally provisioned (SCIM) users. Defaults to "sub". Set to "oid" for
-	// Entra, whose pairwise "sub" differs from the SCIM externalId.
-	ExternalIDClaim string `json:"external_id_claim" api:"nullable"`
 	// Additional OIDC scopes to request from this provider during authentication (e.g.
 	// "groups"). Merged with the default scopes (openid, profile, email).
 	Scopes []string `json:"scopes" api:"nullable"`
@@ -295,7 +375,6 @@ type ProviderProtocolsOpenid struct {
 	UserinfoEndpoint    string `json:"userinfo_endpoint" api:"nullable" format:"uri"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ExternalIDClaim     respjson.Field
 		Scopes              respjson.Field
 		SingleLogoutEnabled respjson.Field
 		UserIdentifierClaim respjson.Field
@@ -319,9 +398,86 @@ const (
 	ProviderTypeKeycardSts   ProviderType = "keycard-sts"
 )
 
+// Result of running the provider OIDC connection checks on demand. Not persisted.
+type ValidationResult struct {
+	// Per-check results, in execution order
+	Checks []ValidationResultCheck `json:"checks" api:"required"`
+	// Provider that was validated
+	ProviderID string `json:"provider_id" api:"required"`
+	// Overall outcome. `fail` when any individual check failed; skipped checks do not
+	// fail the run.
+	//
+	// Any of "pass", "fail".
+	Status ValidationResultStatus `json:"status" api:"required"`
+	// When the validation run completed
+	ValidatedAt time.Time `json:"validated_at" api:"required" format:"date-time"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Checks      respjson.Field
+		ProviderID  respjson.Field
+		Status      respjson.Field
+		ValidatedAt respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ValidationResult) RawJSON() string { return r.JSON.raw }
+func (r *ValidationResult) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Result of a single provider validation check
+type ValidationResultCheck struct {
+	// Identifier of an individual provider validation check
+	//
+	// Any of "issuer_reachability", "metadata_retrieval", "endpoint_consistency",
+	// "authorization_endpoint_reachability", "credential_exchange".
+	Check string `json:"check" api:"required"`
+	// Outcome of a single check. `pass`/`fail` mean the check ran.
+	// `skipped_with_reason` means it could not run because a prerequisite is missing
+	// on our side (e.g. no credential stored). `not_applicable` means the check does
+	// not apply to this provider class (e.g. a login-flow-only provider that does not
+	// advertise the `client_credentials` grant) — render as a neutral state, distinct
+	// from a failure. Neither `skipped_with_reason` nor `not_applicable` fails the
+	// overall run.
+	//
+	// Any of "pass", "fail", "skipped_with_reason", "not_applicable".
+	Status string `json:"status" api:"required"`
+	// Human-readable explanation, present on `fail`, `skipped_with_reason`, and
+	// `not_applicable`.
+	Detail string `json:"detail"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Check       respjson.Field
+		Status      respjson.Field
+		Detail      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ValidationResultCheck) RawJSON() string { return r.JSON.raw }
+func (r *ValidationResultCheck) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Overall outcome. `fail` when any individual check failed; skipped checks do not
+// fail the run.
+type ValidationResultStatus string
+
+const (
+	ValidationResultStatusPass ValidationResultStatus = "pass"
+	ValidationResultStatusFail ValidationResultStatus = "fail"
+)
+
 type ZoneProviderListResponse struct {
 	Items []Provider `json:"items" api:"required"`
 	// Pagination information
+	//
+	// Deprecated: deprecated
 	PageInfo PageInfoPagination `json:"page_info" api:"required"`
 	// Cursor-based pagination metadata
 	Pagination ZoneProviderListResponsePagination `json:"pagination" api:"required"`
@@ -450,6 +606,11 @@ type ZoneProviderNewParamsProtocolsOauth2 struct {
 	// Dot-separated path to the access token in the token response body. Defaults to
 	// "access_token". Slack v2 uses "authed_user.access_token".
 	TokenResponseAccessTokenPointer param.Opt[string] `json:"token_response_access_token_pointer,omitzero"`
+	// Inline JSON Web Key Set (RFC 7517) used to verify the provider's tokens instead
+	// of fetching jwks_uri or discovery, for issuers Keycard can't reach, such as a
+	// local Kubernetes cluster. Mutually exclusive with jwks_uri. Keys stay trusted
+	// until removed, so add a rotated key before the issuer signs with it.
+	Jwks ZoneProviderNewParamsProtocolsOauth2Jwks `json:"jwks,omitzero"`
 	// Custom query parameters appended to authorization redirect URLs. Use for
 	// non-standard providers (e.g. Google prompt=consent, access_type=offline).
 	AuthorizationParameters       map[string]string `json:"authorization_parameters,omitzero"`
@@ -466,12 +627,53 @@ func (r *ZoneProviderNewParamsProtocolsOauth2) UnmarshalJSON(data []byte) error 
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Inline JSON Web Key Set (RFC 7517) used to verify the provider's tokens instead
+// of fetching jwks_uri or discovery, for issuers Keycard can't reach, such as a
+// local Kubernetes cluster. Mutually exclusive with jwks_uri. Keys stay trusted
+// until removed, so add a rotated key before the issuer signs with it.
+//
+// The property Keys is required.
+type ZoneProviderNewParamsProtocolsOauth2Jwks struct {
+	Keys []ZoneProviderNewParamsProtocolsOauth2JwksKey `json:"keys,omitzero" api:"required"`
+	paramObj
+}
+
+func (r ZoneProviderNewParamsProtocolsOauth2Jwks) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneProviderNewParamsProtocolsOauth2Jwks
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZoneProviderNewParamsProtocolsOauth2Jwks) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A public JSON Web Key (RFC 7517). Members beyond those listed, such as n and e,
+// or crv, x and y, are kept as given. Private key material is rejected.
+//
+// The properties Kid, Kty are required.
+type ZoneProviderNewParamsProtocolsOauth2JwksKey struct {
+	// Key ID, unique within the set.
+	Kid string `json:"kid" api:"required"`
+	// Key type: "RSA", or "EC" on P-256, P-384 or P-521.
+	Kty string `json:"kty" api:"required"`
+	// Algorithm the key verifies: RS256 for RSA, ES256, ES384 or ES512 for EC on the
+	// matching curve.
+	Alg param.Opt[string] `json:"alg,omitzero"`
+	// Public key use. Must be "sig" when set.
+	Use         param.Opt[string] `json:"use,omitzero"`
+	ExtraFields map[string]any    `json:"-"`
+	paramObj
+}
+
+func (r ZoneProviderNewParamsProtocolsOauth2JwksKey) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneProviderNewParamsProtocolsOauth2JwksKey
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *ZoneProviderNewParamsProtocolsOauth2JwksKey) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // OpenID Connect protocol configuration for provider creation
 type ZoneProviderNewParamsProtocolsOpenid struct {
-	// Name of the OIDC claim carrying the stable external id used to correlate logins
-	// with externally provisioned (SCIM) users. Defaults to "sub". Set to "oid" for
-	// Entra, whose pairwise "sub" differs from the SCIM externalId.
-	ExternalIDClaim param.Opt[string] `json:"external_id_claim,omitzero"`
 	// When true, logging out of the zone propagates the logout to this provider's
 	// end_session_endpoint (RP-initiated logout). Defaults to false.
 	SingleLogoutEnabled param.Opt[bool] `json:"single_logout_enabled,omitzero"`
@@ -588,7 +790,12 @@ type ZoneProviderUpdateParamsProtocolsOauth2 struct {
 	// unset.
 	AuthorizationParameters       map[string]string `json:"authorization_parameters,omitzero"`
 	CodeChallengeMethodsSupported []string          `json:"code_challenge_methods_supported,omitzero"`
-	ScopesSupported               []string          `json:"scopes_supported,omitzero"`
+	// Inline JSON Web Key Set (RFC 7517) used to verify the provider's tokens instead
+	// of fetching jwks_uri or discovery, for issuers Keycard can't reach, such as a
+	// local Kubernetes cluster. Mutually exclusive with jwks_uri. Keys stay trusted
+	// until removed, so add a rotated key before the issuer signs with it.
+	Jwks            ZoneProviderUpdateParamsProtocolsOauth2Jwks `json:"jwks,omitzero"`
+	ScopesSupported []string                                    `json:"scopes_supported,omitzero"`
 	paramObj
 }
 
@@ -600,13 +807,53 @@ func (r *ZoneProviderUpdateParamsProtocolsOauth2) UnmarshalJSON(data []byte) err
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Inline JSON Web Key Set (RFC 7517) used to verify the provider's tokens instead
+// of fetching jwks_uri or discovery, for issuers Keycard can't reach, such as a
+// local Kubernetes cluster. Mutually exclusive with jwks_uri. Keys stay trusted
+// until removed, so add a rotated key before the issuer signs with it.
+//
+// The property Keys is required.
+type ZoneProviderUpdateParamsProtocolsOauth2Jwks struct {
+	Keys []ZoneProviderUpdateParamsProtocolsOauth2JwksKey `json:"keys,omitzero" api:"required"`
+	paramObj
+}
+
+func (r ZoneProviderUpdateParamsProtocolsOauth2Jwks) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneProviderUpdateParamsProtocolsOauth2Jwks
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZoneProviderUpdateParamsProtocolsOauth2Jwks) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A public JSON Web Key (RFC 7517). Members beyond those listed, such as n and e,
+// or crv, x and y, are kept as given. Private key material is rejected.
+//
+// The properties Kid, Kty are required.
+type ZoneProviderUpdateParamsProtocolsOauth2JwksKey struct {
+	// Key ID, unique within the set.
+	Kid string `json:"kid" api:"required"`
+	// Key type: "RSA", or "EC" on P-256, P-384 or P-521.
+	Kty string `json:"kty" api:"required"`
+	// Algorithm the key verifies: RS256 for RSA, ES256, ES384 or ES512 for EC on the
+	// matching curve.
+	Alg param.Opt[string] `json:"alg,omitzero"`
+	// Public key use. Must be "sig" when set.
+	Use         param.Opt[string] `json:"use,omitzero"`
+	ExtraFields map[string]any    `json:"-"`
+	paramObj
+}
+
+func (r ZoneProviderUpdateParamsProtocolsOauth2JwksKey) MarshalJSON() (data []byte, err error) {
+	type shadow ZoneProviderUpdateParamsProtocolsOauth2JwksKey
+	return param.MarshalWithExtras(r, (*shadow)(&r), r.ExtraFields)
+}
+func (r *ZoneProviderUpdateParamsProtocolsOauth2JwksKey) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // OpenID Connect protocol configuration. Set to null to remove all OpenID config.
 type ZoneProviderUpdateParamsProtocolsOpenid struct {
-	// Name of the OIDC claim carrying the stable external id used to correlate logins
-	// with externally provisioned (SCIM) users. Defaults to "sub". Set to "oid" for
-	// Entra, whose pairwise "sub" differs from the SCIM externalId. Set to null to
-	// revert to default.
-	ExternalIDClaim param.Opt[string] `json:"external_id_claim,omitzero"`
 	// When true, logging out of the zone propagates the logout to this provider's
 	// end_session_endpoint (RP-initiated logout). Defaults to false.
 	SingleLogoutEnabled param.Opt[bool] `json:"single_logout_enabled,omitzero"`
@@ -638,11 +885,27 @@ type ZoneProviderListParams struct {
 	Cursor     param.Opt[string] `query:"cursor,omitzero" json:"-"`
 	Identifier param.Opt[string] `query:"identifier,omitzero" json:"-"`
 	// Maximum number of items to return
-	Limit  param.Opt[int64]                  `query:"limit,omitzero" json:"-"`
-	Slug   param.Opt[string]                 `query:"slug,omitzero" json:"-"`
+	Limit param.Opt[int64]  `query:"limit,omitzero" json:"-"`
+	Slug  param.Opt[string] `query:"slug,omitzero" json:"-"`
+	// Comma-separated sort fields. Prefix with - for descending. Allowed: created_at,
+	// name, identifier
+	Sort   param.Opt[string]                 `query:"sort,omitzero" json:"-"`
 	Expand ZoneProviderListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
-	// Restrict results to providers with this ID. Repeatable, max 100.
+	// Restrict results to providers with this ID. Repeatable, max 100. Mutually
+	// exclusive with after/before.
 	FilterID ZoneProviderListParamsFilterIDUnion `query:"filter[id],omitzero" json:"-"`
+	// Filter by exact provider identifier
+	FilterIdentifier ZoneProviderListParamsFilterIdentifierUnion `query:"filter[identifier],omitzero" json:"-"`
+	// Filter by exact provider slug
+	FilterSlug ZoneProviderListParamsFilterSlugUnion `query:"filter[slug],omitzero" json:"-"`
+	// Filter by provider type
+	FilterType ZoneProviderListParamsFilterTypeUnion `query:"filter[type],omitzero" json:"-"`
+	// Search across name and identifier (substring match)
+	Query ZoneProviderListParamsQueryUnion `query:"query[],omitzero" json:"-"`
+	// Search by identifier (substring match)
+	QueryIdentifier ZoneProviderListParamsQueryIdentifierUnion `query:"query[identifier],omitzero" json:"-"`
+	// Search by name (substring match)
+	QueryName ZoneProviderListParamsQueryNameUnion `query:"query[name],omitzero" json:"-"`
 	// Any of "external", "keycard-vault", "keycard-sts".
 	Type ZoneProviderListParamsType `query:"type,omitzero" json:"-"`
 	paramObj
@@ -682,6 +945,71 @@ type ZoneProviderListParamsFilterIDUnion struct {
 	paramUnion
 }
 
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneProviderListParamsFilterIdentifierUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneProviderListParamsFilterSlugUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneProviderListParamsFilterTypeUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfZoneProviderListsFilterTypeString)
+	OfZoneProviderListsFilterTypeString         param.Opt[string] `query:",omitzero,inline"`
+	OfZoneProviderListsFilterTypeArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Filter by provider type
+type ZoneProviderListParamsFilterTypeString string
+
+const (
+	ZoneProviderListParamsFilterTypeStringExternal     ZoneProviderListParamsFilterTypeString = "external"
+	ZoneProviderListParamsFilterTypeStringKeycardVault ZoneProviderListParamsFilterTypeString = "keycard-vault"
+	ZoneProviderListParamsFilterTypeStringKeycardSts   ZoneProviderListParamsFilterTypeString = "keycard-sts"
+)
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneProviderListParamsQueryUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneProviderListParamsQueryIdentifierUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ZoneProviderListParamsQueryNameUnion struct {
+	OfString      param.Opt[string] `query:",omitzero,inline"`
+	OfStringArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
 type ZoneProviderListParamsType string
 
 const (
@@ -691,6 +1019,11 @@ const (
 )
 
 type ZoneProviderDeleteParams struct {
+	ZoneID string `path:"zoneId" api:"required" json:"-"`
+	paramObj
+}
+
+type ZoneProviderValidateParams struct {
 	ZoneID string `path:"zoneId" api:"required" json:"-"`
 	paramObj
 }
