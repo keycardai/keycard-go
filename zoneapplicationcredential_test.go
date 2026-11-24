@@ -33,10 +33,13 @@ func TestZoneApplicationCredentialNewWithOptionalParams(t *testing.T) {
 		"zoneId",
 		keycard.ZoneApplicationCredentialNewParams{
 			OfApplicationCredentialCreateToken: &keycard.ZoneApplicationCredentialNewParamsBodyApplicationCredentialCreateToken{
-				ApplicationID: "application_id",
-				ProviderID:    "provider_id",
-				Type:          "token",
-				Subject:       keycard.String("subject"),
+				ApplicationID:           "application_id",
+				ProviderID:              "provider_id",
+				Type:                    "token",
+				AllowedAudience:         keycard.String("x"),
+				AuthenticationCondition: keycard.String("x"),
+				Subject:                 keycard.String("subject"),
+				Version:                 1,
 			},
 		},
 	)
@@ -101,8 +104,11 @@ func TestZoneApplicationCredentialUpdateWithOptionalParams(t *testing.T) {
 		keycard.ZoneApplicationCredentialUpdateParams{
 			ZoneID: "zoneId",
 			OfTokenCredentialUpdate: &keycard.ZoneApplicationCredentialUpdateParamsBodyTokenCredentialUpdate{
-				Subject: keycard.String("subject"),
-				Type:    "token",
+				AllowedAudience:         keycard.String("x"),
+				AuthenticationCondition: keycard.String("x"),
+				Subject:                 keycard.String("subject"),
+				Type:                    "token",
+				Version:                 1,
 			},
 		},
 	)
@@ -137,12 +143,28 @@ func TestZoneApplicationCredentialListWithOptionalParams(t *testing.T) {
 			After:         keycard.String("x"),
 			ApplicationID: keycard.String("applicationId"),
 			Before:        keycard.String("x"),
-			Cursor:        keycard.String("cursor"),
 			Expand: keycard.ZoneApplicationCredentialListParamsExpandUnion{
 				OfZoneApplicationCredentialListsExpandString: keycard.String("total_count"),
 			},
+			FilterOwnerTypeNe: keycard.ZoneApplicationCredentialListParamsFilterOwnerTypeNePlatform,
+			FilterTraitsNe: keycard.ZoneApplicationCredentialListParamsFilterTraitsNeUnion{
+				OfString: keycard.String("string"),
+			},
+			FilterType: keycard.ZoneApplicationCredentialListParamsFilterTypeUnion{
+				OfZoneApplicationCredentialListsFilterTypeString: keycard.String("token"),
+			},
 			Limit: keycard.Int(1),
-			Slug:  keycard.String("slug"),
+			Query: keycard.ZoneApplicationCredentialListParamsQueryUnion{
+				OfString: keycard.String("x"),
+			},
+			QueryIdentifier: keycard.ZoneApplicationCredentialListParamsQueryIdentifierUnion{
+				OfString: keycard.String("x"),
+			},
+			QueryProviderName: keycard.ZoneApplicationCredentialListParamsQueryProviderNameUnion{
+				OfString: keycard.String("x"),
+			},
+			Slug: keycard.String("slug"),
+			Sort: keycard.String("-created_at, \u000b\f-created_at,\r\r \t\u000b\n\r-created_at,\n\n\f\t-created_at,\n\u000b\r \r\fcreated_at,\n\t\t\n\t\f\f\ncreated_at,\n\u000b\u000b  \n\r\r -created_at,\f \u000b\u000b\f\t\n\n -created_at"),
 		},
 	)
 	if err != nil {
