@@ -31,6 +31,8 @@ type ZonePolicyService struct {
 	Options []option.RequestOption
 	// Immutable policy version snapshots
 	Versions ZonePolicyVersionService
+	// Mutable policy authoring workspace
+	Draft ZonePolicyDraftService
 }
 
 // NewZonePolicyService generates a new service that applies the given options to
@@ -40,6 +42,7 @@ func NewZonePolicyService(opts ...option.RequestOption) (r ZonePolicyService) {
 	r = ZonePolicyService{}
 	r.Options = opts
 	r.Versions = NewZonePolicyVersionService(opts...)
+	r.Draft = NewZonePolicyDraftService(opts...)
 	return
 }
 
@@ -277,6 +280,76 @@ type PolicyUpdatedByUser struct {
 // Returns the unmodified JSON received from the API
 func (r PolicyUpdatedByUser) RawJSON() string { return r.JSON.raw }
 func (r *PolicyUpdatedByUser) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type PolicyDraft struct {
+	CreatedAt     time.Time `json:"created_at" api:"required" format:"date-time"`
+	PolicyID      string    `json:"policy_id" api:"required"`
+	SchemaVersion string    `json:"schema_version" api:"required"`
+	UpdatedAt     time.Time `json:"updated_at" api:"required" format:"date-time"`
+	UpdatedBy     string    `json:"updated_by" api:"required"`
+	// ID of the policy version this draft was hydrated from. Null when the draft was
+	// created without an existing version.
+	BaseVersionID string `json:"base_version_id" api:"nullable"`
+	// Cedar policy in JSON representation. Populated by default and when `format=json`
+	// is passed; null when `format=cedar` narrows the response to the text
+	// representation only. Serialized verbatim from the converted Cedar so the order
+	// of `staticPolicies` matches the source policy order (ACC-613).
+	CedarJson any `json:"cedar_json" api:"nullable"`
+	// Cedar policy in human-readable syntax. Populated by default and when
+	// `format=cedar` is passed; null when `format=json` narrows the response to the
+	// JSON representation only.
+	CedarRaw string `json:"cedar_raw" api:"nullable"`
+	// The organization user behind a `created_by`, `updated_by` or `archived_by`
+	// value. Returned only when `expand[]=user` is requested.
+	UpdatedByUser PolicyDraftUpdatedByUser `json:"updated_by_user"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		CreatedAt     respjson.Field
+		PolicyID      respjson.Field
+		SchemaVersion respjson.Field
+		UpdatedAt     respjson.Field
+		UpdatedBy     respjson.Field
+		BaseVersionID respjson.Field
+		CedarJson     respjson.Field
+		CedarRaw      respjson.Field
+		UpdatedByUser respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PolicyDraft) RawJSON() string { return r.JSON.raw }
+func (r *PolicyDraft) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The organization user behind a `created_by`, `updated_by` or `archived_by`
+// value. Returned only when `expand[]=user` is requested.
+type PolicyDraftUpdatedByUser struct {
+	// Public ID of the user in the organization's platform zone. This is not the same
+	// value as the `*_by` field it expands; use it to link to
+	// `/zones/{zone_id}/users/{id}`.
+	ID string `json:"id" api:"required"`
+	// The user's email address, or null when not known.
+	Email string `json:"email" api:"required"`
+	// Public ID of the organization's platform zone the user belongs to.
+	ZoneID string `json:"zone_id" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Email       respjson.Field
+		ZoneID      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PolicyDraftUpdatedByUser) RawJSON() string { return r.JSON.raw }
+func (r *PolicyDraftUpdatedByUser) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
