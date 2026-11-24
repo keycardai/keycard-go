@@ -33,10 +33,13 @@ func TestZoneApplicationCredentialNewWithOptionalParams(t *testing.T) {
 		"zoneId",
 		keycard.ZoneApplicationCredentialNewParams{
 			OfApplicationCredentialCreateToken: &keycard.ZoneApplicationCredentialNewParamsBodyApplicationCredentialCreateToken{
-				ApplicationID: "application_id",
-				ProviderID:    "provider_id",
-				Type:          "token",
-				Subject:       keycard.String("subject"),
+				ApplicationID:           "application_id",
+				ProviderID:              "provider_id",
+				Type:                    "token",
+				AllowedAudience:         keycard.String("x"),
+				AuthenticationCondition: keycard.String("x"),
+				Subject:                 keycard.String("subject"),
+				Version:                 1,
 			},
 		},
 	)
@@ -101,8 +104,11 @@ func TestZoneApplicationCredentialUpdateWithOptionalParams(t *testing.T) {
 		keycard.ZoneApplicationCredentialUpdateParams{
 			ZoneID: "zoneId",
 			OfTokenCredentialUpdate: &keycard.ZoneApplicationCredentialUpdateParamsBodyTokenCredentialUpdate{
-				Subject: keycard.String("subject"),
-				Type:    "token",
+				AllowedAudience:         keycard.String("x"),
+				AuthenticationCondition: keycard.String("x"),
+				Subject:                 keycard.String("subject"),
+				Type:                    "token",
+				Version:                 1,
 			},
 		},
 	)

@@ -92,6 +92,39 @@ func (r *OrganizationInvitationService) Delete(ctx context.Context, invitationID
 	return err
 }
 
+// Send a fresh invitation email. The invitation token is rotated, so the link in
+// any earlier email stops working. Returns 409 while a previous email is still
+// queued or sending, or when the invitation is no longer pending. Returns 200 even
+// when the email service cannot be reached: the token has already been rotated,
+// the response's `delivery_status` is `failed`, no new email was queued, and the
+// caller must resend. Each resend counts toward the organization's daily
+// invitation limit. Returns 429 with a `Retry-After` header when that limit or the
+// per-recipient send cap is reached. If the email service rejects the send, the
+// earlier link keeps working.
+//
+// After the organization access check succeeds, the service sends
+// `X-Should-Retry: false` on 409, 429, and 5xx responses to tell SDKs to surface
+// the error without retrying. A retry can rotate the token and invalidate an email
+// link, including when the first send succeeded but the response did not reach the
+// caller.
+func (r *OrganizationInvitationService) Resend(ctx context.Context, invitationID string, params OrganizationInvitationResendParams, opts ...option.RequestOption) (res *Invitation, err error) {
+	if !param.IsOmitted(params.XClientRequestID) {
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
+	}
+	opts = slices.Concat(r.Options, opts)
+	if params.OrganizationID == "" {
+		err = errors.New("missing required organization_id parameter")
+		return nil, err
+	}
+	if invitationID == "" {
+		err = errors.New("missing required invitation_id parameter")
+		return nil, err
+	}
+	path := fmt.Sprintf("organizations/%s/invitations/%s/resend", url.PathEscape(params.OrganizationID), url.PathEscape(invitationID))
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, nil, &res, opts...)
+	return res, err
+}
+
 type Invitation struct {
 	// Identifier for API resources. A 26-char nanoid (URL/DNS safe).
 	ID string `json:"id" api:"required"`
@@ -328,6 +361,13 @@ const (
 )
 
 type OrganizationInvitationDeleteParams struct {
+	// Organization ID or label identifier
+	OrganizationID   string            `path:"organization_id" api:"required" json:"-"`
+	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
+	paramObj
+}
+
+type OrganizationInvitationResendParams struct {
 	// Organization ID or label identifier
 	OrganizationID   string            `path:"organization_id" api:"required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`

@@ -186,30 +186,39 @@ type CredentialUnion struct {
 	ProviderID string `json:"provider_id"`
 	Type       string `json:"type"`
 	// This field is from variant [Token].
+	AllowedAudience string `json:"allowed_audience"`
+	// This field is from variant [Token].
+	AuthenticationCondition string `json:"authentication_condition"`
+	// This field is from variant [Token].
 	Provider Provider `json:"provider"`
 	// This field is from variant [Token].
 	Subject string `json:"subject"`
+	// This field is from variant [Token].
+	Version int64 `json:"version"`
 	// This field is from variant [Password].
 	Password string `json:"password"`
 	// This field is from variant [PublicKey].
 	JwksUri string `json:"jwks_uri"`
 	JSON    struct {
-		ID             respjson.Field
-		ApplicationID  respjson.Field
-		CreatedAt      respjson.Field
-		OrganizationID respjson.Field
-		Slug           respjson.Field
-		UpdatedAt      respjson.Field
-		ZoneID         respjson.Field
-		Application    respjson.Field
-		Identifier     respjson.Field
-		ProviderID     respjson.Field
-		Type           respjson.Field
-		Provider       respjson.Field
-		Subject        respjson.Field
-		Password       respjson.Field
-		JwksUri        respjson.Field
-		raw            string
+		ID                      respjson.Field
+		ApplicationID           respjson.Field
+		CreatedAt               respjson.Field
+		OrganizationID          respjson.Field
+		Slug                    respjson.Field
+		UpdatedAt               respjson.Field
+		ZoneID                  respjson.Field
+		Application             respjson.Field
+		Identifier              respjson.Field
+		ProviderID              respjson.Field
+		Type                    respjson.Field
+		AllowedAudience         respjson.Field
+		AuthenticationCondition respjson.Field
+		Provider                respjson.Field
+		Subject                 respjson.Field
+		Version                 respjson.Field
+		Password                respjson.Field
+		JwksUri                 respjson.Field
+		raw                     string
 	} `json:"-"`
 }
 
@@ -328,6 +337,12 @@ type Token struct {
 	ProviderID string `json:"provider_id" api:"required"`
 	// Any of "token".
 	Type string `json:"type" api:"required"`
+	// Version 2 only. Audience the token's `aud` must contain. `null` when unset, in
+	// which case the zone's issuer URL is required.
+	AllowedAudience string `json:"allowed_audience" api:"nullable"`
+	// Version 2 only. CEL predicate over the token's `claims` that must evaluate to
+	// true. `null` when unset.
+	AuthenticationCondition string `json:"authentication_condition" api:"nullable"`
 	// A Provider is a system that supplies access to Resources and allows actors
 	// (Users or Applications) to authenticate.
 	//
@@ -336,15 +351,22 @@ type Token struct {
 	// Subject identifier for the token. When null or omitted, any token from the
 	// provider is accepted without checking application-specific claims.
 	Subject string `json:"subject" api:"nullable"`
+	// Credential behavior version.
+	//
+	// Any of 1, 2.
+	Version int64 `json:"version"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Identifier  respjson.Field
-		ProviderID  respjson.Field
-		Type        respjson.Field
-		Provider    respjson.Field
-		Subject     respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		Identifier              respjson.Field
+		ProviderID              respjson.Field
+		Type                    respjson.Field
+		AllowedAudience         respjson.Field
+		AuthenticationCondition respjson.Field
+		Provider                respjson.Field
+		Subject                 respjson.Field
+		Version                 respjson.Field
+		ExtraFields             map[string]respjson.Field
+		raw                     string
 	} `json:"-"`
 	BaseFields
 }
@@ -403,30 +425,39 @@ type ZoneApplicationCredentialNewResponseUnion struct {
 	ProviderID string `json:"provider_id"`
 	Type       string `json:"type"`
 	// This field is from variant [Token].
+	AllowedAudience string `json:"allowed_audience"`
+	// This field is from variant [Token].
+	AuthenticationCondition string `json:"authentication_condition"`
+	// This field is from variant [Token].
 	Provider Provider `json:"provider"`
 	// This field is from variant [Token].
 	Subject string `json:"subject"`
+	// This field is from variant [Token].
+	Version int64 `json:"version"`
 	// This field is from variant [Password].
 	Password string `json:"password"`
 	// This field is from variant [PublicKey].
 	JwksUri string `json:"jwks_uri"`
 	JSON    struct {
-		ID             respjson.Field
-		ApplicationID  respjson.Field
-		CreatedAt      respjson.Field
-		OrganizationID respjson.Field
-		Slug           respjson.Field
-		UpdatedAt      respjson.Field
-		ZoneID         respjson.Field
-		Application    respjson.Field
-		Identifier     respjson.Field
-		ProviderID     respjson.Field
-		Type           respjson.Field
-		Provider       respjson.Field
-		Subject        respjson.Field
-		Password       respjson.Field
-		JwksUri        respjson.Field
-		raw            string
+		ID                      respjson.Field
+		ApplicationID           respjson.Field
+		CreatedAt               respjson.Field
+		OrganizationID          respjson.Field
+		Slug                    respjson.Field
+		UpdatedAt               respjson.Field
+		ZoneID                  respjson.Field
+		Application             respjson.Field
+		Identifier              respjson.Field
+		ProviderID              respjson.Field
+		Type                    respjson.Field
+		AllowedAudience         respjson.Field
+		AuthenticationCondition respjson.Field
+		Provider                respjson.Field
+		Subject                 respjson.Field
+		Version                 respjson.Field
+		Password                respjson.Field
+		JwksUri                 respjson.Field
+		raw                     string
 	} `json:"-"`
 }
 
@@ -557,10 +588,21 @@ type ZoneApplicationCredentialNewParamsBodyApplicationCredentialCreateToken stru
 	ProviderID string `json:"provider_id" api:"required"`
 	// Any of "token".
 	Type string `json:"type,omitzero" api:"required"`
+	// Version 2 only. Audience the token's `aud` must contain. When omitted, the
+	// zone's issuer URL is required.
+	AllowedAudience param.Opt[string] `json:"allowed_audience,omitzero"`
+	// Version 2 only. CEL predicate over the token's `claims` that must evaluate to
+	// true.
+	AuthenticationCondition param.Opt[string] `json:"authentication_condition,omitzero"`
 	// Subject identifier for the token. When omitted, any token from the provider is
 	// accepted without checking application-specific claims. A version 2 credential
 	// must set subject or authentication_condition.
 	Subject param.Opt[string] `json:"subject,omitzero"`
+	// Credential behavior version. Immutable. Defaults to 1 when omitted. A version 2
+	// credential's identifier is its ID, which the workload sends as client_id.
+	//
+	// Any of 1, 2.
+	Version int64 `json:"version,omitzero"`
 	paramObj
 }
 
@@ -575,6 +617,9 @@ func (r *ZoneApplicationCredentialNewParamsBodyApplicationCredentialCreateToken)
 func init() {
 	apijson.RegisterFieldValidator[ZoneApplicationCredentialNewParamsBodyApplicationCredentialCreateToken](
 		"type", "token",
+	)
+	apijson.RegisterFieldValidator[ZoneApplicationCredentialNewParamsBodyApplicationCredentialCreateToken](
+		"version", 1, 2,
 	)
 }
 
@@ -735,11 +780,21 @@ func (r *ZoneApplicationCredentialUpdateParams) UnmarshalJSON(data []byte) error
 
 // Schema for updating a token credential
 type ZoneApplicationCredentialUpdateParamsBodyTokenCredentialUpdate struct {
+	// Version 2 only. Audience the token's `aud` must contain. Set to null to unset,
+	// which requires the zone's issuer URL.
+	AllowedAudience param.Opt[string] `json:"allowed_audience,omitzero"`
+	// Version 2 only. CEL predicate over the token's `claims` that must evaluate to
+	// true. Set to null to unset.
+	AuthenticationCondition param.Opt[string] `json:"authentication_condition,omitzero"`
 	// Subject identifier for the token. Set to null to unset, which allows any token
 	// from the provider to be accepted without checking application-specific claims.
 	Subject param.Opt[string] `json:"subject,omitzero"`
 	// Any of "token".
 	Type string `json:"type,omitzero"`
+	// Immutable. When provided, must equal the credential's version.
+	//
+	// Any of 1, 2.
+	Version int64 `json:"version,omitzero"`
 	paramObj
 }
 
@@ -754,6 +809,9 @@ func (r *ZoneApplicationCredentialUpdateParamsBodyTokenCredentialUpdate) Unmarsh
 func init() {
 	apijson.RegisterFieldValidator[ZoneApplicationCredentialUpdateParamsBodyTokenCredentialUpdate](
 		"type", "token",
+	)
+	apijson.RegisterFieldValidator[ZoneApplicationCredentialUpdateParamsBodyTokenCredentialUpdate](
+		"version", 1, 2,
 	)
 }
 
