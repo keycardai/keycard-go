@@ -39,15 +39,16 @@ func TestZoneNewWithOptionalParams(t *testing.T) {
 		OrganizationID: keycard.String("organization_id"),
 		Protocols: keycard.ZoneNewParamsProtocols{
 			Oauth2: keycard.ZoneNewParamsProtocolsOauth2{
+				BackgroundSessionMaxLifetimeSeconds: keycard.Int(3600),
 				Cimd: keycard.ZoneNewParamsProtocolsOauth2Cimd{
 					AllowedClientIDs: []string{"string"},
 					Enabled:          true,
 				},
-				DcrEnabled:   keycard.Bool(true),
-				PkceRequired: keycard.Bool(true),
+				DcrEnabled:                keycard.Bool(true),
+				PkceRequired:              keycard.Bool(true),
+				SessionMaxLifetimeSeconds: keycard.Int(3600),
 			},
 		},
-		RequiresInvitation: keycard.Bool(true),
 	})
 	if err != nil {
 		var apierr *keycard.Error
@@ -117,18 +118,20 @@ func TestZoneUpdateWithOptionalParams(t *testing.T) {
 				Arn:  "x",
 				Type: "aws",
 			},
-			Name: keycard.String("x"),
+			ExternalSyncEnabled: keycard.Bool(true),
+			Name:                keycard.String("x"),
 			Protocols: keycard.ZoneUpdateParamsProtocols{
 				Oauth2: keycard.ZoneUpdateParamsProtocolsOauth2{
+					BackgroundSessionMaxLifetimeSeconds: keycard.Int(3600),
 					Cimd: keycard.ZoneUpdateParamsProtocolsOauth2Cimd{
 						AllowedClientIDs: []string{"string"},
 						Enabled:          true,
 					},
-					DcrEnabled:   keycard.Bool(true),
-					PkceRequired: keycard.Bool(true),
+					DcrEnabled:                keycard.Bool(true),
+					PkceRequired:              keycard.Bool(true),
+					SessionMaxLifetimeSeconds: keycard.Int(3600),
 				},
 			},
-			RequiresInvitation:     keycard.Bool(true),
 			UserIdentityProviderID: keycard.String("user_identity_provider_id"),
 		},
 	)
@@ -164,8 +167,11 @@ func TestZoneListWithOptionalParams(t *testing.T) {
 			OfZoneListsExpandString: keycard.String("total_count"),
 		},
 		FilterOrganizationID: keycard.String("filter[organization_id]"),
-		Limit:                keycard.Int(1),
-		Slug:                 keycard.String("slug"),
+		FilterPermissionIn: keycard.ZoneListParamsFilterPermissionInUnion{
+			OfString: keycard.String("string"),
+		},
+		Limit: keycard.Int(1),
+		Slug:  keycard.String("slug"),
 	})
 	if err != nil {
 		var apierr *keycard.Error
