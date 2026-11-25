@@ -222,7 +222,11 @@ func (r *OrganizationServiceAccountCredentialNewResponse) UnmarshalJSON(data []b
 type OrganizationServiceAccountCredentialListResponse struct {
 	Items []ServiceAccountCredential `json:"items" api:"required"`
 	// Pagination information using cursor-based pagination
+	//
+	// Deprecated: deprecated
 	PageInfo PageInfoCursor `json:"page_info" api:"required"`
+	// Cursor-based pagination metadata returned alongside a list of results
+	Pagination OrganizationServiceAccountCredentialListResponsePagination `json:"pagination" api:"required"`
 	// Permissions granted to the authenticated principal for this resource. Only
 	// populated when the 'expand[]=permissions' query parameter is provided. Keys are
 	// resource types (e.g., "organizations"), values are objects mapping permission
@@ -232,6 +236,7 @@ type OrganizationServiceAccountCredentialListResponse struct {
 	JSON struct {
 		Items       respjson.Field
 		PageInfo    respjson.Field
+		Pagination  respjson.Field
 		Permissions respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -241,6 +246,33 @@ type OrganizationServiceAccountCredentialListResponse struct {
 // Returns the unmodified JSON received from the API
 func (r OrganizationServiceAccountCredentialListResponse) RawJSON() string { return r.JSON.raw }
 func (r *OrganizationServiceAccountCredentialListResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Cursor-based pagination metadata returned alongside a list of results
+type OrganizationServiceAccountCredentialListResponsePagination struct {
+	// An opaque cursor used for paginating through a list of results
+	AfterCursor string `json:"after_cursor" api:"required"`
+	// An opaque cursor used for paginating through a list of results
+	BeforeCursor string `json:"before_cursor" api:"required"`
+	// Total number of items across all pages. Only present when the request includes
+	// ?expand[]=total_count.
+	TotalCount int64 `json:"total_count"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AfterCursor  respjson.Field
+		BeforeCursor respjson.Field
+		TotalCount   respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrganizationServiceAccountCredentialListResponsePagination) RawJSON() string {
+	return r.JSON.raw
+}
+func (r *OrganizationServiceAccountCredentialListResponsePagination) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -270,13 +302,12 @@ type OrganizationServiceAccountCredentialGetParams struct {
 	ServiceAccountID string            `path:"service_account_id" api:"required" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Fields to expand in the response. Supports "permissions" to include the
-	// permissions field with the caller's permissions for the resource. For list
-	// organization identities only, "total_count" populates pagination.total_count
-	// with the number of identities matching the same filters as the list (excluding
-	// cursor and limit). Other operations ignore expand values they do not use.
-	//
-	// Any of "permissions", "total_count".
-	Expand []string `query:"expand,omitzero" json:"-"`
+	// permissions field with the caller's permissions for the resource. For the
+	// service account and service account credential list operations, "total_count"
+	// populates pagination.total_count with the number of items matching the same
+	// filters as the list (excluding cursor and limit). Other operations ignore expand
+	// values they do not use.
+	Expand OrganizationServiceAccountCredentialGetParamsExpandUnion `query:"expand[],omitzero" json:"-"`
 	paramObj
 }
 
@@ -288,6 +319,24 @@ func (r OrganizationServiceAccountCredentialGetParams) URLQuery() (v url.Values,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type OrganizationServiceAccountCredentialGetParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfOrganizationServiceAccountCredentialGetsExpandString)
+	OfOrganizationServiceAccountCredentialGetsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfOrganizationServiceAccountCredentialGetsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type OrganizationServiceAccountCredentialGetParamsExpandString string
+
+const (
+	OrganizationServiceAccountCredentialGetParamsExpandStringPermissions OrganizationServiceAccountCredentialGetParamsExpandString = "permissions"
+	OrganizationServiceAccountCredentialGetParamsExpandStringTotalCount  OrganizationServiceAccountCredentialGetParamsExpandString = "total_count"
+)
 
 type OrganizationServiceAccountCredentialUpdateParams struct {
 	// Organization ID or label identifier
@@ -321,13 +370,16 @@ type OrganizationServiceAccountCredentialListParams struct {
 	Limit            param.Opt[int64]  `query:"limit,omitzero" json:"-"`
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	// Fields to expand in the response. Supports "permissions" to include the
-	// permissions field with the caller's permissions for the resource. For list
-	// organization identities only, "total_count" populates pagination.total_count
-	// with the number of identities matching the same filters as the list (excluding
-	// cursor and limit). Other operations ignore expand values they do not use.
-	//
-	// Any of "permissions", "total_count".
-	Expand []string `query:"expand,omitzero" json:"-"`
+	// permissions field with the caller's permissions for the resource. For the
+	// service account and service account credential list operations, "total_count"
+	// populates pagination.total_count with the number of items matching the same
+	// filters as the list (excluding cursor and limit). Other operations ignore expand
+	// values they do not use.
+	Expand OrganizationServiceAccountCredentialListParamsExpandUnion `query:"expand[],omitzero" json:"-"`
+	// Search credentials by name, client ID, or description (case-insensitive
+	// substring match). When multiple values are provided, a credential matches if it
+	// matches any of them.
+	Query []string `query:"query,omitzero" json:"-"`
 	paramObj
 }
 
@@ -339,6 +391,24 @@ func (r OrganizationServiceAccountCredentialListParams) URLQuery() (v url.Values
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type OrganizationServiceAccountCredentialListParamsExpandUnion struct {
+	// Check if union is this variant with
+	// !param.IsOmitted(union.OfOrganizationServiceAccountCredentialListsExpandString)
+	OfOrganizationServiceAccountCredentialListsExpandString         param.Opt[string] `query:",omitzero,inline"`
+	OfOrganizationServiceAccountCredentialListsExpandArrayItemArray []string          `query:",omitzero,inline"`
+	paramUnion
+}
+
+type OrganizationServiceAccountCredentialListParamsExpandString string
+
+const (
+	OrganizationServiceAccountCredentialListParamsExpandStringPermissions OrganizationServiceAccountCredentialListParamsExpandString = "permissions"
+	OrganizationServiceAccountCredentialListParamsExpandStringTotalCount  OrganizationServiceAccountCredentialListParamsExpandString = "total_count"
+)
 
 type OrganizationServiceAccountCredentialDeleteParams struct {
 	// Organization ID or label identifier
