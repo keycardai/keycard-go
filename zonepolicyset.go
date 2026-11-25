@@ -32,6 +32,10 @@ type ZonePolicySetService struct {
 	Options []option.RequestOption
 	// Immutable policy set manifest snapshots
 	Versions ZonePolicySetVersionService
+	// Mutable policy set manifest workspace
+	Draft ZonePolicySetDraftService
+	// Declarative read/apply of a policy set's full content
+	Manifest ZonePolicySetManifestService
 }
 
 // NewZonePolicySetService generates a new service that applies the given options
@@ -41,6 +45,8 @@ func NewZonePolicySetService(opts ...option.RequestOption) (r ZonePolicySetServi
 	r = ZonePolicySetService{}
 	r.Options = opts
 	r.Versions = NewZonePolicySetVersionService(opts...)
+	r.Draft = NewZonePolicySetDraftService(opts...)
+	r.Manifest = NewZonePolicySetManifestService(opts...)
 	return
 }
 
@@ -175,6 +181,71 @@ func (r *ZonePolicySetService) Archive(ctx context.Context, policySetID string, 
 	}
 	path := fmt.Sprintf("zones/%s/policy-sets/%s", url.PathEscape(params.ZoneID), url.PathEscape(policySetID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
+	return res, err
+}
+
+// Creates a new customer-owned policy set whose first version reproduces the
+// manifest of a source version: the source's latest non-archived version by
+// default, or the one named by `source_version_id`. The set, any copied policies
+// and their versions, the first policy set version, and its attestation are
+// written in one transaction. Any failure leaves zero writes. The source is never
+// modified.
+//
+// Platform-owned sets (for example the zone default `default-zone-policies`)
+// cannot be updated or versioned by customers. Clone is how a customer forks one
+// into a set they can edit with `PUT .../manifest`.
+//
+// `copy_policies` decides what is shared and what is duplicated (default
+// `platform`):
+//
+//   - `none`: every entry pins the same policy version as the source. No new
+//     policies are created.
+//   - `platform`: platform-owned pins are copied into new customer-owned policies;
+//     customer-owned pins are shared. The result is fully editable with minimal
+//     duplication.
+//   - `all`: every pin is copied.
+//
+// Copied policies get `owner_type: customer`, the source policy's description, and
+// a first version whose `cedar_json`, `schema_version` and `sha` are copied
+// verbatim from the pinned source version. There is no Cedar revalidation and no
+// rewrite of the embedded static-policy keys; the evaluator namespaces them by
+// policy version ID.
+//
+// A copied policy is named after its source, with the platform catalog prefix
+// `default-` stripped for platform-owned sources (`default-user-grants` becomes
+// `user-grants`). Customer-owned names are kept as-is. A derived name that
+// collides with a non-archived policy in the zone gets the first free numeric
+// suffix (`user-grants-2`, `user-grants-3`, ...). Names are resolved inside the
+// transaction; a concurrent race still surfaces as `409 policy_name_conflict`.
+//
+// Manifest order is the source's, with shared and copied pins interleaved as they
+// were. `schema_version` is the source version's. `target_type` defaults to the
+// source set's and may be overridden.
+//
+// The `ETag` header is the digest of the first version's manifest, so clone, then
+// conditional `PUT .../manifest`, needs no intermediate GET.
+//
+// Domain error codes: `policy_set_not_found`, `policy_set_version_not_found`,
+// `policy_set_name_conflict`, `policy_name_conflict`, `set_archived`,
+// `version_archived`, `schema_version_unsupported`.
+func (r *ZonePolicySetService) Clone(ctx context.Context, policySetID string, params ZonePolicySetCloneParams, opts ...option.RequestOption) (res *ZonePolicySetCloneResponse, err error) {
+	if !param.IsOmitted(params.XAPIVersion) {
+		opts = append(opts, option.WithHeader("X-API-Version", fmt.Sprintf("%v", params.XAPIVersion.Value)))
+	}
+	if !param.IsOmitted(params.XClientRequestID) {
+		opts = append(opts, option.WithHeader("X-Client-Request-ID", fmt.Sprintf("%v", params.XClientRequestID.Value)))
+	}
+	opts = slices.Concat(r.Options, opts)
+	if params.ZoneID == "" {
+		err = errors.New("missing required zone_id parameter")
+		return nil, err
+	}
+	if policySetID == "" {
+		err = errors.New("missing required policy_set_id parameter")
+		return nil, err
+	}
+	path := fmt.Sprintf("zones/%s/policy-sets/%s/clones", url.PathEscape(params.ZoneID), url.PathEscape(policySetID))
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
 	return res, err
 }
 
@@ -405,6 +476,128 @@ func (r *PolicySetUpdatedByUser) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type PolicySetDraft struct {
+	CreatedAt     time.Time         `json:"created_at" api:"required" format:"date-time"`
+	Manifest      PolicySetManifest `json:"manifest" api:"required"`
+	PolicySetID   string            `json:"policy_set_id" api:"required"`
+	SchemaVersion string            `json:"schema_version" api:"required"`
+	UpdatedAt     time.Time         `json:"updated_at" api:"required" format:"date-time"`
+	UpdatedBy     string            `json:"updated_by" api:"required"`
+	// ID of the policy set version this draft was hydrated from. Null when the draft
+	// was created without an existing version.
+	BaseVersionID string `json:"base_version_id" api:"nullable"`
+	Description   string `json:"description" api:"nullable"`
+	Name          string `json:"name" api:"nullable"`
+	// The organization user behind a `created_by`, `updated_by` or `archived_by`
+	// value. Returned only when `expand[]=user` is requested.
+	UpdatedByUser PolicySetDraftUpdatedByUser `json:"updated_by_user"`
+	// Warnings about manifest entries that would prevent creating a version from this
+	// draft. Present only when there are warnings; omitted when empty.
+	Warnings []PolicySetDraftWarning `json:"warnings"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		CreatedAt     respjson.Field
+		Manifest      respjson.Field
+		PolicySetID   respjson.Field
+		SchemaVersion respjson.Field
+		UpdatedAt     respjson.Field
+		UpdatedBy     respjson.Field
+		BaseVersionID respjson.Field
+		Description   respjson.Field
+		Name          respjson.Field
+		UpdatedByUser respjson.Field
+		Warnings      respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PolicySetDraft) RawJSON() string { return r.JSON.raw }
+func (r *PolicySetDraft) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The organization user behind a `created_by`, `updated_by` or `archived_by`
+// value. Returned only when `expand[]=user` is requested.
+type PolicySetDraftUpdatedByUser struct {
+	// Public ID of the user in the organization's platform zone. This is not the same
+	// value as the `*_by` field it expands; use it to link to
+	// `/zones/{zone_id}/users/{id}`.
+	ID string `json:"id" api:"required"`
+	// The user's email address, or null when not known.
+	Email string `json:"email" api:"required"`
+	// Public ID of the organization's platform zone the user belongs to.
+	ZoneID string `json:"zone_id" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID          respjson.Field
+		Email       respjson.Field
+		ZoneID      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PolicySetDraftUpdatedByUser) RawJSON() string { return r.JSON.raw }
+func (r *PolicySetDraftUpdatedByUser) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type PolicySetDraftWarning struct {
+	// Human-readable description of the warning, e.g. 'validated against schema
+	// "2026-02-24", draft targets "2026-03-16"' or 'policy version is archived'.
+	Message         string `json:"message" api:"required"`
+	PolicyID        string `json:"policy_id" api:"required"`
+	PolicyVersionID string `json:"policy_version_id" api:"required"`
+	// Any of "policy_version_archived", "schema_version_mismatch".
+	Type string `json:"type" api:"required"`
+	// Additional structured context for a manifest warning. The shape depends on the
+	// warning type.
+	Detail PolicySetDraftWarningDetail `json:"detail"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Message         respjson.Field
+		PolicyID        respjson.Field
+		PolicyVersionID respjson.Field
+		Type            respjson.Field
+		Detail          respjson.Field
+		ExtraFields     map[string]respjson.Field
+		raw             string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PolicySetDraftWarning) RawJSON() string { return r.JSON.raw }
+func (r *PolicySetDraftWarning) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Additional structured context for a manifest warning. The shape depends on the
+// warning type.
+type PolicySetDraftWarningDetail struct {
+	// Schema version the draft targets. Present only for schema_version_mismatch
+	// warnings.
+	DraftSchemaVersion string `json:"draft_schema_version"`
+	// Schema version the policy version was validated against. Present only for
+	// schema_version_mismatch warnings.
+	PolicySchemaVersion string `json:"policy_schema_version"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		DraftSchemaVersion  respjson.Field
+		PolicySchemaVersion respjson.Field
+		ExtraFields         map[string]respjson.Field
+		raw                 string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PolicySetDraftWarningDetail) RawJSON() string { return r.JSON.raw }
+func (r *PolicySetDraftWarningDetail) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type PolicySetManifest struct {
 	Entries []PolicySetManifestEntry `json:"entries" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -499,7 +692,7 @@ type PolicySetWithBinding struct {
 	// Public ID of the currently active (bound) version
 	ActiveVersionID string `json:"active_version_id" api:"nullable"`
 	// Active zone binding, present when created with `manifest.activate` set to true.
-	Binding PolicySetWithBindingBinding `json:"binding"`
+	Binding PolicySetBinding `json:"binding"`
 	// Per-policy outcomes, present only when created with a manifest.
 	Changes []PolicySetWithBindingChange `json:"changes"`
 	// Any of "active", "shadow".
@@ -544,57 +737,6 @@ type PolicySetWithBinding struct {
 // Returns the unmodified JSON received from the API
 func (r PolicySetWithBinding) RawJSON() string { return r.JSON.raw }
 func (r *PolicySetWithBinding) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Active zone binding, present when created with `manifest.activate` set to true.
-type PolicySetWithBindingBinding struct {
-	// Binding identifier (stable per slot)
-	ID        string    `json:"id" api:"required"`
-	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
-	// Binding mode
-	//
-	// Any of "active", "shadow".
-	Mode string `json:"mode" api:"required"`
-	// Public ID of the bound policy set
-	PolicySetID string `json:"policy_set_id" api:"required"`
-	// Public ID of the bound policy set version
-	PolicySetVersionID string `json:"policy_set_version_id" api:"required"`
-	// **Deprecated.** Use `target_id` instead. Carries the same value.
-	//
-	// Deprecated: deprecated
-	ScopeTargetID string `json:"scope_target_id" api:"required"`
-	// **Deprecated.** Use `target_type` instead. Carries the same value.
-	//
-	// Any of "zone".
-	//
-	// Deprecated: deprecated
-	ScopeType string `json:"scope_type" api:"required"`
-	// Target entity ID. Equals zone_id for zone-targeted bindings.
-	TargetID string `json:"target_id" api:"required"`
-	// What this binding targets
-	//
-	// Any of "zone", "user".
-	TargetType string `json:"target_type" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID                 respjson.Field
-		CreatedAt          respjson.Field
-		Mode               respjson.Field
-		PolicySetID        respjson.Field
-		PolicySetVersionID respjson.Field
-		ScopeTargetID      respjson.Field
-		ScopeType          respjson.Field
-		TargetID           respjson.Field
-		TargetType         respjson.Field
-		ExtraFields        map[string]respjson.Field
-		raw                string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r PolicySetWithBindingBinding) RawJSON() string { return r.JSON.raw }
-func (r *PolicySetWithBindingBinding) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -687,6 +829,59 @@ type ZonePolicySetListResponsePagination struct {
 // Returns the unmodified JSON received from the API
 func (r ZonePolicySetListResponsePagination) RawJSON() string { return r.JSON.raw }
 func (r *ZonePolicySetListResponsePagination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ZonePolicySetCloneResponse struct {
+	// One row per manifest entry, in manifest order.
+	Policies []ZonePolicySetCloneResponsePolicy `json:"policies" api:"required"`
+	// The new set. `latest_version_id` is the first version; it is unbound.
+	PolicySet PolicySetWithBinding `json:"policy_set" api:"required"`
+	// The new set's first version, with manifest and attestation.
+	PolicySetVersion PolicySetVersion `json:"policy_set_version" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Policies         respjson.Field
+		PolicySet        respjson.Field
+		PolicySetVersion respjson.Field
+		ExtraFields      map[string]respjson.Field
+		raw              string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZonePolicySetCloneResponse) RawJSON() string { return r.JSON.raw }
+func (r *ZonePolicySetCloneResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ZonePolicySetCloneResponsePolicy struct {
+	// Any of "shared", "copied".
+	Action string `json:"action" api:"required"`
+	// The pinned policy's name (the derived name when `copied`).
+	Name string `json:"name" api:"required"`
+	// Public ID of the policy pinned by the clone. Equals `source_policy_id` when
+	// `shared`.
+	PolicyID string `json:"policy_id" api:"required"`
+	// Public ID of the pinned policy version. Equals the source's when `shared`.
+	PolicyVersionID string `json:"policy_version_id" api:"required"`
+	// Public ID of the policy pinned by the source version.
+	SourcePolicyID string `json:"source_policy_id" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Action          respjson.Field
+		Name            respjson.Field
+		PolicyID        respjson.Field
+		PolicyVersionID respjson.Field
+		SourcePolicyID  respjson.Field
+		ExtraFields     map[string]respjson.Field
+		raw             string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ZonePolicySetCloneResponsePolicy) RawJSON() string { return r.JSON.raw }
+func (r *ZonePolicySetCloneResponsePolicy) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -1063,3 +1258,52 @@ type ZonePolicySetArchiveParams struct {
 	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
+
+type ZonePolicySetCloneParams struct {
+	ZoneID string `path:"zone_id" api:"required" json:"-"`
+	// Name of the new policy set. 409 `policy_set_name_conflict` on collision.
+	Name string `json:"name" api:"required"`
+	// Policy set version public ID on the source set. Defaults to the source's latest
+	// non-archived version.
+	SourceVersionID  param.Opt[string] `json:"source_version_id,omitzero"`
+	XAPIVersion      param.Opt[string] `header:"X-API-Version,omitzero" json:"-"`
+	XClientRequestID param.Opt[string] `header:"X-Client-Request-ID,omitzero" format:"uuid" json:"-"`
+	// Which pinned policies are duplicated as new customer-owned policies. `none`
+	// shares every pin; `platform` copies platform-owned pins and shares
+	// customer-owned ones; `all` copies every pin.
+	//
+	// Any of "none", "platform", "all".
+	CopyPolicies ZonePolicySetCloneParamsCopyPolicies `json:"copy_policies,omitzero"`
+	// Defaults to the source set's target type.
+	//
+	// Any of "zone", "user".
+	TargetType ZonePolicySetCloneParamsTargetType `json:"target_type,omitzero"`
+	paramObj
+}
+
+func (r ZonePolicySetCloneParams) MarshalJSON() (data []byte, err error) {
+	type shadow ZonePolicySetCloneParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ZonePolicySetCloneParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Which pinned policies are duplicated as new customer-owned policies. `none`
+// shares every pin; `platform` copies platform-owned pins and shares
+// customer-owned ones; `all` copies every pin.
+type ZonePolicySetCloneParamsCopyPolicies string
+
+const (
+	ZonePolicySetCloneParamsCopyPoliciesNone     ZonePolicySetCloneParamsCopyPolicies = "none"
+	ZonePolicySetCloneParamsCopyPoliciesPlatform ZonePolicySetCloneParamsCopyPolicies = "platform"
+	ZonePolicySetCloneParamsCopyPoliciesAll      ZonePolicySetCloneParamsCopyPolicies = "all"
+)
+
+// Defaults to the source set's target type.
+type ZonePolicySetCloneParamsTargetType string
+
+const (
+	ZonePolicySetCloneParamsTargetTypeZone ZonePolicySetCloneParamsTargetType = "zone"
+	ZonePolicySetCloneParamsTargetTypeUser ZonePolicySetCloneParamsTargetType = "user"
+)
