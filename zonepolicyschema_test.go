@@ -66,9 +66,11 @@ func TestZonePolicySchemaListWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"zone_id",
 		keycard.ZonePolicySchemaListParams{
-			After:            keycard.String("x"),
-			Before:           keycard.String("x"),
-			Expand:           []string{"total_count"},
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Expand: keycard.ZonePolicySchemaListParamsExpandUnion{
+				OfZonePolicySchemaListsExpandPdpExpandField: keycard.String("total_count"),
+			},
 			FilterDefault:    keycard.Bool(true),
 			Format:           keycard.ZonePolicySchemaListParamsFormatCedar,
 			IsDefault:        keycard.Bool(true),
