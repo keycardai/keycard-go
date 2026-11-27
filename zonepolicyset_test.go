@@ -32,7 +32,19 @@ func TestZonePolicySetNewWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"zone_id",
 		keycard.ZonePolicySetNewParams{
-			Name:             "name",
+			Name: "name",
+			Manifest: keycard.ZonePolicySetNewParamsManifest{
+				Entries: []keycard.ZonePolicySetNewParamsManifestEntryUnion{{
+					OfZonePolicySetNewsManifestEntryPdpExistingPolicyEntry: &keycard.ZonePolicySetNewParamsManifestEntryPdpExistingPolicyEntry{
+						PolicyID:        "policy_id",
+						CedarJson:       map[string]any{},
+						CedarRaw:        keycard.String("cedar_raw"),
+						PolicyVersionID: keycard.String("policy_version_id"),
+					},
+				}},
+				Activate:      keycard.Bool(true),
+				SchemaVersion: keycard.String("schema_version"),
+			},
 			ScopeType:        keycard.ZonePolicySetNewParamsScopeTypeZone,
 			TargetType:       keycard.ZonePolicySetNewParamsTargetTypeZone,
 			XAPIVersion:      keycard.String("X-API-Version"),
@@ -67,7 +79,10 @@ func TestZonePolicySetGetWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"policy_set_id",
 		keycard.ZonePolicySetGetParams{
-			ZoneID:           "zone_id",
+			ZoneID: "zone_id",
+			Expand: keycard.ZonePolicySetGetParamsExpandUnion{
+				OfZonePolicySetGetsExpandPdpExpandSingleField: keycard.String("user"),
+			},
 			XAPIVersion:      keycard.String("X-API-Version"),
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
@@ -135,17 +150,21 @@ func TestZonePolicySetListWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"zone_id",
 		keycard.ZonePolicySetListParams{
-			Active:           keycard.Bool(true),
-			After:            keycard.String("x"),
-			Before:           keycard.String("x"),
-			Expand:           []string{"total_count"},
+			Active: keycard.Bool(true),
+			After:  keycard.String("x"),
+			Before: keycard.String("x"),
+			Expand: keycard.ZonePolicySetListParamsExpandUnion{
+				OfZonePolicySetListsExpandPdpExpandField: keycard.String("total_count"),
+			},
 			FilterActive:     keycard.Bool(true),
 			FilterOwnerType:  []string{"string"},
 			FilterScopeType:  []string{"string"},
 			FilterTargetType: []string{"string"},
 			Limit:            keycard.Int(1),
 			Order:            keycard.ZonePolicySetListParamsOrderAsc,
-			Query:            []string{"x"},
+			Query: keycard.ZonePolicySetListParamsQueryUnion{
+				OfString: keycard.String("string"),
+			},
 			QueryName:        []string{"x"},
 			Sort:             keycard.ZonePolicySetListParamsSortCreatedAt,
 			XAPIVersion:      keycard.String("X-API-Version"),
@@ -182,6 +201,43 @@ func TestZonePolicySetArchiveWithOptionalParams(t *testing.T) {
 		keycard.ZonePolicySetArchiveParams{
 			ZoneID:           "zone_id",
 			IfMatch:          keycard.String("If-Match"),
+			XAPIVersion:      keycard.String("X-API-Version"),
+			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		},
+	)
+	if err != nil {
+		var apierr *keycard.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestZonePolicySetCloneWithOptionalParams(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := keycard.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+		option.WithClientID("My Client ID"),
+		option.WithClientSecret("My Client Secret"),
+	)
+	_, err := client.Zones.PolicySets.Clone(
+		context.TODO(),
+		"policy_set_id",
+		keycard.ZonePolicySetCloneParams{
+			ZoneID:           "zone_id",
+			Name:             "name",
+			CopyPolicies:     keycard.ZonePolicySetCloneParamsCopyPoliciesNone,
+			SourceVersionID:  keycard.String("source_version_id"),
+			TargetType:       keycard.ZonePolicySetCloneParamsTargetTypeZone,
 			XAPIVersion:      keycard.String("X-API-Version"),
 			XClientRequestID: keycard.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
