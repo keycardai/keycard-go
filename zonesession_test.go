@@ -101,11 +101,12 @@ func TestZoneSessionListWithOptionalParams(t *testing.T) {
 			Expand: keycard.ZoneSessionListParamsExpandUnion{
 				OfZoneSessionListsExpandString: keycard.String("total_count"),
 			},
-			IncludeNested: keycard.ZoneSessionListParamsIncludeNestedTrue,
-			Limit:         keycard.Int(1),
-			SessionType:   keycard.ZoneSessionListParamsSessionTypeUser,
-			Status:        keycard.ZoneSessionListParamsStatusActive,
-			UserID:        keycard.String("user_id"),
+			FilterBackground: keycard.Bool(true),
+			IncludeNested:    keycard.ZoneSessionListParamsIncludeNestedTrue,
+			Limit:            keycard.Int(1),
+			SessionType:      keycard.ZoneSessionListParamsSessionTypeUser,
+			Status:           keycard.ZoneSessionListParamsStatusActive,
+			UserID:           keycard.String("user_id"),
 		},
 	)
 	if err != nil {
